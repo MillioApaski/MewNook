@@ -6,7 +6,6 @@ export class AmbientEngine {
   private sources: AudioBufferSourceNode[] = []
   private gains: Partial<Record<AmbientKind, GainNode>> = {}
   private volume: Record<AmbientKind, number> = { rain: 0.23, wind: 0.08, brown: 0 }
-  private master: GainNode | null = null
 
   async start() {
     if (this.context) { await this.context.resume(); return }
@@ -27,7 +26,6 @@ export class AmbientEngine {
     const master = context.createGain()
     master.gain.value = 0.35
     master.connect(context.destination)
-    this.master = master
     for (const kind of ['rain', 'wind', 'brown'] as AmbientKind[]) {
       const source = context.createBufferSource()
       source.buffer = kind === 'brown' ? brown : white
@@ -54,7 +52,6 @@ export class AmbientEngine {
     this.sources = []
     await this.context.close()
     this.context = null
-    this.master = null
     this.gains = {}
   }
 }

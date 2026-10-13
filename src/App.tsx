@@ -246,7 +246,7 @@ export default function App() {
       const answer = /累|困|休息/.test(content) ? '那就稍微休息一下吧。窗外的风也在等你呢。' :
         /学习|工作|专注|代码|任务/.test(content) ? '我们一起把这一小段时间认真过好喵。我会安静地陪着你。' :
         '喵呜～我在这里！想聊天的话随时可以找我。'
-      setChat(previous => [...previous, {id:uid(),role:'assistant',content:answer}].slice(-100))
+      setChat(previous => [...previous, {id:uid(),role:'assistant' as const,content:answer}].slice(-100))
       return
     }
     setChatLoading(true)
@@ -267,7 +267,7 @@ export default function App() {
       const data = await reply.json() as { choices?: {message?: {content?: string}}[] }
       const answer = data.choices?.[0]?.message?.content?.trim()
       if (!answer) throw new Error('API 未返回可显示的回复')
-      setChat(previous => [...previous,{id:uid(),role:'assistant',content:answer}].slice(-100))
+      setChat(previous => [...previous,{id:uid(),role:'assistant' as const,content:answer}].slice(-100))
     } catch (error) {
       setChatError(error instanceof TypeError ? '网络请求失败。请检查网络、API 地址和服务商是否允许浏览器跨域（CORS）。' : error instanceof Error ? error.message : '请求失败')
     } finally { setChatLoading(false) }
