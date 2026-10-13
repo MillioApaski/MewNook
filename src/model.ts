@@ -36,7 +36,11 @@ export function useSavedState<T>(key: string, initial: T) {
   const [value, setValue] = useState<T>(() => {
     try {
       const saved = localStorage.getItem('mewnook:' + key)
-      return saved ? { ...((Array.isArray(initial) || initial === null) ? {} : initial), ...JSON.parse(saved) } as T : initial
+      if (!saved) return initial
+      const parsed: unknown = JSON.parse(saved)
+      if (Array.isArray(initial)) return (Array.isArray(parsed) ? parsed : initial) as T
+      if (initial && typeof initial === 'object' && parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return { ...initial, ...parsed } as T
+      return (parsed as T) ?? initial
     } catch { return initial }
   })
   useEffect(() => {

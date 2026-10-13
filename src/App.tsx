@@ -3,7 +3,7 @@ import {
   BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, Check, ChevronLeft, ChevronRight,
   Clock3, CloudRain, Coffee, Download, Headphones, Heart, Home, KeyRound, ListTodo,
   MapPin, MoonStar, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
-  Sparkles, Sun, Trash2, Upload, Volume2, VolumeX, Wind, X
+  Sparkles, Sun, Trash2, Upload, Volume2, VolumeX, Wind
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { Companion, type Mood } from './Companion'
@@ -307,7 +307,7 @@ export default function App() {
 
         {view === 'home' && <>
           <section className={'scene-card scene-' + roomScene}>
-            <div className="scene-stars"/><div className="scene-light"/><div className="scene-window"><div className="scene-skyline"/><div className="scene-rain"/></div>
+            <div className="scene-stars"/><div className="scene-light"/><div className="scene-window"><div className="scene-skyline"/><div className="rain-overlay"/></div>
             <div className="scene-wall-art">✧</div><div className="scene-shelf"><span>▥</span><span>▤</span><span>✦</span></div>
             <div className="scene-lamp"/><div className="scene-table"/>
             <div className="scene-copy"><span className="scene-kicker"><span className="scene-kicker-dot"/> LITTLE MOMENTS, BIG DREAMS</span><h2>让今天，也成为<br/><em>温柔的一天。</em></h2><p>你的专属陪伴空间，<br/>和她一起学习、工作、发呆。</p><div className="scene-chips"><span><Sparkles size={13}/> {sceneName[settings.scene]}</span><span>♫ 慢慢来，不着急</span></div></div>
