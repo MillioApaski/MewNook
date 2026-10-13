@@ -2,6 +2,8 @@
 
 ## Stage 1: local-first usable prototype
 
+- [x] v0.2 immersive full-screen virtual room UI, floating docks, slide-out panels, visual-novel dialogue and expandable chat.
+
 - [x] Responsive cozy dashboard and dedicated tasks, statistics, settings views
 - [x] Pomodoro with pause/resume, reload recovery and focus session history
 - [x] Daily tasks, scheduled dates, completion, task selection

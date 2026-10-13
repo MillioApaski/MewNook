@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, Check, ChevronLeft, ChevronRight,
-  Clock3, CloudRain, Coffee, Download, Headphones, Heart, Home, KeyRound, ListTodo,
+  Clock3, CloudRain, Coffee, Download, Headphones, Heart, KeyRound, ListTodo,
   MapPin, MoonStar, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
-  Sparkles, Sun, Trash2, Upload, Volume2, VolumeX, Wind
+  Sparkles, Sun, Trash2, Upload, Wind
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { Companion, type Mood } from './Companion'
@@ -64,9 +64,6 @@ function determineScene(choice: Scene, weather: Weather | null): Exclude<Scene, 
   return 'day'
 }
 
-const NavButton = ({active,icon,label,onClick}: {active: boolean;icon: React.ReactNode; label: string;onClick:()=>void}) =>
-  <button className={'nav-item' + (active ? ' active' : '')} onClick={onClick}>{icon}<span>{label}</span>{active && <span className="nav-dot" />}</button>
-
 function WeeklyChart({ sessions }: { sessions: FocusSession[] }) {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => {
     const d = new Date()
@@ -106,9 +103,13 @@ export default function App() {
   const [ambientLevels, setAmbientLevels] = useState<Record<AmbientKind, number>>({ rain: 25, wind: 8, brown: 0 })
   const [tracks, setTracks] = useState<{name: string; url: string}[]>([])
   const [trackIndex, setTrackIndex] = useState(0)
+  const [musicPlaying, setMusicPlaying] = useState(false)
   const [importError, setImportError] = useState('')
-  const [mobileNav, setMobileNav] = useState(false)
   const [moodOverride, setMoodOverride] = useState<Mood | null>(null)
+  const [utilityPanel, setUtilityPanel] = useState<'timer' | 'music' | 'sound' | null>(null)
+  const [chatExpanded, setChatExpanded] = useState(false)
+  const [dialogueOffset, setDialogueOffset] = useState(0)
+  const [showHud, setShowHud] = useState(true)
   const audio = useRef<AmbientEngine | null>(null)
   const musicRef = useRef<HTMLAudioElement | null>(null)
   const chatBottomRef = useRef<HTMLDivElement | null>(null)
@@ -124,6 +125,11 @@ export default function App() {
   }, [chat.length, chatLoading])
   useEffect(() => () => { void audio.current?.stop() }, [])
   useEffect(() => () => { tracks.forEach(t => URL.revokeObjectURL(t.url)) }, [tracks])
+  useEffect(() => {
+    if (musicPlaying && tracks.length && musicRef.current?.paused) {
+      void musicRef.current.play().catch(() => setMusicPlaying(false))
+    }
+  }, [trackIndex, musicPlaying, tracks.length])
 
   const remaining = timer.running && timer.endsAt ? Math.max(0, Math.ceil((timer.endsAt - now) / 1000)) : timer.remaining
   const currentDuration = phaseSeconds(timer.phase, settings)
@@ -136,6 +142,17 @@ export default function App() {
   const roomScene = determineScene(settings.scene, weather)
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
+  const panel = view !== 'home' ? view : utilityPanel
+  const openPanel = (next: 'timer'|'music'|'sound'|'tasks'|'stats'|'settings') => {
+    setChatExpanded(false)
+    if (panel === next) { setView('home'); setUtilityPanel(null); return }
+    if (next === 'tasks' || next === 'stats' || next === 'settings') {
+      setView(next); setUtilityPanel(null)
+    } else { setView('home'); setUtilityPanel(next) }
+  }
+  const closePanel = () => { setView('home'); setUtilityPanel(null) }
+  const assistantLines = chat.filter(message => message.role === 'assistant')
+  const latestDialogue = assistantLines[Math.max(0, assistantLines.length - 1 - dialogueOffset)]?.content || '今天也一起度过温柔的一天吧。'
   const greeting = now && new Date(now).getHours() >= 18 ? '晚上好' : new Date(now).getHours() < 11 ? '早上好' : '下午好'
 
   const saveSettings = (changes: Partial<Settings>) => setSettings(s => ({...s,...changes}))
@@ -210,6 +227,13 @@ export default function App() {
     const selected = Array.from(files).filter(f => f.type.startsWith('audio/') || /\.(mp3|m4a|wav|ogg|flac)$/i.test(f.name))
     setTracks(selected.map(file => ({ name: file.name, url: URL.createObjectURL(file) })))
     setTrackIndex(0)
+    setMusicPlaying(false)
+  }
+  async function toggleMusic() {
+    const element = musicRef.current
+    if (!element || !tracks.length) return
+    if (musicPlaying) { element.pause(); setMusicPlaying(false); return }
+    try { await element.play(); setMusicPlaying(true) } catch { setMusicPlaying(false) }
   }
   const exportData = () => {
     const blob = new Blob([JSON.stringify({ version: 1, settings, tasks, sessions, chat }, null, 2)], {type:'application/json'})
@@ -240,7 +264,7 @@ export default function App() {
     const userMessage: ChatMessage = {id:uid(),role:'user',content}
     const history = [...chat, userMessage].slice(-20)
     setChat(previous => [...previous, userMessage].slice(-100))
-    setChatDraft(''); setChatError('')
+    setChatDraft(''); setChatError(''); setDialogueOffset(0)
     setMoodOverride('chat')
     if (!settings.aiUrl.trim() || !settings.aiModel.trim()) {
       const answer = /累|困|休息/.test(content) ? '那就稍微休息一下吧。窗外的风也在等你呢。' :
@@ -273,76 +297,71 @@ export default function App() {
     } finally { setChatLoading(false) }
   }
 
-  return <div className={'app-shell accent-' + settings.accent}>
-    <div className="mobile-bar"><button aria-label="切换导航" onClick={() => setMobileNav(!mobileNav)}><Home size={19}/></button><strong>MewNook</strong><span>🐾</span></div>
-    {mobileNav && <div className="mobile-backdrop" onClick={() => setMobileNav(false)} />}
-    <aside className={'sidebar' + (mobileNav ? ' open' : '')}>
-      <div className="brand"><div className="brand-icon">🐾</div><div><strong>MewNook</strong><span>YOUR COZY CORNER</span></div></div>
-      <div className="side-section-title">我的空间</div>
-      <nav aria-label="页面导航">
-        <NavButton active={view === 'home'} icon={<Home size={19}/>} label="陪伴工作台" onClick={() => {setView('home');setMobileNav(false)}}/>
-        <NavButton active={view === 'tasks'} icon={<ListTodo size={19}/>} label="日程与任务" onClick={() => {setView('tasks');setMobileNav(false)}}/>
-        <NavButton active={view === 'stats'} icon={<ChartNoAxesColumnIncreasing size={19}/>} label="专注统计" onClick={() => {setView('stats');setMobileNav(false)}}/>
-      </nav>
-      <div className="side-section-title side-later">偏好</div>
-      <nav><NavButton active={view === 'settings'} icon={<Settings2 size={19}/>} label="设置" onClick={() => {setView('settings');setMobileNav(false)}}/></nav>
-      <div className="sidebar-spacer"/>
-      <div className="side-today">
-        <div className="side-today-icon"><Sparkles size={19}/></div>
-        <div className="side-today-title">今天的小成就</div>
-        <strong>{todayMinutes}<small> 分钟</small></strong>
-        <div className="side-progress"><span style={{width:Math.min(100,todayMinutes / 120 * 100) + '%'}}/></div>
-        <p>再专注一点点，慢慢来就好 ♡</p>
-      </div>
-      <div className="side-footer"><span className="online-dot"/> 本地优先 · 自由自在</div>
-    </aside>
+  return <div className={'immersive-shell accent-' + settings.accent + ' backdrop-' + roomScene}>
+    <div className="room-stage" aria-label="沉浸式猫娘工作空间">
+      <div className="room-wall-texture" aria-hidden="true"/>
+      <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
+      <div className="room-curtain curtain-left" aria-hidden="true"/><div className="room-curtain curtain-right" aria-hidden="true"/>
+      <div className="room-light" aria-hidden="true"/><div className="room-stringlights" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
+      <div className="room-wall-pictures" aria-hidden="true"><i/><i/></div>
+      <div className="room-floating-shelf" aria-hidden="true"><span className="room-books">▰ ▥ ▥ ▰</span><span className="room-vase">✿</span></div>
+      <div className="room-plant" aria-hidden="true"><span>❦</span></div>
+      <div className="room-rug" aria-hidden="true"/>
+      <div className="room-desk" aria-hidden="true"><span className="desk-monitor"/><span className="desk-cup"/><span className="desk-book"/></div>
+      <div className="room-dust" aria-hidden="true"><span/><span/><span/><span/><span/><span/></div>
+      <button type="button" className="character-actor" onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')} aria-label="摸摸猫娘的头">
+        <Companion mood={mood} phase={timer.phase}/>
+      </button>
+    </div>
 
-    <div className="workspace">
-      <main className="main-pane">
-        <header className="page-head">
-          <div><div className="eyebrow">{new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date(now))}</div><h1>{view === 'home' ? greeting + '，' + showName + '。' : view === 'tasks' ? '日程与任务' : view === 'stats' ? '专注统计' : '偏好设置'}</h1>
-          <p className="page-subtitle">{view === 'home' ? '欢迎回到属于你的小小角落。' : view === 'tasks' ? '给今天安排一些温柔又充实的事情。' : view === 'stats' ? '每一份认真的时间，都值得珍藏。' : '把这个小窝调整成你喜欢的样子。'}</p></div>
-          <div className="weather-pill" title={weatherError ? '天气暂时不可用，场景仍可手动控制' : '天气由 Open-Meteo 提供'}><MapPin size={15}/><span>{weather ? weather.name : settings.city}</span><span className="weather-separator">·</span>{weather ? <><CloudRain size={15}/>{weather.temperature}° · {weatherDescription(weather.code)}</> : weatherError ? '天气离线' : '加载天气…'}</div>
-        </header>
+    <header className="scene-topbar">
+      <div className="scene-brand"><span className="brand-paw">✿</span><span><b>MewNook</b><small>YOUR COZY CORNER</small></span></div>
+      {showHud && <div className="scene-status"><span><Clock3 size={14}/> {new Intl.DateTimeFormat('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(now))}</span><span className="status-separator">✧</span><span><MapPin size={13}/> {weather?.name || settings.city}</span><span className="status-separator">✧</span><span>{weather ? weather.temperature + '° · ' + weatherDescription(weather.code) : weatherError ? '天气暂不可用' : '天气加载中'}</span></div>}
+      <button className="topbar-toggle" onClick={() => setShowHud(v => !v)} aria-label={showHud ? '隐藏顶部信息' : '显示顶部信息'} title="隐藏或显示顶部信息">{showHud ? <SlidersHorizontal size={17}/> : <Sun size={17}/>}</button>
+    </header>
 
-        {view === 'home' && <>
-          <section className={'scene-card scene-' + roomScene}>
-            <div className="scene-stars"/><div className="scene-light"/><div className="scene-window"><div className="scene-skyline"/><div className="rain-overlay"/></div>
-            <div className="scene-wall-art">✧</div><div className="scene-shelf"><span>▥</span><span>▤</span><span>✦</span></div>
-            <div className="scene-lamp"/><div className="scene-table"/>
-            <div className="scene-copy"><span className="scene-kicker"><span className="scene-kicker-dot"/> LITTLE MOMENTS, BIG DREAMS</span><h2>让今天，也成为<br/><em>温柔的一天。</em></h2><p>你的专属陪伴空间，<br/>和她一起学习、工作、发呆。</p><div className="scene-chips"><span><Sparkles size={13}/> {sceneName[settings.scene]}</span><span>♫ 慢慢来，不着急</span></div></div>
-            <Companion mood={mood} phase={timer.phase}/>
-            <div className="companion-bubble">{timer.running ? '嘘…我们一起认真工作喵 ♡' : timer.phase !== 'focus' ? '辛苦啦，休息一会儿吧！' : '今天想先做什么呢？'}</div>
-            <div className="scene-controls">
-              <button onClick={() => saveSettings({ scene: settings.scene === 'auto' ? 'rain' : settings.scene === 'rain' ? 'night' : 'auto' })} title="切换场景"><MoonStar size={17}/> 更换场景</button>
-              <button onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')} title="和猫娘互动"><Heart size={17}/> 摸摸头</button>
-            </div>
-          </section>
-          <div className="dashboard-grid">
-            <section className="panel timer-panel">
-              <div className="panel-heading"><div><span className="section-icon lilac"><Clock3 size={18}/></span><strong>一起专注</strong></div><span className="muted-small">POMODORO</span></div>
-              <div className="phase-switch">
-                {(['focus','short','long'] as Phase[]).map(phase => <button key={phase} className={timer.phase === phase ? 'selected' : ''} onClick={() => selectPhase(phase)}>{phaseName[phase]}</button>)}
-              </div>
-              <div className="clock-display"><span>{timeLabel(remaining)}</span><svg viewBox="0 0 270 12" preserveAspectRatio="none"><rect width="270" height="12" rx="6" fill="#e8e7f1"/><rect width={270 * progress / 100} height="12" rx="6" fill="#8b98ce"/></svg></div>
-              <div className="timer-actions"><button className="primary-button" onClick={toggleTimer}>{timer.running ? <Pause size={18}/> : <Play size={18} fill="currentColor"/>}{timer.running ? '暂停专注' : remaining < currentDuration ? '继续计时' : '开始专注'}</button><ButtonIcon title="重置当前计时" onClick={resetTimer}><RotateCcw size={18}/></ButtonIcon></div>
-              <div className="timer-task"><span>本轮任务</span><select aria-label="本轮专注关联任务" value={timer.selectedTaskId || ''} onChange={e => setTimer(t => ({...t,selectedTaskId:e.target.value || null}))}><option value="">自由专注</option>{tasks.filter(t=>!t.done).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></div>
-            </section>
+    <nav className="float-dock float-dock-left" aria-label="工作工具">
+      <button className={'dock-button' + (panel === 'timer' ? ' selected' : '')} onClick={() => openPanel('timer')} title="番茄钟" aria-label="番茄钟"><Clock3 size={21}/><span>专注</span></button>
+      <button className={'dock-button' + (panel === 'tasks' ? ' selected' : '')} onClick={() => openPanel('tasks')} title="任务日程" aria-label="任务日程"><ListTodo size={21}/><span>日程</span></button>
+      <button className={'dock-button' + (panel === 'stats' ? ' selected' : '')} onClick={() => openPanel('stats')} title="专注统计" aria-label="专注统计"><ChartNoAxesColumnIncreasing size={21}/><span>统计</span></button>
+      <span className="dock-divider" aria-hidden="true"/>
+      <button className={'dock-button' + (panel === 'settings' ? ' selected' : '')} onClick={() => openPanel('settings')} title="设置" aria-label="设置"><Settings2 size={21}/><span>设置</span></button>
+    </nav>
+    <nav className="float-dock float-dock-right" aria-label="环境与互动">
+      <button className={'dock-button' + (panel === 'music' ? ' selected' : '')} onClick={() => openPanel('music')} title="我的音乐" aria-label="我的音乐"><Music2 size={21}/><span>音乐</span></button>
+      <button className={'dock-button' + (panel === 'sound' ? ' selected' : '')} onClick={() => openPanel('sound')} title="环境音" aria-label="环境音"><Headphones size={21}/><span>环境</span></button>
+      <button className={'dock-button' + (chatExpanded ? ' selected' : '')} onClick={() => {setChatExpanded(v => !v);closePanel()}} title="与猫娘聊天" aria-label="与猫娘聊天"><Heart size={21}/><span>聊天</span></button>
+    </nav>
 
-            <section className="panel today-panel">
-              <div className="panel-heading"><div><span className="section-icon peach"><ListTodo size={18}/></span><strong>今日计划</strong></div><button className="text-link" onClick={() => {setSelectedDate(localDate());setView('tasks')}}>查看全部 <ChevronRight size={14}/></button></div>
-              <div className="task-today-summary">已完成 <b>{completedToday}</b> / {todayTasks.length} 项任务</div>
-              {todayTasks.length === 0 ? <div className="empty-mini">今天还没有任务喵。<br/>写下第一件想做的事吧。</div> :
-                <div className="mini-tasks">{todayTasks.slice(0,4).map(t=><label key={t.id} className={'mini-task' + (t.done ? ' done' : '')}><input type="checkbox" checked={t.done} onChange={e=>updateTask(t.id,{done:e.target.checked})}/><span>{t.title}</span>{t.priority==='high' && <i className="priority-dot"/>}</label>)}</div>}
-              <button className="add-task-link" onClick={() => {setSelectedDate(localDate());setView('tasks')}}><Plus size={16}/> 添加今日任务</button>
-            </section>
+    {showHud && <div className="scene-focus-chip">
+      <span className={'focus-dot' + (timer.running ? ' active' : '')}/>
+      <span>{timer.running ? '一起努力中' : phaseName[timer.phase]}</span>
+      <b>{timeLabel(remaining)}</b>
+      <button onClick={toggleTimer} aria-label={timer.running ? '暂停计时' : '开始或继续计时'} title={timer.running ? '暂停' : '开始'}>{timer.running ? <Pause size={15}/> : <Play size={15} fill="currentColor"/>}</button>
+      <button onClick={() => openPanel('timer')} aria-label="打开番茄钟设置" title="更多计时选项"><ChevronRight size={15}/></button>
+    </div>}
+
+    <div className="scene-corner-line">✦ {greeting}，{showName}。 <span>今天也一起慢慢来。</span></div>
+
+    {panel && <>
+      <button type="button" className="overlay-scrim" aria-label="关闭功能面板" onClick={closePanel}/>
+      <aside className={'immersive-drawer' + (panel === 'music' || panel === 'sound' ? ' right-drawer' : '')} aria-label={panel === 'timer' ? '番茄钟' : panel === 'tasks' ? '日程' : panel === 'stats' ? '统计' : panel === 'settings' ? '设置' : panel === 'music' ? '音乐' : '环境音'}>
+        <div className="drawer-top">
+          <div><small>MEWNOOK · LITTLE MOMENTS</small><h2>{panel === 'timer' ? '一起专注' : panel === 'tasks' ? '日程与任务' : panel === 'stats' ? '专注统计' : panel === 'settings' ? '偏好设置' : panel === 'music' ? '我的音乐' : '声音空间'}</h2></div>
+          <button className="drawer-close" onClick={closePanel} aria-label="关闭面板"><X size={20}/></button>
+        </div>
+        <div className="drawer-scroll">
+        {panel === 'timer' && <section className="panel timer-panel">
+          <div className="panel-heading"><div><span className="section-icon lilac"><Clock3 size={18}/></span><strong>番茄钟</strong></div><span className="muted-small">FOCUS WITH ME</span></div>
+          <div className="phase-switch">
+            {(['focus','short','long'] as Phase[]).map(phase => <button key={phase} className={timer.phase === phase ? 'selected' : ''} onClick={() => selectPhase(phase)}>{phaseName[phase]}</button>)}
           </div>
-          <div className="dashboard-grid bottom-grid">
-            <section className="panel mini-stats"><div className="panel-heading"><div><span className="section-icon blue"><ChartNoAxesColumnIncreasing size={18}/></span><strong>本周专注</strong></div><button className="text-link" onClick={()=>setView('stats')}>详细统计 <ChevronRight size={14}/></button></div><WeeklyChart sessions={sessions}/></section>
-            <section className="panel gentle-note"><div className="quote-sparkle">✧</div><span>今日小贴士</span><p>不用每一分钟都充满效率。<br/>休息，也是认真生活的一部分。</p><small>WITH LOVE, MEWNOOK ♡</small></section>
-          </div>
-        </>}
-
+          <div className="clock-display"><span>{timeLabel(remaining)}</span><svg viewBox="0 0 270 12" preserveAspectRatio="none"><rect width="270" height="12" rx="6" fill="#e8e7f1"/><rect width={270 * progress / 100} height="12" rx="6" fill="#8b98ce"/></svg></div>
+          <div className="timer-actions"><button className="primary-button" onClick={toggleTimer}>{timer.running ? <Pause size={18}/> : <Play size={18} fill="currentColor"/>}{timer.running ? '暂停专注' : remaining < currentDuration ? '继续计时' : '开始专注'}</button><ButtonIcon title="重置当前计时" onClick={resetTimer}><RotateCcw size={18}/></ButtonIcon></div>
+          <div className="timer-task"><span>本轮任务</span><select aria-label="本轮专注关联任务" value={timer.selectedTaskId || ''} onChange={e => setTimer(t => ({...t,selectedTaskId:e.target.value || null}))}><option value="">自由专注</option>{tasks.filter(t=>!t.done).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></div>
+          <div className="timer-summary"><span><Sparkles size={16}/> 今日累计 <strong>{todayMinutes} 分钟</strong></span><span><Check size={16}/> 完成 <strong>{completedToday}/{todayTasks.length} 项</strong></span></div>
+          <button className="drawer-secondary-link" onClick={() => openPanel('tasks')}>安排今天的计划 <ChevronRight size={16}/></button>
+        </section>}
         {view === 'tasks' && <section className="panel full-panel">
           <div className="panel-heading large"><div><span className="section-icon peach"><CalendarDays size={20}/></span><strong>每日计划</strong></div><button className="light-button" onClick={()=>setSelectedDate(localDate())}>回到今天</button></div>
           <div className="calendar-header"><ButtonIcon title="前一天" onClick={()=>moveDay(-1)}><ChevronLeft size={20}/></ButtonIcon><h3>{new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(new Date(selectedDate + 'T12:00:00'))}</h3><ButtonIcon title="后一天" onClick={()=>moveDay(1)}><ChevronRight size={20}/></ButtonIcon></div>
@@ -352,13 +371,11 @@ export default function App() {
           {plannedTasks.length === 0 && <div className="empty-state"><BookOpen size={34}/><h3>还没有任务安排</h3><p>从一件小事开始，也是在向前走喵。</p></div>}
           <div className="task-list">{plannedTasks.map(t=><div className={'task-row' + (t.done?' completed':'')} key={t.id}><label><input type="checkbox" checked={t.done} onChange={e=>updateTask(t.id,{done:e.target.checked})}/><span>{t.title}</span></label>{t.priority==='high'&&<span className="high-priority">重要</span>}<button className="light-button small" onClick={()=>{setTimer(s=>({...s,selectedTaskId:t.id}));setView('home')}}>专注</button><ButtonIcon title="删除任务" onClick={()=>{setTasks(all=>all.filter(item=>item.id!==t.id));if(timer.selectedTaskId===t.id)setTimer(old=>({...old,selectedTaskId:null}))}}><Trash2 size={17}/></ButtonIcon></div>)}</div>
         </section>}
-
         {view === 'stats' && <div className="stats-view">
           <div className="stats-summary"><div className="stat-tile"><span><Clock3 size={17}/> 累计专注</span><strong>{sessions.reduce((a,s)=>a+s.minutes,0)} <small>分钟</small></strong></div><div className="stat-tile"><span><Sparkles size={17}/> 完成番茄钟</span><strong>{sessions.length} <small>次</small></strong></div><div className="stat-tile"><span><Check size={17}/> 已完成任务</span><strong>{tasks.filter(t=>t.done).length} <small>项</small></strong></div></div>
           <section className="panel full-panel"><div className="panel-heading"><div><span className="section-icon blue"><ChartNoAxesColumnIncreasing size={18}/></span><strong>近七天专注时长</strong></div><span className="muted-small">单位：分钟</span></div><WeeklyChart sessions={sessions}/></section>
           <section className="panel full-panel"><div className="panel-heading"><div><span className="section-icon lilac"><BookOpen size={18}/></span><strong>最近的专注记录</strong></div></div>{sessions.length===0?<div className="empty-state"><Clock3 size={32}/><h3>尚无专注记录</h3><p>完成第一个专注时段，这里就会开始记录。</p></div>:<div className="session-list">{[...sessions].reverse().slice(0,15).map(s=><div key={s.id}><span>{new Intl.DateTimeFormat('zh-CN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(s.finishedAt))}</span><span>{tasks.find(t=>t.id===s.taskId)?.title||'自由专注'}</span><b>{s.minutes} 分钟</b></div>)}</div>}</section>
         </div>}
-
         {view === 'settings' && <div className="settings-view">
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon lilac"><SlidersHorizontal size={20}/></span><strong>番茄钟偏好</strong></div></div>
             <div className="settings-grid">{(['focusMinutes','shortMinutes','longMinutes'] as const).map((field,i)=><Field key={field} label={['专注时长（分钟）','短休息（分钟）','长休息（分钟）'][i]}><input type="number" min="1" max="180" value={settings[field]} onChange={e=>updateDuration(field,Number(e.target.value))}/></Field>)}
@@ -382,30 +399,50 @@ export default function App() {
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon peach"><Download size={20}/></span><strong>本地数据</strong></div></div><p className="settings-intro">数据只保存在当前浏览器，清理网站数据会删除记录。建议定期备份，不包含 API Key 或本地音乐文件。</p>
             <div className="data-actions"><button className="light-button" onClick={exportData}><Download size={17}/> 导出 JSON 备份</button><label className="light-button file-label"><Upload size={17}/> 导入 JSON 备份<input type="file" accept="application/json,.json" hidden onChange={e=>{void importData(e.target.files?.[0]);e.target.value=''}}/></label></div>{importError&&<p className="error-text">{importError}</p>}</section>
         </div>}
-        <footer className="content-footer"><span>MewNook · Made for little moments ✧</span><span>本地数据不会自动同步到云端</span></footer>
-      </main>
-
-      <aside className="companion-pane">
-        <div className="side-widget-heading"><div><span className="section-icon lilac"><Heart size={18}/></span><strong>陪伴角落</strong></div><span className="connected-badge"><span/> {settings.aiUrl && settings.aiModel ? '自定义 API' : '离线陪伴'}</span></div>
-        <div className="cat-profile"><div className="cat-avatar">🐱</div><div><b>小猫同学</b><span>{timer.running ? '正在陪你认真工作…' : '正在小窝里等你 ♡'}</span></div></div>
-        <div className="chat-scroll" aria-live="polite">{chat.map(message=><div key={message.id} className={'chat-message '+message.role}>{message.role==='assistant'&&<span className="message-avatar">🐾</span>}<p>{message.content}</p></div>)}{chatLoading&&<div className="chat-message assistant"><span className="message-avatar">🐾</span><p>正在想怎么回答你…</p></div>}{chatError&&<div className="chat-error">{chatError}</div>}<div ref={chatBottomRef}/></div>
-        <div className="chat-input"><input aria-label="给猫娘发送消息" maxLength={1600} value={chatDraft} onChange={e=>setChatDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();void sendChat()}}} placeholder="和小猫说点什么…" /><button aria-label="发送消息" disabled={chatLoading||!chatDraft.trim()} onClick={()=>void sendChat()}><Send size={17}/></button></div>
-        <div className="chat-disclaimer">{settings.aiUrl ? '自定义 API · Key 不保存在云端' : '当前为预设台词 · 设置中可连接 AI'}</div>
-        <div className="aside-divider" />
-        <div className="side-widget-heading"><div><span className="section-icon peach"><Headphones size={18}/></span><strong>声音空间</strong></div><button className="icon-button" title={ambientOn?'关闭环境音':'开启环境音'} onClick={()=>void toggleAmbient()}>{ambientOn?<Volume2 size={18}/>:<VolumeX size={18}/>}</button></div>
-        <div className="ambience-list">{([
-          {kind:'rain' as AmbientKind,name:'轻轻雨声',icon:<CloudRain size={18}/>},
-          {kind:'wind' as AmbientKind,name:'窗边微风',icon:<Wind size={18}/>},
-          {kind:'brown' as AmbientKind,name:'柔和底噪',icon:<Coffee size={18}/>}
-        ]).map(item=><div className="ambience-row" key={item.kind}><span className="ambience-icon">{item.icon}</span><span>{item.name}</span><input aria-label={item.name+'音量'} type="range" min="0" max="100" value={ambientLevels[item.kind]} onChange={e=>levelChange(item.kind,Number(e.target.value))}/></div>)}</div>
-        <button className={'sound-toggle'+(ambientOn?' active':'')} onClick={()=>void toggleAmbient()}>{ambientOn?<Pause size={16}/>:<Play size={16}/>} {ambientOn?'暂停环境音':'播放环境音'}</button>
-        <div className="aside-divider"/>
-        <div className="side-widget-heading"><div><span className="section-icon blue"><Music2 size={18}/></span><strong>我的音乐</strong></div></div>
-        <label className="music-import"><Plus size={16}/> 选择本地音乐<input type="file" accept="audio/*,.flac" multiple hidden onChange={e=>loadTracks(e.target.files)}/></label>
-        {tracks.length>0 ? <div className="music-player"><div className="track-name">♫ {tracks[trackIndex]?.name}</div><audio ref={musicRef} controls preload="metadata" src={tracks[trackIndex]?.url} onEnded={()=>setTrackIndex(i=>(i+1)%tracks.length)}/><div className="track-nav"><button onClick={()=>setTrackIndex(i=>(i+tracks.length-1)%tracks.length)}><ChevronLeft size={16}/> 上一首</button><span>{trackIndex+1}/{tracks.length}</span><button onClick={()=>setTrackIndex(i=>(i+1)%tracks.length)}>下一首 <ChevronRight size={16}/></button></div></div>
-        :<div className="music-empty">支持本地音频，不上传服务器。<br/>更换或刷新页面需要重新选择文件。</div>}
-        <div className="aside-bottom">✦ 愿每个普通的日子都闪闪发光</div>
+        {panel === 'sound' && <section className="panel">
+          <div className="drawer-intro">让雨声与微风陪伴你，不需要下载任何背景音资源。</div>
+          <div className="ambience-list">
+            {([
+              {kind:'rain' as AmbientKind,name:'轻轻雨声',icon:<CloudRain size={20}/>},
+              {kind:'wind' as AmbientKind,name:'窗边微风',icon:<Wind size={20}/>},
+              {kind:'brown' as AmbientKind,name:'柔和底噪',icon:<Coffee size={20}/>}
+            ]).map(item => <div className="ambience-row" key={item.kind}><span className="ambience-icon">{item.icon}</span><span>{item.name}</span><input aria-label={item.name+'音量'} type="range" min="0" max="100" value={ambientLevels[item.kind]} onChange={e=>levelChange(item.kind,Number(e.target.value))}/><small>{ambientLevels[item.kind]}%</small></div>)}
+          </div>
+          <button className="primary-button wide-button" onClick={() => void toggleAmbient()}>{ambientOn ? <Pause size={18}/> : <Play size={18}/>} {ambientOn ? '暂停环境音' : '播放环境音'}</button>
+          <div className="drawer-subheading">窗外风景</div><div className="scene-selector">{(Object.keys(sceneName) as Scene[]).map(scene => <button className={settings.scene===scene?'active':''} key={scene} onClick={()=>saveSettings({scene})}>{sceneName[scene]}</button>)}</div>
+        </section>}
+        {panel === 'music' && <section className="panel">
+          <div className="drawer-intro">本地音乐只在你的设备上播放，不上传服务器。</div>
+          <label className="music-import"><Plus size={18}/> 选择本地音乐<input type="file" accept="audio/*,.flac" multiple hidden onChange={e=>loadTracks(e.target.files)}/></label>
+          {tracks.length > 0 ? <div className="music-player"><div className="track-name">♫ {tracks[trackIndex]?.name}</div><button className="primary-button wide-button" onClick={() => void toggleMusic()}>{musicPlaying ? <Pause size={17}/> : <Play size={17}/>} {musicPlaying ? '暂停音乐' : '播放音乐'}</button><div className="track-nav"><button onClick={()=>setTrackIndex(i=>(i+tracks.length-1)%tracks.length)}><ChevronLeft size={16}/> 上一首</button><span>{trackIndex+1}/{tracks.length}</span><button onClick={()=>setTrackIndex(i=>(i+1)%tracks.length)}>下一首 <ChevronRight size={16}/></button></div></div> : <div className="music-empty">这里还没有音乐。选择本地音频文件后就能开始播放；刷新页面后需要重新选择。</div>}
+        </section>}
+        </div>
       </aside>
-    </div>
+    </>}
+
+    <section className={'vn-dialogue' + (chatExpanded ? ' expanded' : '')} aria-label="和猫娘对话">
+      <div className="vn-frame-ornament" aria-hidden="true">✧</div>
+      <div className="vn-nameplate"><span>✦</span> 小猫同学 <span className="vn-name-en">COMPANION</span></div>
+      {!chatExpanded ? <>
+        <p className="vn-line" aria-live="polite">{timer.running && dialogueOffset === 0 && chat.length <= 1 ? '嘘…专注的时候，我也会安静地陪着你。' : latestDialogue}</p>
+        <div className="vn-bottom">
+          <span className="vn-hint">{settings.aiUrl && settings.aiModel ? 'AI 陪伴模式' : '离线预设台词'} · 点击「聊天」展开自由对话</span>
+          <div className="vn-actions">
+            <button disabled={dialogueOffset >= assistantLines.length - 1} onClick={()=>setDialogueOffset(i=>Math.min(assistantLines.length-1,i+1))} title="上一句台词" aria-label="上一句台词"><ChevronLeft size={17}/></button>
+            <button disabled={dialogueOffset===0} onClick={()=>setDialogueOffset(i=>Math.max(0,i-1))} title="下一句台词" aria-label="下一句台词"><ChevronRight size={17}/></button>
+            <button className="vn-chat-button" onClick={()=>setChatExpanded(true)} aria-label="展开聊天"><Send size={16}/> 聊天</button>
+          </div>
+        </div>
+      </> : <>
+        <div className="vn-history" aria-live="polite">{chat.map(message=><div key={message.id} className={'vn-message '+message.role}><span>{message.role==='assistant'?'小猫同学':'你'}</span><p>{message.content}</p></div>)}{chatLoading&&<p className="vn-typing">小猫正在想怎么回复你…</p>}{chatError&&<p className="chat-error">{chatError}</p>}<div ref={chatBottomRef}/></div>
+        <form className="vn-compose" onSubmit={e=>{e.preventDefault();void sendChat()}}>
+          <input aria-label="和猫娘说话" placeholder="和小猫说点什么…" maxLength={1600} value={chatDraft} onChange={e=>setChatDraft(e.target.value)} />
+          <button disabled={chatLoading||!chatDraft.trim()} type="submit" aria-label="发送消息"><Send size={19}/></button>
+          <button type="button" className="vn-collapse" onClick={()=>setChatExpanded(false)} aria-label="收起聊天"><X size={18}/></button>
+        </form>
+      </>}
+    </section>
+    <audio className="persistent-music" ref={musicRef} preload="metadata" src={tracks[trackIndex]?.url} onEnded={()=>setTrackIndex(i=>(i+1)%tracks.length)} />
+    <div className="scene-attribution"><span>Weather · Open-Meteo</span>　✧　MewNook</div>
   </div>
 }
