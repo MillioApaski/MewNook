@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, Check, ChevronLeft, ChevronRight,
   Clock3, CloudRain, Coffee, Download, Headphones, Heart, KeyRound, ListTodo,
-  MapPin, MoonStar, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
-  Sparkles, Sun, Trash2, Upload, Wind
+  MapPin, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
+  Sparkles, Sun, Trash2, Upload, Wind, X
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { Companion, type Mood } from './Companion'
