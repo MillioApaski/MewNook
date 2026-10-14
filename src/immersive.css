@@ -89,3 +89,9 @@ body{overflow:hidden}
    so the front layer aligns with the existing keyboard and stationery. */
 .art-day .art-foreground{top:0;filter:none}
 .art-day .art-character{filter:none}
+
+/* Sunset and rain adopt the same 1672×941 layered camera as day/night.
+   Both assets already contain their desired lighting. */
+.art-sunset .art-character,.art-rain .art-character{filter:none}
+.art-sunset .art-foreground,.art-rain .art-foreground{filter:none}
+.art-sunset .art-foreground,.art-rain .art-foreground{top:16.5%}

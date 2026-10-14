@@ -19,6 +19,7 @@
 ## Stage 2: companion media and visual polish
 
 - [x] Daytime room + sitting idle character + matching desk foreground bundled in public/assets/rooms/day/.
+- [x] Sunset and rainy room, character, desk foreground bundled in public/assets/rooms/sunset/ and public/assets/rooms/rain/; all four scene modes now use illustration layers.
 
 - [x] Native three-layer night scene compositor using consistent virtual coordinates (background, sleepy companion, foreground occlusion).
 - [x] Include actual day and night WebP images in the repository and use static assets, without manual scene import.
