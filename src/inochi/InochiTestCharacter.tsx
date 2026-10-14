@@ -37,6 +37,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     const canvas=canvasRef.current
     if(!canvas)return
     let disposed=false,controller:Controller|null=null,observer:ResizeObserver|null=null
+    let resizeHandler:(()=>void)|null=null
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
@@ -57,7 +58,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       if(typeof ResizeObserver!=='undefined'){
         observer=new ResizeObserver(resize)
         observer.observe(canvas)
-      }else window.addEventListener('resize',resize)
+      }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,1450,scale)
       if(disposed)return
       await controller.loadModel('/inochi2d-test/models/Aka.inx')
@@ -65,6 +66,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
+      void controller.setExpressionPreset?.(activity==='focus'?'focused':activity==='rest'?'relaxed':'neutral')
       onStatus('ready')
     })().catch(e=>{
       if(!disposed)onStatus('error',e instanceof Error?e.message:String(e))
@@ -72,7 +74,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     return()=>{
       disposed=true
       observer?.disconnect()
-      window.removeEventListener('resize',()=>{}) // ResizeObserver handles modern browsers.
+      if(resizeHandler)window.removeEventListener('resize',resizeHandler)
       if(controllerRef.current===controller)controllerRef.current=null
       if(controller)void Promise.resolve(controller.unmount()).catch(()=>{})
       onStatus('off')
@@ -90,7 +92,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     const c=controllerRef.current
     if(!c)return
     const expression=activity==='focus'?'focused':activity==='rest'?'relaxed':'neutral'
-    void c.setExpressionPreset?.(expression)
+    void Promise.resolve(c.setExpressionPreset?.(expression)).catch(()=>{})
   },[activity])
 
   useEffect(()=>{

@@ -112,3 +112,5 @@ npm run deploy
 测试资源以固定 Git 修订版和 SHA-1 Git blob 校验下载：`npm run prepare:inochi`。GitHub Actions 首次构建会把验证通过的 WASM、JS 与模型一起保存到公开仓库；后续部署无需手动下载。示例模型约 18 MB，只在测试模式开启后请求，不参与 PWA precache。测试模型有自己的许可，不得将其当成 MewNook 原创角色素材。
 
 正式 Inochi2D 猫娘模型制作仍需要单独的分层美术与 Inochi Creator 参数绑定；本阶段主要验收浏览器运行、真实骨骼/网格变形、动作调用与图层集成。
+
+独立的 Inochi2D 验证页面：`/inochi2d-test/smoke.html`。无需启用 MewNook 主页面的实验开关，可以直接测试 WebGL2、模型加载、点击动画及缩放。

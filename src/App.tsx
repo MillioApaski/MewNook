@@ -590,7 +590,7 @@ export default function App() {
               <Field label="测试模型缩放" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
               <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载示例模型…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
               {inochiError && <p className="error-text">{inochiError}</p>}
-              <p className="footnote">当前为第三方 Aka 示例模型（作者 seagetch，CC BY 4.0），不是 MewNook 正式白发猫娘。<a href="https://github.com/Inochi2D/example-models" target="_blank" rel="noreferrer">来源与署名</a></p>
+              <p className="footnote">当前为第三方 Aka 示例模型（作者 seagetch，CC BY 4.0），不是 MewNook 正式白发猫娘。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/example-models" target="_blank" rel="noreferrer">来源与署名</a></p>
             </>}
           </div><p className="footnote">天气数据：<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · 非商业使用请遵守其许可与署名要求。</p></section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon blue"><KeyRound size={20}/></span><strong>自定义 AI API</strong></div><span className="badge">BYOK · 可选</span></div>

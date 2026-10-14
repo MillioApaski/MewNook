@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MewNook · Inochi2D 运行时检测</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;background:#292e42;color:#f4edff}
+main{max-width:1080px;margin:0 auto;padding:18px}
+header{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+a{color:#b9ddff}#status{background:#404d69;padding:8px 13px;border-radius:10px}
+figure{position:relative;margin:16px 0;width:min(100%,650px);height:min(72dvh,750px);min-height:360px;
+border-radius:18px;overflow:hidden;background:radial-gradient(circle at 50% 10%,#dfe4ff,#9cabc6 65%,#717d9d)}
+canvas{display:block;width:100%;height:100%}
+button{padding:10px 14px;background:#6e87b7;color:white;border:0;border-radius:9px;cursor:pointer}
+button:disabled{opacity:.45}input{accent-color:#a0bde5}
+#details{font-size:12px;color:#c3cce6;max-width:650px;line-height:1.7}
+</style>
+</head>
+<body>
+<main>
+<header><h2>Inochi2D WebGL2 测试</h2><span id="status" data-state="loading">正在初始化…</span><a href="/">返回 MewNook</a></header>
+<figure><canvas id="puppet" aria-label="Inochi2D Aka 模型"/></figure>
+<div><button id="tap" disabled>播放点击反应</button> <button id="idle" disabled>恢复待机</button>
+ <label>缩放 <input id="scale" type="range" min="0.1" max="0.9" step="0.01" value="0.32"/></label></div>
+<p id="details">模型 Aka © seagetch（CC BY 4.0），运行时基于 Inox2D（BSD-2-Clause）。页面只用于验证已绑定示例模型的渲染和动画，不代表原创角色已完成。</p>
+</main>
+<script type="module">
+const node=document.querySelector('#status')
+const canvas=document.querySelector('#puppet')
+const setStatus=(status,text)=>{node.dataset.state=status;node.textContent=text}
+let controller
+try {
+ if(!canvas.getContext('webgl2'))throw new Error('无 WebGL2 支持')
+ const {createInochi2DController}=await import('./runtime/inochi_bridge.js')
+ controller=await createInochi2DController({wasmUrl:'/inochi2d-test/runtime/inochi2d_bg.wasm'})
+ await controller.mount(canvas)
+ const resize=()=>controller.resize(canvas.clientWidth,canvas.clientHeight,Math.min(devicePixelRatio||1,1.25))
+ resize()
+ new ResizeObserver(resize).observe(canvas)
+ await controller.setCameraTransform(0,1450,0.32)
+ await controller.loadModel('/inochi2d-test/models/Aka.inx')
+ const names=controller.getAnimationNames?.()||[]
+ if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
+ setStatus('ready','模型加载成功 · '+names.length+' 个动作')
+ document.querySelector('#tap').disabled=false
+ document.querySelector('#idle').disabled=false
+ document.querySelector('#tap').onclick=()=>{
+   void controller.applyInteractionImpulse?.(6,-4)
+   if(names.includes('Yatta Celebration'))void controller.playAnimation?.('Yatta Celebration',{restart:true,kind:'reaction'})
+ }
+ document.querySelector('#idle').onclick=()=>{
+   if(names.includes('Energetic Sway'))void controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
+ }
+ document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,1450,Number(e.target.value))
+} catch(e) {
+ setStatus('error','加载失败：'+(e?.message||e))
+ console.error('Inochi2D smoke test failed:',e)
+}
+window.addEventListener('pagehide',()=>{void controller?.unmount()},{once:true})
+</script>
+</body>
+</html>
