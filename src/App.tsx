@@ -130,6 +130,7 @@ export default function App() {
   const endHandled = useRef<number | null>(null)
   const touchCount = useRef(0)
   const requestController = useRef<AbortController | null>(null)
+  const proactiveController = useRef<AbortController | null>(null)
   const requestBusy = useRef(false)
   const failedContent = useRef<string | null>(null)
   const lastInteraction = useRef(Date.now())
@@ -169,7 +170,14 @@ export default function App() {
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }, [chat.length, chatLoading])
-  useEffect(() => () => { void audio.current?.stop() }, [])
+  useEffect(() => () => { void audio.current?.stop(); requestController.current?.abort() }, [])
+  useEffect(() => {
+    const cancelHiddenProactive = () => {
+      if(document.visibilityState === 'hidden') proactiveController.current?.abort()
+    }
+    document.addEventListener('visibilitychange',cancelHiddenProactive)
+    return () => document.removeEventListener('visibilitychange',cancelHiddenProactive)
+  }, [])
   useEffect(() => () => { tracks.forEach(t => URL.revokeObjectURL(t.url)) }, [tracks])
   useEffect(() => {
     if (musicPlaying && tracks.length && musicRef.current?.paused) {
@@ -219,6 +227,9 @@ export default function App() {
     setTimer(t => ({...t, phase, remaining: phaseSeconds(phase, settings), endsAt: null, running: false}))
   }
   const toggleTimer = () => {
+    // A newly started focus session must never be interrupted by a late
+    // proactive greeting that was started while the user was resting.
+    if (!timer.running && timer.phase === 'focus') proactiveController.current?.abort()
     lastInteraction.current = Date.now()
     if (!timer.running && timer.phase === 'focus') {
       setMoodOverride(null)
@@ -433,16 +444,19 @@ export default function App() {
         requestBusy.current=true
         const controller = new AbortController()
         requestController.current=controller
+        proactiveController.current=controller
         void requestAI({
           url:settings.aiUrl,model:settings.aiModel,key,signal:controller.signal,
           streaming:false,maxTokens:120,
           messages:[{role:'system',content:currentSystemPrompt()+'\n【主动问候】现在不是专注状态。请用一句不超过40字的中文自然问候用户，不催促、不连续追问。'},...chatContext(chat,4)]
         }).then(answer=>{
-          if(controller.signal.aborted || document.visibilityState!=='visible')return
+          if(controller.signal.aborted || document.visibilityState!=='visible' ||
+            (timer.phase==='focus' && timer.running))return
           setChat(prev=>[...prev,{id:uid(),role:'assistant' as const,content:answer}].slice(-100))
           showDialogue(answer)
         }).catch(()=>{ /* Proactive failures are silent; never auto-retry paid calls. */ })
-          .finally(()=>{requestBusy.current=false;if(requestController.current===controller)requestController.current=null})
+          .finally(()=>{requestBusy.current=false;if(requestController.current===controller)requestController.current=null;
+            if(proactiveController.current===controller)proactiveController.current=null})
       } else {
         const line = mode==='shortBreak'||mode==='longBreak'
           ? '休息时间里，看看窗外也不错呢。我在这里。'

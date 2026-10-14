@@ -14,5 +14,7 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit
+      - name: AI protocol unit tests
+        run: npm run test:ai
       - name: Typecheck and build PWA
         run: npm run build
