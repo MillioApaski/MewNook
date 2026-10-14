@@ -8,6 +8,10 @@ import {
 import { AmbientEngine, type AmbientKind } from './audio'
 import { Companion, type Mood } from './Companion'
 import {
+  DEFAULT_COMPANION_PROMPT, buildCompanionSystemPrompt, companionMode,
+  offlineCompanionReply, pickCompanionClickLine
+} from './companionPersona'
+import {
   dayMinutes, initialSettings, initialTimer, localDate, phaseSeconds, timeLabel, uid, useSavedState,
   type ChatMessage, type FocusSession, type Phase, type Scene, type Settings, type Task, type Timer,
   type View, type Weather
@@ -111,6 +115,7 @@ export default function App() {
   const [dialogueOffset, setDialogueOffset] = useState(0)
   const [dialogueVisible, setDialogueVisible] = useState(true)
   const [dialogueSequence, setDialogueSequence] = useState(0)
+  const [dialogueTimeoutMs, setDialogueTimeoutMs] = useState(6500)
   const [sceneLine, setSceneLine] = useState<string | null>(null)
   const [focusPose, setFocusPose] = useSavedState<'auto' | 'reading' | 'typing'>('focusPose', 'auto')
   const [showHud, setShowHud] = useState(true)
@@ -118,12 +123,14 @@ export default function App() {
   const musicRef = useRef<HTMLAudioElement | null>(null)
   const chatBottomRef = useRef<HTMLDivElement | null>(null)
   const endHandled = useRef<number | null>(null)
+  const touchCount = useRef(0)
   const { weather, weatherError } = useWeather(settings.city)
 
   // The collapsed Galgame line is a temporary notification, not a permanent HUD.
-  const showDialogue = (line: string | null = null) => {
+  const showDialogue = (line: string | null = null, durationMs = 6500) => {
     setSceneLine(line)
     setDialogueOffset(0)
+    setDialogueTimeoutMs(durationMs)
     setDialogueVisible(true)
     setDialogueSequence(value => value + 1)
   }
@@ -141,9 +148,9 @@ export default function App() {
   }
   useEffect(() => {
     if (!dialogueVisible || chatExpanded) return
-    const timeout = window.setTimeout(() => setDialogueVisible(false), 6500)
+    const timeout = window.setTimeout(() => setDialogueVisible(false), dialogueTimeoutMs)
     return () => window.clearTimeout(timeout)
-  }, [dialogueVisible, chatExpanded, dialogueSequence])
+  }, [dialogueVisible, chatExpanded, dialogueSequence, dialogueTimeoutMs])
 
   useEffect(() => {
     const handle = window.setInterval(() => setNow(Date.now()), 800)
@@ -175,6 +182,13 @@ export default function App() {
     : null
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
+  const handleCompanionClick = () => {
+    const mode = companionMode(timer.phase, timer.running)
+    const line = pickCompanionClickLine(mode, touchCount.current++, activeArtPose)
+    // Focus-mode taps acknowledge the user without changing the reading/typing pose.
+    setMoodOverride(mode === 'focus' ? null : 'happy')
+    showDialogue(line, mode === 'focus' ? 3400 : 6800)
+  }
   const panel = view !== 'home' ? view : utilityPanel
   const openPanel = (next: 'timer'|'music'|'sound'|'tasks'|'stats'|'settings') => {
     setChatExpanded(false)
@@ -306,6 +320,7 @@ export default function App() {
   async function sendChat() {
     const content = chatDraft.trim()
     if (!content || chatLoading) return
+    const mode = companionMode(timer.phase, timer.running)
     const userMessage: ChatMessage = {id:uid(),role:'user',content}
     const history = [...chat, userMessage].slice(-20)
     setChat(previous => [...previous, userMessage].slice(-100))
@@ -313,9 +328,7 @@ export default function App() {
     setMoodOverride('chat')
     setDialogueVisible(true)
     if (!settings.aiUrl.trim() || !settings.aiModel.trim()) {
-      const answer = /累|困|休息/.test(content) ? '那就稍微休息一下吧。窗外的风也在等你呢。' :
-        /学习|工作|专注|代码|任务/.test(content) ? '我们一起把这一小段时间认真过好喵。我会安静地陪着你。' :
-        '喵呜～我在这里！想聊天的话随时可以找我。'
+      const answer = offlineCompanionReply(content, mode)
       setChat(previous => [...previous, {id:uid(),role:'assistant' as const,content:answer}].slice(-100))
       showDialogue(answer)
       return
@@ -331,7 +344,10 @@ export default function App() {
       const reply = await fetch(endpoint, {
         method:'POST', headers: {'Content-Type':'application/json', ...(key ? {Authorization:'Bearer ' + key} : {})},
         body: JSON.stringify({model:settings.aiModel,stream:false,temperature:0.8,
-          messages:[{role:'system',content:`你是一位白发蓝瞳、性格温柔俏皮的猫娘，是用户在 MewNook 的专注伙伴。用自然简短的中文回复，不要过度打扰。当前状态：${phaseName[timer.phase]}。正在做：${activeTask?.title || '自由安排'}。你不能直接操作用户的任务。`},
+          messages:[{role:'system',content:buildCompanionSystemPrompt(settings.aiPersonaPrompt, {
+            mode, phase:timer.phase, running:timer.running,
+            remainingSeconds:remaining, taskTitle:activeTask?.title, nickname:showName
+          })},
             ...history.map(m => ({role:m.role,content:m.content}))]})
       })
       if (!reply.ok) throw new Error('API 返回 HTTP ' + reply.status + '，请检查地址、模型、Key 或额度')
@@ -349,7 +365,7 @@ export default function App() {
     <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
       {illustratedScene && <div className={'art-stage art-' + illustratedScene} key={illustratedScene}>
         <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
-        <button className={'art-character' + (activeArtPose ? ' focus-art' : '')} aria-label="摸摸猫娘的头" onClick={() => {setMoodOverride(m => m === 'happy' ? null : 'happy');showDialogue('喵？我在这里陪着你呢。')}}>
+        <button className={'art-character' + (activeArtPose ? ' focus-art' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
             src={activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
             alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
@@ -367,7 +383,7 @@ export default function App() {
       <div className="room-rug" aria-hidden="true"/>
       <div className="room-desk" aria-hidden="true"><span className="desk-monitor"/><span className="desk-cup"/><span className="desk-book"/></div>
       <div className="room-dust" aria-hidden="true"><span/><span/><span/><span/><span/><span/></div>
-      <button type="button" className="character-actor" onClick={() => {setMoodOverride(m => m === 'happy' ? null : 'happy');showDialogue('喵？我在这里陪着你呢。')}} aria-label="摸摸猫娘的头">
+      <button type="button" className="character-actor" onClick={handleCompanionClick} aria-label="摸摸猫娘的头">
         <Companion mood={mood} phase={timer.phase}/>
       </button>
     </div>
@@ -453,7 +469,12 @@ export default function App() {
             <div className="settings-grid"><Field label="OpenAI 兼容 API Base URL" hint="例如 https://api.example.com/v1"><input autoComplete="off" type="url" placeholder="https://api.example.com/v1" value={settings.aiUrl} onChange={e=>saveSettings({aiUrl:e.target.value})}/></Field>
               <Field label="模型 ID"><input placeholder="model-name" value={settings.aiModel} onChange={e=>saveSettings({aiModel:e.target.value})}/></Field>
               <Field label="API Key" hint="仅保存在当前浏览器会话的 sessionStorage，关闭标签页后通常会清除。"><input type="password" autoComplete="off" placeholder="sk-..." value={key} onChange={e=>{setKey(e.target.value);sessionStorage.setItem('mewnook:apiKey',e.target.value)}}/></Field></div>
-            <p className="footnote">⚠ Key 会发送给你填写的服务商。只使用可信 API 地址；前端会话存储不能防御恶意浏览器扩展或 XSS。</p>
+            <div className="ai-persona-heading"><b>小猫同学 · 人格预设</b><button type="button" className="light-button" onClick={()=>saveSettings({aiPersonaPrompt:DEFAULT_COMPANION_PROMPT})}><RotateCcw size={14}/> 恢复默认</button></div>
+            <p className="settings-intro">可以自定义性格与语言风格。专注状态、休息阶段、剩余时间、当前任务与用户称呼会随请求自动补充，不需要重复写进提示词。</p>
+            <label className="ai-persona-field" htmlFor="ai-persona-prompt">系统提示词</label>
+            <textarea id="ai-persona-prompt" className="ai-persona-editor" rows={10} maxLength={5000} value={settings.aiPersonaPrompt ?? DEFAULT_COMPANION_PROMPT} onChange={e=>saveSettings({aiPersonaPrompt:e.target.value})} spellCheck={false}/>
+            <div className="ai-persona-foot"><span>留空时使用默认人格</span><span>{(settings.aiPersonaPrompt ?? DEFAULT_COMPANION_PROMPT).length}/5000</span></div>
+            <p className="footnote">⚠ Key、对话、人格预设、昵称和当前任务会随 AI 请求发给你的服务商。请只使用可信 API 地址；浏览器会话存储无法抵御恶意扩展或 XSS。点击猫娘只用本地台词，不会调用付费 API。</p>
           </section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon peach"><Download size={20}/></span><strong>本地数据</strong></div></div><p className="settings-intro">数据只保存在当前浏览器，清理网站数据会删除记录。建议定期备份，不包含 API Key 或本地音乐文件。</p>
             <div className="data-actions"><button className="light-button" onClick={exportData}><Download size={17}/> 导出 JSON 备份</button><label className="light-button file-label"><Upload size={17}/> 导入 JSON 备份<input type="file" accept="application/json,.json" hidden onChange={e=>{void importData(e.target.files?.[0]);e.target.value=''}}/></label></div>{importError&&<p className="error-text">{importError}</p>}</section>

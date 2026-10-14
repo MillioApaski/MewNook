@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { DEFAULT_COMPANION_PROMPT } from './companionPersona'
 
 export type Phase = 'focus' | 'short' | 'long'
 export type View = 'home' | 'tasks' | 'stats' | 'settings'
@@ -9,7 +10,7 @@ export type Timer = { phase: Phase; running: boolean; endsAt: number | null; rem
 export type Settings = {
   focusMinutes: number; shortMinutes: number; longMinutes: number; longEvery: number;
   autoAdvance: boolean; soundOnFinish: boolean; city: string; scene: Scene;
-  aiUrl: string; aiModel: string; nickname: string; accent: 'blue' | 'pink' | 'lavender'
+  aiUrl: string; aiModel: string; aiPersonaPrompt: string; nickname: string; accent: 'blue' | 'pink' | 'lavender'
 }
 export type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string }
 export type Weather = { temperature: number; code: number; isDay: boolean; name: string }
@@ -17,7 +18,7 @@ export type Weather = { temperature: number; code: number; isDay: boolean; name:
 export const initialSettings: Settings = {
   focusMinutes: 25, shortMinutes: 5, longMinutes: 15, longEvery: 4,
   autoAdvance: false, soundOnFinish: true, city: 'Tokyo', scene: 'auto',
-  aiUrl: '', aiModel: '', nickname: '你', accent: 'blue'
+  aiUrl: '', aiModel: '', aiPersonaPrompt: DEFAULT_COMPANION_PROMPT, nickname: '你', accent: 'blue'
 }
 export const initialTimer: Timer = { phase: 'focus', running: false, endsAt: null, remaining: 25 * 60, focusCount: 0, selectedTaskId: null }
 export const uid = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? crypto.randomUUID() : Math.random().toString(36).slice(2)
