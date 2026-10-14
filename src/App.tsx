@@ -2,11 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, Check, ChevronLeft, ChevronRight,
   Clock3, CloudRain, Coffee, Download, Headphones, Heart, KeyRound, ListTodo,
-  MapPin, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
+  MapPin, MoonStar, Music2, Pause, Play, Plus, RotateCcw, Send, Settings2, SlidersHorizontal,
   Sparkles, Sun, Trash2, Upload, Wind, X
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { Companion, type Mood } from './Companion'
+import { NIGHT_ASSET_LABELS, NIGHT_LAYERS, type NightLayer, useNightSceneAssets } from './sceneAssets'
 import {
   dayMinutes, initialSettings, initialTimer, localDate, phaseSeconds, timeLabel, uid, useSavedState,
   type ChatMessage, type FocusSession, type Phase, type Scene, type Settings, type Task, type Timer,
@@ -115,6 +116,9 @@ export default function App() {
   const chatBottomRef = useRef<HTMLDivElement | null>(null)
   const endHandled = useRef<number | null>(null)
   const { weather, weatherError } = useWeather(settings.city)
+  const nightAssets = useNightSceneAssets()
+  const [assetMessage, setAssetMessage] = useState('')
+  const [importingLayer, setImportingLayer] = useState<NightLayer | null>(null)
 
   useEffect(() => {
     const handle = window.setInterval(() => setNow(Date.now()), 800)
@@ -140,6 +144,7 @@ export default function App() {
   const plannedTasks = tasks.filter(t => t.date === selectedDate).sort((a,b) => Number(a.done)-Number(b.done) || Number(b.priority === 'high')-Number(a.priority === 'high'))
   const activeTask = tasks.find(t => t.id === timer.selectedTaskId)
   const roomScene = determineScene(settings.scene, weather)
+  const nightArtReady = roomScene === 'night' && NIGHT_LAYERS.every(layer => Boolean(nightAssets.urls[layer]))
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
   const panel = view !== 'home' ? view : utilityPanel
@@ -207,6 +212,27 @@ export default function App() {
     saveSettings({[field]: minutes})
     const phase = field === 'focusMinutes' ? 'focus' : field === 'shortMinutes' ? 'short' : 'long'
     if (!timer.running && timer.phase === phase) setTimer(t => ({...t, remaining: minutes * 60}))
+  }
+
+  async function handleNightAsset(layer: NightLayer, file?: File) {
+    if (!file) return
+    setImportingLayer(layer)
+    setAssetMessage('')
+    try {
+      await nightAssets.importLayer(layer, file)
+      saveSettings({scene: 'night'})
+      setAssetMessage('已保存' + NIGHT_ASSET_LABELS[layer] + '。全部三层导入后会自动显示。')
+    } catch (error) {
+      setAssetMessage(error instanceof Error ? error.message : '导入失败')
+    } finally { setImportingLayer(null) }
+  }
+
+  async function removeNightAsset(layer: NightLayer) {
+    setAssetMessage('')
+    try {
+      await nightAssets.clearLayer(layer)
+      setAssetMessage('已清除本地' + NIGHT_ASSET_LABELS[layer] + '。')
+    } catch(error) { setAssetMessage(error instanceof Error ? error.message : '清除失败') }
   }
 
   async function toggleAmbient() {
@@ -298,7 +324,14 @@ export default function App() {
   }
 
   return <div className={'immersive-shell accent-' + settings.accent + ' backdrop-' + roomScene}>
-    <div className="room-stage" aria-label="沉浸式猫娘工作空间">
+    <div className={'room-stage' + (nightArtReady ? ' has-night-art' : '')} aria-label="沉浸式猫娘工作空间">
+      {nightArtReady && <div className="art-stage">
+        <img className="art-background" src={nightAssets.urls.background!} alt="" draggable={false}/>
+        <button className="art-character" aria-label="摸摸猫娘的头" onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')}>
+          <img src={nightAssets.urls.character!} alt="夜间在书桌旁打哈欠的白发蓝瞳猫娘" draggable={false}/>
+        </button>
+        <img className="art-foreground" src={nightAssets.urls.foreground!} alt="" draggable={false}/>
+      </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
       <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
       <div className="room-curtain curtain-left" aria-hidden="true"/><div className="room-curtain curtain-right" aria-hidden="true"/>
@@ -398,6 +431,20 @@ export default function App() {
           </section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon peach"><Download size={20}/></span><strong>本地数据</strong></div></div><p className="settings-intro">数据只保存在当前浏览器，清理网站数据会删除记录。建议定期备份，不包含 API Key 或本地音乐文件。</p>
             <div className="data-actions"><button className="light-button" onClick={exportData}><Download size={17}/> 导出 JSON 备份</button><label className="light-button file-label"><Upload size={17}/> 导入 JSON 备份<input type="file" accept="application/json,.json" hidden onChange={e=>{void importData(e.target.files?.[0]);e.target.value=''}}/></label></div>{importError&&<p className="error-text">{importError}</p>}</section>
+          <section className="panel full-panel">
+            <div className="panel-heading large"><div><span className="section-icon blue"><MoonStar size={20}/></span><strong>夜间场景素材</strong></div></div>
+            <p className="settings-intro">导入背景、人物、桌面前景三张图片，将自动合成为真正的夜间场景。素材保存在当前设备的 IndexedDB，不会上传云端。</p>
+            <div className="asset-import-list">
+              {NIGHT_LAYERS.map(layer => <div className="asset-import-row" key={layer}>
+                <div><b>{NIGHT_ASSET_LABELS[layer]}</b><small>{nightAssets.urls[layer] ? '已准备' : nightAssets.loading ? '检查中…' : '尚未导入'}</small></div>
+                <label className="light-button file-label"><Upload size={15}/>{importingLayer===layer?'保存中…':'选择文件'}<input type="file" hidden accept="image/png,image/webp,image/jpeg" disabled={importingLayer!==null} onChange={e=>{void handleNightAsset(layer,e.target.files?.[0]);e.target.value=''}}/></label>
+                <button className="light-button" disabled={!nightAssets.urls[layer]} onClick={()=>void removeNightAsset(layer)}>清除</button>
+              </div>)}
+            </div>
+            {assetMessage && <p className="asset-message" role="status">{assetMessage}</p>}
+            <button className="primary-button wide-button" onClick={()=>{saveSettings({scene:'night'});closePanel()}}>预览夜间场景</button>
+            <p className="footnote">需要三层齐全才启用图片模式，否则仍显示 CSS 原型房间；PNG / WebP / JPEG，单张不超过 16 MB。夜间场景不会影响其他天气场景。</p>
+          </section>
         </div>}
         {panel === 'sound' && <section className="panel">
           <div className="drawer-intro">让雨声与微风陪伴你，不需要下载任何背景音资源。</div>

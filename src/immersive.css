@@ -72,3 +72,19 @@ body{overflow:hidden}
 @keyframes mobile-drawer-in{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @media(max-height:650px) and (min-width:681px){.float-dock{top:43%}.vn-dialogue{min-height:127px;padding-top:21px}.vn-line{font-size:13px;min-height:45px}.scene-corner-line{bottom:175px}.character-actor{height:87vh;bottom:-12%}}
 @media(prefers-reduced-motion:reduce){.character-actor .companion,.room-dust span,.window-rain{animation:none!important}.immersive-drawer{animation:none}}
+
+/* Real layered illustrated night scene. All three images share a 1672×941 stage. */
+.room-stage.has-night-art:before,.room-stage.has-night-art:after{display:none}
+.room-stage.has-night-art > :not(.art-stage){display:none}
+.art-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:max(100vw,177.68vh);height:max(100vh,56.28vw);overflow:hidden;z-index:3;isolation:isolate}
+.art-background{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.art-character{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;border:0;padding:0;z-index:2;background:transparent;cursor:pointer;filter:brightness(.87) saturate(.88);transition:transform .35s}
+.art-character:hover{transform:translateY(-.5%)}
+.art-character img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.art-foreground{position:absolute;left:0;top:16.5%;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
+.asset-import-list{display:grid;gap:9px}
+.asset-import-row{display:flex;align-items:center;gap:8px;border:1px solid #e6e7ef;border-radius:11px;padding:10px 8px}
+.asset-import-row>div{flex:1;min-width:0}.asset-import-row b{display:block;font-size:11px;color:#596581}.asset-import-row small{display:block;font-size:10px;color:#99a3bb;margin-top:5px}.asset-import-row .light-button{padding:8px;font-size:10px;flex-shrink:0}
+.asset-message{padding:8px 11px;background:#eef4fe;border-radius:9px;font-size:11px;line-height:1.6;color:#5774a2}
+@media(max-width:680px){.art-stage{width:max(100vw,177.68dvh);height:max(100dvh,56.28vw)}.asset-import-row{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.art-character{transition:none!important}}

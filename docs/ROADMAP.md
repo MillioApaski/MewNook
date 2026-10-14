@@ -18,6 +18,10 @@
 
 ## Stage 2: companion media and visual polish
 
+- [x] Native three-layer night scene compositor using consistent virtual coordinates (background, sleepy companion, foreground occlusion).
+- [x] Import night illustrations in settings and persist image Blobs locally in IndexedDB, with optional packaged defaults.
+- [ ] Commit finalized image artwork to `public/assets/rooms/night/` when binary asset upload is available; downloadable pack prepared separately.
+
 - [ ] Import and use the user's **six** consistent transparent-background portrait assets (current generated images are scene collages, not ready-to-layer portraits)
 - [ ] Blend images with room layers, smooth transitions, click/hover expressions
 - [ ] Focus/rest activity variations; additional outfits; accessible reduced-motion options
