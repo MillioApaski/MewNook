@@ -18,8 +18,10 @@
 
 ## Stage 2: companion media and visual polish
 
+- [x] Daytime room + sitting idle character + matching desk foreground bundled in public/assets/rooms/day/.
+
 - [x] Native three-layer night scene compositor using consistent virtual coordinates (background, sleepy companion, foreground occlusion).
-- [x] Include actual night-scene WebP images in the repository and use static assets, without manual scene import.
+- [x] Include actual day and night WebP images in the repository and use static assets, without manual scene import.
 
 - [ ] Import and use the user's **six** consistent transparent-background portrait assets (current generated images are scene collages, not ready-to-layer portraits)
 - [ ] Blend images with room layers, smooth transitions, click/hover expressions

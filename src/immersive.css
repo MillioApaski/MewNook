@@ -73,9 +73,9 @@ body{overflow:hidden}
 @media(max-height:650px) and (min-width:681px){.float-dock{top:43%}.vn-dialogue{min-height:127px;padding-top:21px}.vn-line{font-size:13px;min-height:45px}.scene-corner-line{bottom:175px}.character-actor{height:87vh;bottom:-12%}}
 @media(prefers-reduced-motion:reduce){.character-actor .companion,.room-dust span,.window-rain{animation:none!important}.immersive-drawer{animation:none}}
 
-/* Real layered illustrated night scene. All three images share a 1672×941 stage. */
-.room-stage.has-night-art:before,.room-stage.has-night-art:after{display:none}
-.room-stage.has-night-art > :not(.art-stage){display:none}
+/* Three-layer illustrated scenes use the same 1672 × 941 virtual canvas. */
+.room-stage.has-scene-art:before,.room-stage.has-scene-art:after{display:none}
+.room-stage.has-scene-art > :not(.art-stage){display:none}
 .art-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:max(100vw,177.68vh);height:max(100vh,56.28vw);overflow:hidden;z-index:3;isolation:isolate}
 .art-background{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
 .art-character{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;border:0;padding:0;z-index:2;background:transparent;cursor:pointer;filter:brightness(.87) saturate(.88);transition:transform .35s}
@@ -84,3 +84,8 @@ body{overflow:hidden}
 .art-foreground{position:absolute;left:0;top:16.5%;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
 @media(max-width:680px){.art-stage{width:max(100vw,177.68dvh);height:max(100dvh,56.28vw)}}
 @media(prefers-reduced-motion:reduce){.art-character{transition:none!important}}
+
+/* Daylight illustration uses a desk crop taken from its exact background,
+   so the front layer aligns with the existing keyboard and stationery. */
+.art-day .art-foreground{top:0;filter:none}
+.art-day .art-character{filter:none}

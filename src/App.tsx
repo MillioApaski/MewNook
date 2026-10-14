@@ -140,7 +140,7 @@ export default function App() {
   const plannedTasks = tasks.filter(t => t.date === selectedDate).sort((a,b) => Number(a.done)-Number(b.done) || Number(b.priority === 'high')-Number(a.priority === 'high'))
   const activeTask = tasks.find(t => t.id === timer.selectedTaskId)
   const roomScene = determineScene(settings.scene, weather)
-  const nightArtReady = roomScene === 'night'
+  const illustratedScene = roomScene === 'day' || roomScene === 'night' ? roomScene : null
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
   const panel = view !== 'home' ? view : utilityPanel
@@ -299,13 +299,13 @@ export default function App() {
   }
 
   return <div className={'immersive-shell accent-' + settings.accent + ' backdrop-' + roomScene}>
-    <div className={'room-stage' + (nightArtReady ? ' has-night-art' : '')} aria-label="沉浸式猫娘工作空间">
-      {nightArtReady && <div className="art-stage">
-        <img className="art-background" src="/assets/rooms/night/background.webp" alt="" draggable={false}/>
+    <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
+      {illustratedScene && <div className={'art-stage art-' + illustratedScene} key={illustratedScene}>
+        <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
         <button className="art-character" aria-label="摸摸猫娘的头" onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')}>
-          <img src="/assets/rooms/night/character.webp" alt="夜间在书桌旁打哈欠的白发蓝瞳猫娘" draggable={false}/>
+          <img src={'/assets/rooms/' + illustratedScene + '/character.webp'} alt={illustratedScene === 'day' ? '白天坐在书桌前微笑的白发蓝瞳猫娘' : '夜间在书桌旁打哈欠的白发蓝瞳猫娘'} draggable={false}/>
         </button>
-        <img className="art-foreground" src="/assets/rooms/night/foreground.webp" alt="" draggable={false}/>
+        <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>
       </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
       <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
