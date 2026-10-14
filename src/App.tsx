@@ -162,10 +162,14 @@ export default function App() {
     setTimer(t => ({...t, phase, remaining: phaseSeconds(phase, settings), endsAt: null, running: false}))
   }
   const toggleTimer = () => {
+    // Use the same timestamp for the countdown deadline and its first render.
+    // Otherwise Math.ceil can briefly display one extra second on start.
+    const timestamp = Date.now()
     endHandled.current = null
+    setNow(timestamp)
     setTimer(t => t.running
-      ? {...t, running: false, remaining: Math.max(0, Math.ceil(((t.endsAt || Date.now()) - Date.now()) / 1000)), endsAt: null}
-      : {...t, running: true, endsAt: Date.now() + Math.max(1, t.remaining) * 1000})
+      ? {...t, running: false, remaining: Math.max(0, Math.ceil(((t.endsAt ?? timestamp) - timestamp) / 1000)), endsAt: null}
+      : {...t, running: true, endsAt: timestamp + Math.max(1, t.remaining) * 1000})
   }
   const resetTimer = () => { endHandled.current = null; setTimer(t => ({ ...t, running: false, remaining: phaseSeconds(t.phase, settings), endsAt: null })) }
   useEffect(() => {
