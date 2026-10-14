@@ -109,12 +109,41 @@ export default function App() {
   const [utilityPanel, setUtilityPanel] = useState<'timer' | 'music' | 'sound' | null>(null)
   const [chatExpanded, setChatExpanded] = useState(false)
   const [dialogueOffset, setDialogueOffset] = useState(0)
+  const [dialogueVisible, setDialogueVisible] = useState(true)
+  const [dialogueSequence, setDialogueSequence] = useState(0)
+  const [sceneLine, setSceneLine] = useState<string | null>(null)
+  const [focusPose, setFocusPose] = useSavedState<'auto' | 'reading' | 'typing'>('focusPose', 'auto')
   const [showHud, setShowHud] = useState(true)
   const audio = useRef<AmbientEngine | null>(null)
   const musicRef = useRef<HTMLAudioElement | null>(null)
   const chatBottomRef = useRef<HTMLDivElement | null>(null)
   const endHandled = useRef<number | null>(null)
   const { weather, weatherError } = useWeather(settings.city)
+
+  // The collapsed Galgame line is a temporary notification, not a permanent HUD.
+  const showDialogue = (line: string | null = null) => {
+    setSceneLine(line)
+    setDialogueOffset(0)
+    setDialogueVisible(true)
+    setDialogueSequence(value => value + 1)
+  }
+  const openChat = () => {
+    setSceneLine(null)
+    setDialogueVisible(true)
+    setChatExpanded(true)
+    setView('home')
+    setUtilityPanel(null)
+  }
+  const closeChat = () => {
+    setChatExpanded(false)
+    setDialogueVisible(false)
+    setMoodOverride(null)
+  }
+  useEffect(() => {
+    if (!dialogueVisible || chatExpanded) return
+    const timeout = window.setTimeout(() => setDialogueVisible(false), 6500)
+    return () => window.clearTimeout(timeout)
+  }, [dialogueVisible, chatExpanded, dialogueSequence])
 
   useEffect(() => {
     const handle = window.setInterval(() => setNow(Date.now()), 800)
@@ -141,6 +170,9 @@ export default function App() {
   const activeTask = tasks.find(t => t.id === timer.selectedTaskId)
   const roomScene = determineScene(settings.scene, weather)
   const illustratedScene = roomScene
+  const activeArtPose = timer.running && timer.phase === 'focus'
+    ? (focusPose === 'auto' ? (activeTask ? 'typing' : 'reading') : focusPose)
+    : null
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
   const panel = view !== 'home' ? view : utilityPanel
@@ -162,6 +194,11 @@ export default function App() {
     setTimer(t => ({...t, phase, remaining: phaseSeconds(phase, settings), endsAt: null, running: false}))
   }
   const toggleTimer = () => {
+    if (!timer.running && timer.phase === 'focus') {
+      setMoodOverride(null)
+      showDialogue('专注时间开始啦。我也会一起' +
+        ((focusPose === 'typing' || (focusPose === 'auto' && activeTask)) ? '写字，安静陪着你。' : '看书，安静陪着你。'))
+    }
     // Use the same timestamp for the countdown deadline and its first render.
     // Otherwise Math.ceil can briefly display one extra second on start.
     const timestamp = Date.now()
@@ -184,7 +221,10 @@ export default function App() {
     const nextPhase: Phase = isFocus ? (focusCount % Math.max(1,settings.longEvery) === 0 ? 'long' : 'short') : 'focus'
     const seconds = phaseSeconds(nextPhase, settings)
     setTimer(t => ({...t, phase: nextPhase, focusCount, remaining: seconds, running: settings.autoAdvance, endsAt: settings.autoAdvance ? Date.now() + seconds * 1000 : null}))
-    setMoodOverride(isFocus ? 'happy' : null)
+    setMoodOverride(null)
+    const announcement = isFocus ? '辛苦啦！这轮专注结束了，来休息一下吧。' : '休息结束了，要一起开始下一轮吗？'
+    setChat(previous => [...previous, {id:uid(),role:'assistant' as const,content:announcement}].slice(-100))
+    showDialogue(announcement)
     if (settings.soundOnFinish) {
       try {
         const ctx = new AudioContext(), oscillator = ctx.createOscillator(), gain = ctx.createGain()
@@ -271,11 +311,13 @@ export default function App() {
     setChat(previous => [...previous, userMessage].slice(-100))
     setChatDraft(''); setChatError(''); setDialogueOffset(0)
     setMoodOverride('chat')
+    setDialogueVisible(true)
     if (!settings.aiUrl.trim() || !settings.aiModel.trim()) {
       const answer = /累|困|休息/.test(content) ? '那就稍微休息一下吧。窗外的风也在等你呢。' :
         /学习|工作|专注|代码|任务/.test(content) ? '我们一起把这一小段时间认真过好喵。我会安静地陪着你。' :
         '喵呜～我在这里！想聊天的话随时可以找我。'
       setChat(previous => [...previous, {id:uid(),role:'assistant' as const,content:answer}].slice(-100))
+      showDialogue(answer)
       return
     }
     setChatLoading(true)
@@ -297,6 +339,7 @@ export default function App() {
       const answer = data.choices?.[0]?.message?.content?.trim()
       if (!answer) throw new Error('API 未返回可显示的回复')
       setChat(previous => [...previous,{id:uid(),role:'assistant' as const,content:answer}].slice(-100))
+      showDialogue(answer)
     } catch (error) {
       setChatError(error instanceof TypeError ? '网络请求失败。请检查网络、API 地址和服务商是否允许浏览器跨域（CORS）。' : error instanceof Error ? error.message : '请求失败')
     } finally { setChatLoading(false) }
@@ -306,8 +349,11 @@ export default function App() {
     <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
       {illustratedScene && <div className={'art-stage art-' + illustratedScene} key={illustratedScene}>
         <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
-        <button className="art-character" aria-label="摸摸猫娘的头" onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')}>
-          <img src={'/assets/rooms/' + illustratedScene + '/character.webp'} alt={illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'} draggable={false}/>
+        <button className={'art-character' + (activeArtPose ? ' focus-art' : '')} aria-label="摸摸猫娘的头" onClick={() => {setMoodOverride(m => m === 'happy' ? null : 'happy');showDialogue('喵？我在这里陪着你呢。')}}>
+          <img key={activeArtPose || illustratedScene}
+            src={activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
+            alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
+            draggable={false}/>
         </button>
         <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>
       </div>}
@@ -321,7 +367,7 @@ export default function App() {
       <div className="room-rug" aria-hidden="true"/>
       <div className="room-desk" aria-hidden="true"><span className="desk-monitor"/><span className="desk-cup"/><span className="desk-book"/></div>
       <div className="room-dust" aria-hidden="true"><span/><span/><span/><span/><span/><span/></div>
-      <button type="button" className="character-actor" onClick={() => setMoodOverride(m => m === 'happy' ? null : 'happy')} aria-label="摸摸猫娘的头">
+      <button type="button" className="character-actor" onClick={() => {setMoodOverride(m => m === 'happy' ? null : 'happy');showDialogue('喵？我在这里陪着你呢。')}} aria-label="摸摸猫娘的头">
         <Companion mood={mood} phase={timer.phase}/>
       </button>
     </div>
@@ -342,7 +388,7 @@ export default function App() {
     <nav className="float-dock float-dock-right" aria-label="环境与互动">
       <button className={'dock-button' + (panel === 'music' ? ' selected' : '')} onClick={() => openPanel('music')} title="我的音乐" aria-label="我的音乐"><Music2 size={21}/><span>音乐</span></button>
       <button className={'dock-button' + (panel === 'sound' ? ' selected' : '')} onClick={() => openPanel('sound')} title="环境音" aria-label="环境音"><Headphones size={21}/><span>环境</span></button>
-      <button className={'dock-button' + (chatExpanded ? ' selected' : '')} onClick={() => {setChatExpanded(v => !v);closePanel()}} title="与猫娘聊天" aria-label="与猫娘聊天"><Heart size={21}/><span>聊天</span></button>
+      <button className={'dock-button' + (chatExpanded ? ' selected' : '')} onClick={() => chatExpanded ? closeChat() : openChat()} title="与猫娘聊天" aria-label="与猫娘聊天"><Heart size={21}/><span>聊天</span></button>
     </nav>
 
     {showHud && <div className="scene-focus-chip">
@@ -371,6 +417,7 @@ export default function App() {
           <div className="clock-display"><span>{timeLabel(remaining)}</span><svg viewBox="0 0 270 12" preserveAspectRatio="none"><rect width="270" height="12" rx="6" fill="#e8e7f1"/><rect width={270 * progress / 100} height="12" rx="6" fill="#8b98ce"/></svg></div>
           <div className="timer-actions"><button className="primary-button" onClick={toggleTimer}>{timer.running ? <Pause size={18}/> : <Play size={18} fill="currentColor"/>}{timer.running ? '暂停专注' : remaining < currentDuration ? '继续计时' : '开始专注'}</button><ButtonIcon title="重置当前计时" onClick={resetTimer}><RotateCcw size={18}/></ButtonIcon></div>
           <div className="timer-task"><span>本轮任务</span><select aria-label="本轮专注关联任务" value={timer.selectedTaskId || ''} onChange={e => setTimer(t => ({...t,selectedTaskId:e.target.value || null}))}><option value="">自由专注</option>{tasks.filter(t=>!t.done).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></div>
+          <div className="timer-task focus-pose-control"><span>猫娘专注动作</span><select aria-label="专注时猫娘的动作" value={focusPose} onChange={e => setFocusPose(e.target.value as 'auto' | 'reading' | 'typing')}><option value="auto">自动（自由看书／任务打字）</option><option value="reading">专注看书</option><option value="typing">专注写字 / 打字</option></select></div>
           <div className="timer-summary"><span><Sparkles size={16}/> 今日累计 <strong>{todayMinutes} 分钟</strong></span><span><Check size={16}/> 完成 <strong>{completedToday}/{todayTasks.length} 项</strong></span></div>
           <button className="drawer-secondary-link" onClick={() => openPanel('tasks')}>安排今天的计划 <ChevronRight size={16}/></button>
         </section>}
@@ -432,17 +479,17 @@ export default function App() {
       </aside>
     </>}
 
-    <section className={'vn-dialogue' + (chatExpanded ? ' expanded' : '')} aria-label="和猫娘对话">
+    {(dialogueVisible || chatExpanded) && <section className={'vn-dialogue' + (chatExpanded ? ' expanded' : '')} aria-label="和猫娘对话">
       <div className="vn-frame-ornament" aria-hidden="true">✧</div>
       <div className="vn-nameplate"><span>✦</span> 小猫同学 <span className="vn-name-en">COMPANION</span></div>
       {!chatExpanded ? <>
-        <p className="vn-line" aria-live="polite">{timer.running && dialogueOffset === 0 && chat.length <= 1 ? '嘘…专注的时候，我也会安静地陪着你。' : latestDialogue}</p>
+        <p className="vn-line" aria-live="polite">{sceneLine && dialogueOffset === 0 ? sceneLine : latestDialogue}</p>
         <div className="vn-bottom">
           <span className="vn-hint">{settings.aiUrl && settings.aiModel ? 'AI 陪伴模式' : '离线预设台词'} · 点击「聊天」展开自由对话</span>
           <div className="vn-actions">
             <button disabled={dialogueOffset >= assistantLines.length - 1} onClick={()=>setDialogueOffset(i=>Math.min(assistantLines.length-1,i+1))} title="上一句台词" aria-label="上一句台词"><ChevronLeft size={17}/></button>
             <button disabled={dialogueOffset===0} onClick={()=>setDialogueOffset(i=>Math.max(0,i-1))} title="下一句台词" aria-label="下一句台词"><ChevronRight size={17}/></button>
-            <button className="vn-chat-button" onClick={()=>setChatExpanded(true)} aria-label="展开聊天"><Send size={16}/> 聊天</button>
+            <button className="vn-chat-button" onClick={openChat} aria-label="展开聊天"><Send size={16}/> 聊天</button>
           </div>
         </div>
       </> : <>
@@ -450,10 +497,10 @@ export default function App() {
         <form className="vn-compose" onSubmit={e=>{e.preventDefault();void sendChat()}}>
           <input aria-label="和猫娘说话" placeholder="和小猫说点什么…" maxLength={1600} value={chatDraft} onChange={e=>setChatDraft(e.target.value)} />
           <button disabled={chatLoading||!chatDraft.trim()} type="submit" aria-label="发送消息"><Send size={19}/></button>
-          <button type="button" className="vn-collapse" onClick={()=>setChatExpanded(false)} aria-label="收起聊天"><X size={18}/></button>
+          <button type="button" className="vn-collapse" onClick={closeChat} aria-label="关闭聊天"><X size={18}/></button>
         </form>
       </>}
-    </section>
+    </section>}
     <audio className="persistent-music" ref={musicRef} preload="metadata" src={tracks[trackIndex]?.url} onEnded={()=>setTrackIndex(i=>(i+1)%tracks.length)} />
     <div className="scene-attribution"><span>Weather · Open-Meteo</span>　✧　MewNook</div>
   </div>

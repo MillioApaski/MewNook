@@ -95,3 +95,13 @@ body{overflow:hidden}
 .art-sunset .art-character,.art-rain .art-character{filter:none}
 .art-sunset .art-foreground,.art-rain .art-foreground{filter:none}
 .art-sunset .art-foreground,.art-rain .art-foreground{top:16.5%}
+
+/* Focus illustrations share a normalized transparent portrait canvas. */
+.art-character.focus-art{filter:none}
+.art-night .art-character.focus-art{filter:brightness(.77) saturate(.72) hue-rotate(11deg)}
+.art-rain .art-character.focus-art{filter:brightness(.9) saturate(.8)}
+.art-character.focus-art img{animation:focus-appearance .25s ease-out}
+@keyframes focus-appearance{from{opacity:.45}to{opacity:1}}
+.drawer-scroll .timer-task.focus-pose-control{margin:15px 0;align-items:center}
+.drawer-scroll .timer-task.focus-pose-control select{max-width:75%;width:75%}
+@media(prefers-reduced-motion:reduce){.art-character.focus-art img{animation:none!important}}

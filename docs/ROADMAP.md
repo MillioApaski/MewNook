@@ -18,6 +18,9 @@
 
 ## Stage 2: companion media and visual polish
 
+- [x] Temporarily show Galgame dialogue (6.5 seconds), reveal it for new messages and focus-cycle notifications, and retain expanded chat until dismissed.
+- [x] Switch actual bundled catgirl artwork on focus (reading or typing) with manual selection and auto task-aware pose, across all four rooms.
+
 - [x] Daytime room + sitting idle character + matching desk foreground bundled in public/assets/rooms/day/.
 - [x] Sunset and rainy room, character, desk foreground bundled in public/assets/rooms/sunset/ and public/assets/rooms/rain/; all four scene modes now use illustration layers.
 
