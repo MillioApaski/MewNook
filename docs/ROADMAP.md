@@ -49,3 +49,13 @@
 - Restrict provider URLs to HTTPS except loopback for local inference.
 - Timer uses timestamps rather than interval counting and logs a completed work block once.
 - Open-Meteo noncommercial usage and attribution are subject to their license.
+
+## Phase 3C: AI companion (ahead of Live2D)
+
+- [x] Browser-side OpenAI compatible SSE streaming, with non-streaming option, AbortController cancel and explicit retry.
+- [x] Bounded recent conversation context and user-configurable output-token cap.
+- [x] Local editable companion-memory notes and user-triggered API memory summarization (never silent paid calls).
+- [x] Opt-in foreground-only proactive greetings, local free-by-default and separate AI opt-in with interval and daily budget.
+- [ ] Add cross-tab request coordination and provider token-usage metrics if strict multi-tab cost accounting becomes necessary.
+- [ ] Real-browser tests against chosen user's AI provider (CORS/stream format varies).
+- [ ] Defer Live2D actions, expressions and scene animations to the Live2D milestone; do final PWA optimization afterwards.
