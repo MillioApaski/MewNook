@@ -127,3 +127,16 @@ body{overflow:hidden}
 .ai-proactive-controls input[type="number"]{max-width:125px}
 .ai-persona-foot .light-button{flex-shrink:0;padding:5px 8px;font-size:10px}
 @media(prefers-reduced-motion:reduce){.vn-stream-cursor{animation:none}}
+
+/* Inochi2D test rig is composited in the exact same character anchor as PNG.
+   Keep the original invisible button to handle tapping and preserve fallback. */
+.inochi-demo-layer{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;z-index:2;
+  pointer-events:none;opacity:0;transition:opacity .3s ease}
+.inochi-demo-layer.ready{opacity:1}
+.inochi-demo-canvas{width:100%;height:100%;display:block;pointer-events:none}
+.art-character.inochi-ready img{visibility:hidden}
+.inochi-test-settings{padding:13px 11px;margin:12px 0 5px;border:1px solid #e4e4ef;background:#f8f8fc;border-radius:12px}
+.inochi-test-settings .setting-field{display:flex;flex-direction:column;gap:4px;margin-top:9px}
+.inochi-test-settings input[type="range"]{width:100%;accent-color:#8798c4}
+.inochi-test-settings .footnote{line-height:1.55;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.inochi-demo-layer{transition:none}}

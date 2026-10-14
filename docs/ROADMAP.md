@@ -59,3 +59,13 @@
 - [ ] Add cross-tab request coordination and provider token-usage metrics if strict multi-tab cost accounting becomes necessary.
 - [ ] Real-browser tests against chosen user's AI provider (CORS/stream format varies).
 - [ ] Defer Live2D actions, expressions and scene animations to the Live2D milestone; do final PWA optimization afterwards.
+
+## Inochi2D runtime experiment
+
+- [x] Select open Inochi2D runtime with pinned SHA-verified WebGL2/WASM dependencies.
+- [x] Add **opt-in** Inochi2D prototype and keep PNG default/fallback.
+- [x] Adapt rendering into the existing background → character → foreground order; camera scale adjustable.
+- [x] Attribute the temporary CC BY 4.0 Aka test rig and bundled third-party runtime licenses.
+- [ ] Validate actual rendering / animation / click interactions in a deployed browser.
+- [ ] Create and rig the original MewNook white-haired catgirl in Inochi Creator, then replace Aka.
+- [ ] Integrate mature focus/rest/chat behavior after model action names are confirmed.

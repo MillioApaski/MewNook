@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "deploy": "npm run build && wrangler deploy",
     "typecheck": "tsc -b",
-    "test:ai": "node --test tests/aiChat.test.mjs"
+    "test:ai": "node --test tests/aiChat.test.mjs",
+    "prepare:inochi": "node scripts/prepare-inochi-test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

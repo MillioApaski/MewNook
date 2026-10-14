@@ -4,6 +4,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,7 +17,19 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit
+      - name: Download and integrity-check pinned Inochi2D demo assets
+        run: npm run prepare:inochi
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA
         run: npm run build
+      - name: Commit pinned Inochi2D test assets into repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git add public/inochi2d-test/
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: vendor pinned Inochi2D WebGL2 demo assets and CC BY sample rig"
+            git push origin HEAD:main
+          fi

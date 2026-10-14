@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   BookOpen, CalendarDays, ChartNoAxesColumnIncreasing, Check, ChevronLeft, ChevronRight,
   Clock3, CloudRain, Coffee, Download, Headphones, Heart, KeyRound, ListTodo,
@@ -6,6 +6,7 @@ import {
   Sparkles, Sun, Trash2, Upload, Wind, X
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
+import { InochiTestCharacter, type InochiTestStatus } from './inochi/InochiTestCharacter'
 import { boundedOutputTokens, chatContext, requestAI } from './aiChat'
 import { Companion, type Mood } from './Companion'
 import {
@@ -123,6 +124,12 @@ export default function App() {
   const [dialogueTimeoutMs, setDialogueTimeoutMs] = useState(6500)
   const [sceneLine, setSceneLine] = useState<string | null>(null)
   const [focusPose, setFocusPose] = useSavedState<'auto' | 'reading' | 'typing'>('focusPose', 'auto')
+  const [inochiStatus, setInochiStatus] = useState<InochiTestStatus>('off')
+  const [inochiError, setInochiError] = useState('')
+  const [inochiTouches, setInochiTouches] = useState(0)
+  const reportInochiStatus = useCallback((status:InochiTestStatus,error?:string)=>{
+    setInochiStatus(status);setInochiError(error||'')
+  },[])
   const [showHud, setShowHud] = useState(true)
   const audio = useRef<AmbientEngine | null>(null)
   const musicRef = useRef<HTMLAudioElement | null>(null)
@@ -201,6 +208,7 @@ export default function App() {
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
   const handleCompanionClick = () => {
+    setInochiTouches(n=>n+1)
     lastInteraction.current = Date.now()
     const mode = companionMode(timer.phase, timer.running)
     const line = pickCompanionClickLine(mode, touchCount.current++, activeArtPose)
@@ -473,12 +481,17 @@ export default function App() {
     <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
       {illustratedScene && <div className={'art-stage art-' + illustratedScene} key={illustratedScene}>
         <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
-        <button className={'art-character' + (activeArtPose ? ' focus-art' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
+        <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
             src={activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
             alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
             draggable={false}/>
         </button>
+        {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
+          <InochiTestCharacter active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
+            activity={timer.phase==='focus' && timer.running?'focus':timer.phase!=='focus'?'rest':'idle'}
+            touches={inochiTouches} onStatus={reportInochiStatus}/>
+        </div>}
         <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>
       </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
@@ -571,6 +584,14 @@ export default function App() {
             <Field label="天气城市" hint="使用 Open-Meteo，城市名支持中文或英文。"><input value={settings.city} onChange={e=>saveSettings({city:e.target.value})}/></Field>
             <Field label="场景"><select value={settings.scene} onChange={e=>saveSettings({scene:e.target.value as Scene})}>{(Object.keys(sceneName) as Scene[]).map(scene=><option key={scene} value={scene}>{sceneName[scene]}</option>)}</select></Field>
             <Field label="主题配色"><select value={settings.accent} onChange={e=>saveSettings({accent:e.target.value as Settings['accent']})}><option value="blue">雾蓝</option><option value="pink">樱粉</option><option value="lavender">淡紫</option></select></Field>
+          </div><div className="inochi-test-settings">
+            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用真正的 Inochi2D WebGL2 模型测试动画与分层遮挡。默认不加载，模型约 18 MB。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
+            {settings.inochiTestMode && <>
+              <Field label="测试模型缩放" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
+              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载示例模型…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
+              {inochiError && <p className="error-text">{inochiError}</p>}
+              <p className="footnote">当前为第三方 Aka 示例模型（作者 seagetch，CC BY 4.0），不是 MewNook 正式白发猫娘。<a href="https://github.com/Inochi2D/example-models" target="_blank" rel="noreferrer">来源与署名</a></p>
+            </>}
           </div><p className="footnote">天气数据：<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · 非商业使用请遵守其许可与署名要求。</p></section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon blue"><KeyRound size={20}/></span><strong>自定义 AI API</strong></div><span className="badge">BYOK · 可选</span></div>
             <p className="settings-intro">没有 API 也能使用预设猫娘对话。使用第三方模型时，由浏览器直接向你的服务商发起请求，必须支持 CORS。项目不提供付费 Key，也没有云端中转。</p>

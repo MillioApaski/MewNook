@@ -12,7 +12,8 @@ export type Settings = {
   autoAdvance: boolean; soundOnFinish: boolean; city: string; scene: Scene;
   aiUrl: string; aiModel: string; aiPersonaPrompt: string; nickname: string; accent: 'blue' | 'pink' | 'lavender';
   aiStreaming: boolean; aiContextTurns: number; aiMaxTokens: number; aiMemory: string;
-  proactiveEnabled: boolean; proactiveAI: boolean; proactiveIntervalMinutes: number; proactiveDailyLimit: number
+  proactiveEnabled: boolean; proactiveAI: boolean; proactiveIntervalMinutes: number; proactiveDailyLimit: number;
+  inochiTestMode: boolean; inochiScale: number
 }
 export type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string }
 export type Weather = { temperature: number; code: number; isDay: boolean; name: string }
@@ -22,7 +23,8 @@ export const initialSettings: Settings = {
   autoAdvance: false, soundOnFinish: true, city: 'Tokyo', scene: 'auto',
   aiUrl: '', aiModel: '', aiPersonaPrompt: DEFAULT_COMPANION_PROMPT, nickname: '你', accent: 'blue',
   aiStreaming: true, aiContextTurns: 12, aiMaxTokens: 600, aiMemory: '',
-  proactiveEnabled: false, proactiveAI: false, proactiveIntervalMinutes: 60, proactiveDailyLimit: 2
+  proactiveEnabled: false, proactiveAI: false, proactiveIntervalMinutes: 60, proactiveDailyLimit: 2,
+  inochiTestMode: false, inochiScale: 0.32
 }
 export const initialTimer: Timer = { phase: 'focus', running: false, endsAt: null, remaining: 25 * 60, focusCount: 0, selectedTaskId: null }
 export const uid = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? crypto.randomUUID() : Math.random().toString(36).slice(2)
