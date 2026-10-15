@@ -42,8 +42,38 @@ try {
  await controller.setCameraTransform(0,120,0.32)
  await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
  const names=controller.getAnimationNames?.()||[]
+ const selftest = new URLSearchParams(location.search).has('selftest')
+ if(selftest) {
+   const gl=canvas.getContext('webgl2')
+   if(!gl) throw new Error('WebGL2 context unavailable in pixel verification')
+   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))
+   const snapshot=()=>{
+     const pixels=new Uint8Array(gl.drawingBufferWidth*gl.drawingBufferHeight*4)
+     gl.readPixels(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight,gl.RGBA,gl.UNSIGNED_BYTE,pixels)
+     return pixels
+   }
+   await controller.setParameter?.('ParamEyeBlinkLeft',0)
+   await controller.setParameter?.('ParamEyeBlinkRight',0)
+   await wait(350)
+   const openPixels=snapshot()
+   await controller.setParameter?.('ParamEyeBlinkLeft',1)
+   await controller.setParameter?.('ParamEyeBlinkRight',1)
+   await wait(450)
+   const closedPixels=snapshot()
+   let changed=0
+   for(let i=0;i<openPixels.length;i+=4) {
+     const diff=Math.abs(openPixels[i]-closedPixels[i])
+       +Math.abs(openPixels[i+1]-closedPixels[i+1])
+       +Math.abs(openPixels[i+2]-closedPixels[i+2])
+     if(diff>45) changed++
+   }
+   node.dataset.blinkChangedPixels=String(changed)
+   if(changed<70) throw new Error('眨眼控制未造成足够的画面变化：'+changed+' pixels')
+   await controller.setParameter?.('ParamEyeBlinkLeft',0)
+   await controller.setParameter?.('ParamEyeBlinkRight',0)
+ }
  if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- setStatus('ready','MewNook v2 加载成功 · 独立眼皮及表情参数已初始化')
+ setStatus('ready','MewNook v2 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
  document.querySelector('#chat').disabled=false

@@ -133,7 +133,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       const blinkValue=current<manualBlinkUntil.current?1:blink
       const touched=current<tapUntilRef.current
       const state=smoothed.current
-      state.smile+=(resting||talking?0.65:focused?0.10:0.22-state.smile)*0.12
+      state.smile+=((resting||talking?0.65:focused?0.10:0.22)-state.smile)*0.12
       state.sleepy+=((sleepy?0.85:focused?0.16:0)-state.sleepy)*0.12
       state.mouth+=((talking?Math.abs(Math.sin(t*8)):0)-state.mouth)*0.38
       const set=(name:string,val:number)=>void c.setParameter?.(name,val)
