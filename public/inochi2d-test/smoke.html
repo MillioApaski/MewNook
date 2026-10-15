@@ -43,8 +43,8 @@ try {
  await controller.setCameraTransform(0,120,0.32)
  const candidateModel=new URLSearchParams(location.search).get('model')!=='v2'
  await controller.loadModel(candidateModel
-   ? '/inochi2d-test/models/MewNook-v3.inx?rig=tilted-face-20261015'
-   : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-face-20261015')
+   ? '/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'
+   : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015')
  const names=controller.getAnimationNames?.()||[]
  const probe = new URLSearchParams(location.search).has('probe')
  if(probe)window.__inochiProbe={set:async(name,value)=>controller.setParameter(name,value),

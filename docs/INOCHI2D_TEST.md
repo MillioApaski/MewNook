@@ -148,3 +148,21 @@ appropriate face region, and saves neutral, small and large mouth frames.
 This is source-matched generated art, **not** a professional manually rigged
 Inochi Creator face. Full manual redraw and hidden-area overpainting remain
 future work.
+
+## 2026-10-15: compact tilted drowsy eyelids
+
+The old `ParamSleepy` layered a whole recolored eye ellipse over each iris
+and moved a thick stroke, producing rectangular-looking skin patches around
+brows and bangs. This has been replaced by
+`scripts/mewnook_eye_art.py`:
+
+- Independently angled, bounded iris masks (near and far eye use unequal spans).
+- A feathered upper-edge covering strip that stays strictly within the iris.
+- A thinner, curved dark eyelid edge aligned with the source character's
+  tilted pupil instead of a horizontal detached eyelash.
+- Smooth parameter entry/exit with independent skin and stroke ArtMesh parts.
+- Test assertions check the drowsy mask cannot grow to the full eye-white
+  ellipse, and Playwright records open, drowsy and closed frames separately.
+
+The remaining model is still semi-automatically derived from one flattened
+illustration; expert manual redraw will be necessary for larger expressions.
