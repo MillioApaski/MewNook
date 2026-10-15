@@ -140,8 +140,11 @@ blush_image = Image.new('RGBA',(W,H),(0,0,0,0))
 draw = ImageDraw.Draw(blush_image)
 for center in [(345, 546),(586, 468)]:
     x,y=xy(*center)
-    draw.ellipse((x-19,y-9,x+19,y+9), fill=(245, 125, 152, 65))
-blush_image = blush_image.filter(ImageFilter.GaussianBlur(max(1,W/180)))
+    draw.ellipse((x-22,y-10,x+22,y+10), fill=(242, 122, 152, 148))
+    for dx in (-13,0,13):
+        draw.line((x+dx-5,y+4,x+dx+3,y-5),fill=(229,107,140,120),
+                  width=max(2,round(W/600)))
+blush_image = blush_image.filter(ImageFilter.GaussianBlur(max(.7,W/700)))
 
 def polygon(points, blur=1.9):
     img = Image.new('L',(W,H),0)
@@ -229,9 +232,10 @@ for i,eye in enumerate(eyes):
     # regression. The cover contains the reconstructed face under the iris.
     cover=add_part('Eye '+eye['name']+' Upper Lid',body,eye['mask'],z=7+i*5)
     # A separate half-closed upper lid gives drowsy mode a persistent pose.
-    drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,eye['mask'],z=8+i*5)
-    lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=9+i*5)
-    eye_parts[eye['name']]=(iris,cover,drowsy,lash)
+    drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,eye['mask'],z=8+i*6)
+    sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lash_sprite(eye),z=9+i*6)
+    lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=10+i*6)
+    eye_parts[eye['name']]=(iris,cover,drowsy,sleepy_lash,lash)
 neutral=add_part('Neutral Smile',np.asarray(neutral_mouth),z=20)
 mouth=add_part('Talking Mouth',np.asarray(mouth_image),z=21)
 blush=add_part('Shy Blush',np.asarray(blush_image),z=22)
@@ -255,7 +259,7 @@ def param(name, bindings, limits=(-1,1), initial=0):
     })
 def bind(node,kind,values): return (node,kind,values)
 
-for name,(iris,cover,drowsy,lash) in eye_parts.items():
+for name,(iris,cover,drowsy,sleepy_lash,lash) in eye_parts.items():
     # -1 and 0: open. +1: fully covered by skin + closed eyelash.
     # Translate the eyelid from above the eye to its final centered position
     # while expanding downwards. This is occlusion, not iris compression.
@@ -271,9 +275,9 @@ param('ParamBreath',[bind(base,'transform.s.y',[.995,1.,1.005])])
 param('ParamBodyY',[bind(base,'transform.t.y',[-2.,0.,2.])])
 param('ParamBodyZ',[bind(base,'transform.r.z',[-.002,0.,.002])])
 param('ParamHeadX',[bind(iris,'transform.t.x',[-2,0,2])
-                   for iris,_,_,_ in eye_parts.values()])
+                   for iris,_,_,_,_ in eye_parts.values()])
 param('ParamHeadY',[bind(iris,'transform.t.y',[-2,0,2])
-                   for iris,_,_,_ in eye_parts.values()])
+                   for iris,_,_,_,_ in eye_parts.values()])
 param('ParamMouthOpen',[
     bind(mouth,'transform.s.y',[.008,.008,1.]),
     bind(mouth,'transform.t.y',[-9,-9,0])
@@ -281,10 +285,11 @@ param('ParamMouthOpen',[
 param('ParamSmile',[bind(neutral,'transform.s.x',[.94,1.,1.08])])
 param('ParamSleepy',[
     binding
-    for _,(_,_,drowsy,_) in eye_parts.items()
+    for _,(_,_,drowsy,sleepy_lash,_) in eye_parts.items()
     for binding in (
-        bind(drowsy,'transform.s.y',[.008,.008,.80]),
-        bind(drowsy,'transform.t.y',[-26,-26,-9])
+        bind(drowsy,'transform.s.y',[.008,.008,.56]),
+        bind(drowsy,'transform.t.y',[-26,-26,-11]),
+        bind(sleepy_lash,'transform.s.y',[.002,.002,.74])
     )
 ])
 param('ParamEmbarrassed',[bind(blush,'transform.s.y',[.002,.002,1.])])
