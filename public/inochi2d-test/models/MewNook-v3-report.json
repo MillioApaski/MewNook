@@ -1,6 +1,6 @@
 {
   "parts": 13,
-  "parameters": 22,
+  "parameters": 18,
   "newParts": [
     "Hair Left Outer",
     "Hair Right Outer",
@@ -10,13 +10,9 @@
     "ParamHairLeft",
     "ParamHairRight",
     "ParamHairFront",
-    "ParamTailDeform",
-    "ParamLidCurveLeft",
-    "ParamLidCurveRight",
-    "ParamEyeDeformLeft",
-    "ParamEyeDeformRight"
+    "ParamTailDeform"
   ],
-  "modelBytes": 2294740,
+  "modelBytes": 2282143,
   "limitations": [
     "Flattened illustration used",
     "Hidden areas approximated, not hand-painted",
