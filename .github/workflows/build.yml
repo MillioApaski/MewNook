@@ -60,6 +60,17 @@ jobs:
             'http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3&diagnose=1' \
             > /tmp/inochi-v3-diagnostic.html 2> /tmp/inochi-v3-browser.log || true
           python -c "import re; s=open('/tmp/inochi-v3-diagnostic.html').read(); m=re.search(r'data-diagnostic=\\\"([^\\\"]+)',s); print('V3 DIAGNOSTIC:',m.group(1) if m else 'Missing!'); print('V3 STATUS:',re.findall(r'<span id=\\\"status\\\"[^>]*>[^<]*',s)[:1])"
+      - name: Diagnose v3 with real Chrome frame screenshots
+        run: |
+          npm install --no-save --no-audit --no-fund playwright-core pngjs pixelmatch
+          node scripts/diagnose-inochi-v3.mjs
+      - name: Upload v3 diagnostic screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inochi-v3-probe
+          path: /tmp/inochi-v3-shots
+          if-no-files-found: ignore
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |

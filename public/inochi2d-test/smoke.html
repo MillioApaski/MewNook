@@ -45,6 +45,10 @@ try {
    ? '/inochi2d-test/models/MewNook-v3.inx'
    : '/inochi2d-test/models/MewNook-v2.inx')
  const names=controller.getAnimationNames?.()||[]
+ const probe = new URLSearchParams(location.search).has('probe')
+ if(probe)window.__inochiProbe={set:async(name,value)=>controller.setParameter(name,value),
+   debug:()=>controller.getDebugState?.(),
+   canvas:()=>[canvas.width,canvas.height]}
  const selftest = new URLSearchParams(location.search).has('selftest')
  const diagnose = new URLSearchParams(location.search).has('diagnose')
  if(diagnose) {
@@ -123,7 +127,7 @@ try {
  document.querySelector('#chat').disabled=false
  document.querySelector('#sleep').disabled=false
  let tapUntil=0, manualBlinkUntil=0, expressionUntil=0, currentExpression='idle'
- const ticker=setInterval(()=>{
+ const ticker=probe?null:setInterval(()=>{
     const t=performance.now()/1000,phase=t%4.2,blink=phase<.17?Math.sin(Math.PI*phase/.17):0
     for(const [id,val] of [
       ['ParamEyeBlinkLeft',performance.now()<manualBlinkUntil?1:blink],['ParamEyeBlinkRight',performance.now()<manualBlinkUntil?1:blink],
@@ -137,7 +141,7 @@ try {
       ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?Math.abs(Math.sin(t*7)):0]
     ]) void controller.setParameter?.(id,val)
  },80)
-window.addEventListener('pagehide',()=>clearInterval(ticker),{once:true})
+window.addEventListener('pagehide',()=>{if(ticker)clearInterval(ticker)},{once:true})
  document.querySelector('#tap').onclick=()=>{
    tapUntil=performance.now()+700
    void controller.applyInteractionImpulse?.(6,-4)
