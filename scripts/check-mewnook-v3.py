@@ -22,6 +22,7 @@ for p in deform:
     assert count>=15 and len(node['mesh']['indices'])>=18,(p['name'],count)
     assert len(node['mesh']['uvs'])==count*2
     assert len(b['values'])==3
+    assert len(p['bindings'])==1, (p['name'],'fallback transform must not mask failed mesh deform')
     for row in b['values']:
         assert len(row)==2
         for cell in row:

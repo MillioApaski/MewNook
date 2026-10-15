@@ -40,7 +40,7 @@ try {
  resize()
  new ResizeObserver(resize).observe(canvas)
  await controller.setCameraTransform(0,120,0.32)
- const candidateModel=new URLSearchParams(location.search).get('model')==='v3'
+ const candidateModel=new URLSearchParams(location.search).get('model')!=='v2'
  await controller.loadModel(candidateModel
    ? '/inochi2d-test/models/MewNook-v3.inx'
    : '/inochi2d-test/models/MewNook-v2.inx')
@@ -121,7 +121,7 @@ try {
 
  }
  if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- setStatus('ready','MewNook v2 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
+ setStatus('ready','MewNook '+(candidateModel?'v3':'v2')+' 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
  document.querySelector('#chat').disabled=false
@@ -132,6 +132,12 @@ try {
     for(const [id,val] of [
       ['ParamEyeBlinkLeft',performance.now()<manualBlinkUntil?1:blink],['ParamEyeBlinkRight',performance.now()<manualBlinkUntil?1:blink],
       ['ParamBreath',Math.sin(t*2)],['ParamTailSwing',Math.sin(t*1.3)],
+      ...(candidateModel?[
+        ['ParamHairLeft',Math.sin(t*.82)*.23],
+        ['ParamHairRight',Math.sin(t*.73+1.1)*.20],
+        ['ParamHairFront',Math.sin(t*1.07+.5)*.15],
+        ['ParamTailDeform',Math.sin(t*.94+1.7)*.28]
+      ]:[]),
       ['ParamEarLeft',performance.now()<tapUntil?.9:Math.sin(t*1.8)*.4],
       ['ParamEarRight',performance.now()<tapUntil?-.9:Math.sin(t*1.7+.4)*.4],
       ['ParamHeadX',Math.sin(t*.4)*.2],

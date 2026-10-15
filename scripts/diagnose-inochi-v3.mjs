@@ -36,6 +36,18 @@ try{
      await set(0)
    }
  }
+ // Integration test: same v3 rig must load inside the actual MewNook React scene.
+ await page.addInitScript(()=>{
+   localStorage.setItem('mewnook:settings',JSON.stringify({
+     inochiTestMode:true,inochiScale:0.32,scene:'day',city:''
+   }))
+ })
+ await page.goto('http://127.0.0.1:4173/')
+ await page.locator('.art-character.inochi-ready').waitFor({timeout:60000})
+ const status=await page.locator('.inochi-demo-canvas').getAttribute('data-inochi2d-model-status')
+ if(status!=='loaded')throw Error('MewNook React failed to load v3: '+status)
+ await page.locator('.art-stage').screenshot({path:'/tmp/inochi-v3-shots/mewnook-main-v3.png'})
+ console.log('MEWNOOK APP INTEGRATION: v3 canvas loaded')
  await writeFile('/tmp/inochi-v3-shots/report.json',JSON.stringify(results,null,2))
 }finally{await browser.close()}
 if(results.find(x=>x.model==='v2'&&x.param==='ParamEyeBlinkLeft')?.pixels<40)

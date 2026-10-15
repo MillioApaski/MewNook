@@ -84,8 +84,10 @@
 - [x] Use native INX `deform` keyframe tracks with per-vertex displacements.
 - [x] Integrate animation tick with focus, rest, chat, sleepy, and touch states.
 - [x] Add structural tests for native deformation keyframe tracks.
-- [ ] Verify native per-vertex deformation changes rendered pixels in the pinned WebGL runtime.
+- [x] Verify native per-vertex deform in Playwright Chromium screenshots with position fallback disabled.
 - [ ] Merge new portrait layered source into repository and manually repaint concealed artwork.
 - [ ] Finish manually authored Inochi Creator motion curves and visual proof across four rooms.
 
-- [ ] v3 verification: per-vertex keys parse but produce 0 changed pixels in existing headless harness. Investigate runtime/render loop and texture z-order before enabling v3 by default.
+- [x] Correct Inox2D zsort and premultiplied-alpha exports; validate nonzero pixels for v3 hair/tail and blinking.
+- [x] Make v3 the opt-in experiment model with v2 fallback, retaining PNG as site-wide default.
+- [ ] Integrate the separately created original layered portrait after manual overpaint and fine mesh work.

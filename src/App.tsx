@@ -585,12 +585,12 @@ export default function App() {
             <Field label="场景"><select value={settings.scene} onChange={e=>saveSettings({scene:e.target.value as Scene})}>{(Object.keys(sceneName) as Scene[]).map(scene=><option key={scene} value={scene}>{sceneName[scene]}</option>)}</select></Field>
             <Field label="主题配色"><select value={settings.accent} onChange={e=>saveSettings({accent:e.target.value as Settings['accent']})}><option value="blue">雾蓝</option><option value="pink">樱粉</option><option value="lavender">淡紫</option></select></Field>
           </div><div className="inochi-test-settings">
-            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用真正的 Inochi2D WebGL2 模型测试动画与分层遮挡。默认不加载，模型约 18 MB。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
+            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用真正的 Inochi2D WebGL2 模型测试动画与分层遮挡。默认不加载，v3 模型约 2.3 MB。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
             {settings.inochiTestMode && <>
               <Field label="测试模型缩放" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
-              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载示例模型…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
+              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
               {inochiError && <p className="error-text">{inochiError}</p>}
-              <p className="footnote">现使用 MewNook Inochi2D v2 工程绑定：非矩形眼部、独立闭眼眼线、白边清理及 14 个基础参数。仍在完善精细美术绑定。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/inochi2d" target="_blank" rel="noreferrer">Inochi2D 技术</a></p>
+              <p className="footnote">当前使用 MewNook v3：已验证独立眨眼、原生多顶点头发及尾巴变形、预乘 Alpha 修复。加载失败自动回退 v2；精细手工绑定仍待完成。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/inochi2d" target="_blank" rel="noreferrer">Inochi2D 技术</a></p>
             </>}
           </div><p className="footnote">天气数据：<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · 非商业使用请遵守其许可与署名要求。</p></section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon blue"><KeyRound size={20}/></span><strong>自定义 AI API</strong></div><span className="badge">BYOK · 可选</span></div>

@@ -103,38 +103,13 @@ npm run deploy
 
 本项目代码与文档主要由 OpenAI ChatGPT 辅助生成与维护，**本次使用模型为 GPT-6 Sol**。请在公开部署前审查代码、依赖及素材授权。
 
-## Inochi2D 实验模式
+## Inochi2D 实验模式（v3）
 
-在 **设置 → 虚拟房间 → Inochi2D 实验模式** 手动启用。原来的 PNG 三层房间仍然默认生效，测试模式会尝试在人物层加载真正的 Inochi2D WebGL2 WASM 模型，背景、桌面遮挡和 UI 保持不变。加载失败或未开启时自动使用原有 PNG。使用「测试模型缩放」调整取景。
+打开 **设置 → 虚拟房间 → Inochi2D 实验模式**，即可将原有场景人物 PNG 替换成透明 WebGL2 Inochi2D 模型；未启用或最终加载失败时仍使用原来 PNG。v3 加载异常会先尝试自动回退 v2。独立测试页面：`/inochi2d-test/smoke.html`，默认 v3，使用 `?model=v2` 可对比上一版本。
 
-**当前已接入原创简化测试模型** `public/inochi2d-test/models/MewNook-test.inx`，用仓库内置的白发猫娘白天立绘自动拆成 8 个独立纹理网格，包含左右眼眨眼、猫耳抖动、尾巴摇摆、呼吸等 8 个参数。模型通过 Chromium WebGL2 自动化加载测试；这是工程验证版而非精细手绘绑定，局部运动可能有裁切瑕疵。生成器：`scripts/build-mewnook-inx.py`。
-
-此前使用的 **Aka** 第三方示例模型仍保留用于兼容测试，作者 seagetch，CC BY 4.0，详见 `public/inochi2d-test/models/Aka.ATTRIBUTION.md`；运行时基于 Inox2D（BSD-2-Clause），包含依赖许可说明。
-
-运行库和 Aka 兼容模型使用固定 Git 修订版及哈希校验：`npm run prepare:inochi`；原创简化模型由 `python scripts/build-mewnook-inx.py` 生成。两种模型文件已写入 GitHub。当前页面只加载原创简化模型，Aka 不在默认路径下请求。测试资源不加入 PWA precache。
-
-新生成的白发蓝瞳半身原画另已拆成 14 个独立图层，供后续精细绑定使用；它与此处使用仓库既有白天立绘制作的工程测试模型不是同一套源图。正式模型仍需补画遮挡面、专业网格、平滑参数绑定与专注/休息动作。
-
-独立的 Inochi2D 验证页面：`/inochi2d-test/smoke.html`。无需启用 MewNook 主页面的实验开关，可以直接测试 WebGL2、模型加载、点击动画及缩放。
-
-### Inochi2D v2 绑定（2026-10-15）
-
-已加入 `MewNook-v2.inx`，并成为实验模式/独立 smoke 测试页默认模型。与 v1 直接压扁矩形眼部不同，v2 从原图准确定位双眼，构建带羽化轮廓的独立虹膜/眼线图层，对脸部底色做局部修复；眼睛完全闭合时显示新绘制的独立闭眼线，不再放大原始眼睛周围的矩形贴图。对外轮廓进行了 alpha 清理与纹理边缘处理。绑定参数包括独立眨眼、呼吸、躯干轻摆、视线、猫耳、尾巴、嘴、微笑、困倦和脸红。
-
-生成：`python scripts/build-mewnook-v2.py`。验证：`python scripts/check-mewnook-v2.py`。所有动作仍以浏览器参数驱动，没有制作正式 Inochi Creator 手工变形网格或完整动作文件，因此这是可运行的 **v2 工程绑定**，不是已经完成的专业手工 rig。暂时保留 v1 文件以便对比和回退。
-
-### Inochi2D v3 多顶点网格变形
-
-工程测试模型升级至 `MewNook-v3.inx`。构建流程先生成 v2，再通过 `scripts/build-mewnook-v3.py` 将左右外侧头发、前发、尾巴、眼睛、眼线升级为细分三角网格，并为每个网格写入 Inochi2D 原生 `deform` 参数（非 CSS 动画）。对应的顶点变形绑定已写入候选模型，但现有 WebGL2 运行时尚未通过可见变形验证，因此不启用默认替换。独立测试页面仍由已验证的 v2 模型承担基础眨眼回归检查。
-
-**注意：本阶段仍使用仓库中现有白天猫娘的扁平原画作为生成源。** 虽然已有一份额外创作的白发坐姿新原画与分层素材，但它尚未并入 GitHub，缺少全套手绘遮挡补画。v3 采用保守的变形幅度和图像修补，属于技术绑定升级，不等同于完整的 Inochi Creator 手工绑定模型。
-
-#### v3 运行时兼容性说明
-
-当前固定版本的 WebGL/WASM 运行时可以加载包含 `deform` 绑定的模型，但第一次 Chromium 像素测试发现，单独修改这些顶点绑定时画面不变。因此 v3 暂时给同一控制参数附加少量 `transform.t.x` 兼容变换，让模型有可观察到的头发/尾巴运动。该变换**不应冒充已验证的逐顶点弯曲**；源码保留原生 `deform` 绑定，后续需要升级运行库或继续排查 WebGL 渲染路径。自动化测试明确区分模型结构和可见动作。
-
-#### v3 候选模型的验证结果
-
-已生成 Inochi2D `deform` 逐顶点绑定，但在当前 WebGL 自动化测试中，仅修改网格变形参数没有产生可检测的画面变化（0 像素），加入节点位移兼容绑定后仍如此。**不能把模型文件包含变形参数等同于实际可见网格变形。**
-
-因此 MewNook 主页面暂时继续使用已通过验证的 v2 绑定；v3 可以在独立测试页面使用 `?model=v3` 手动测试。v3 绑定生成器及结构测试仍随 CI 运行和保留，后续需要验证 WASM 帧更新路径、纹理图层排序与逐帧截图，再启用正式切换。
+- 原创**工程绑定**：`public/inochi2d-test/models/MewNook-v3.inx`（约 2.3 MB），从仓库已有白天人物立绘生成的 13 个部件、18 个参数。包括可独立眨眼的眼部、闭眼眼线、微笑/困倦/聊天，以及 3 组可变形发束和 1 组尾巴网格。
+- **验证**：Chromium WebGL2 正常加载、眨眼以及四组原生 `deform` 参数的画面变化，都由真正的 Chrome 截图逐帧对比验证。已经移除所有 `transform.t.x` 兼容位移兜底，头发和尾巴确实由**网格顶点**驱动。
+- **修复**：Inox2D 按 `zsort` 从大到小绘制，新增眼睛和发束必须使用较小（负）层级；纹理必须输出 **premultiplied alpha** 才能与 Inox2D 的 `GL_ONE / GL_ONE_MINUS_SRC_ALPHA` 混合匹配。两项均有自动测试。
+- 模型生成：`python scripts/build-mewnook-v2.py` 然后 `python scripts/build-mewnook-v3.py`，配套 `check-mewnook-v2.py`、`check-mewnook-v3.py` 与 `scripts/diagnose-inochi-v3.mjs`。
+- Web 运行时及旧版 Aka 样例由 [AITuber OnAir](https://github.com/shinshin86/aituber-onair) 提供，固定哈希下载且在仓库内保留依赖许可。Aka 作者 seagetch，CC BY 4.0，仅作兼容对照，不作为 MewNook 原创模型。
+- **局限**：当前仍然用扁平原画半自动抽取图层，没有对隐藏部分全面手工补画，也不是由 Inochi Creator 艺术家逐网格绑定的完成品。此前生成的另一套角色分层素材尚未替换成正式工程源图；大幅度头部转向、书本/打字动作仍待制作。默认仍然为静态 PNG，以免初次打开网站就加载模型。

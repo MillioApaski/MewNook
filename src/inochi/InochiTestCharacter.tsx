@@ -2,8 +2,9 @@ import {useEffect, useRef} from 'react'
 
 /**
  * Inochi2D WebGL2 runtime. The browser JS/WASM is third-party licensed;
- * MewNook-test.inx is our own minimal, procedurally rigged catgirl model,
- * generated from existing artwork. An older Aka test model remains attributed.
+ * MewNook-v3.inx is our reproducible experimental puppet with validated
+ * native per-vertex hair/tail deformation; the original source is still flat
+ * artwork, so this is not a finished hand-rigged Inochi Creator model.
  */
 interface Controller {
   mount(canvas: HTMLCanvasElement): Promise<void> | void
@@ -67,15 +68,22 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
-      await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
+      let fellBackToV2=false
+      try {
+        await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx')
+      } catch {
+        if(disposed)return
+        fellBackToV2=true
+        // Keep the known-good rig as a fallback if v3 loading fails.
+        await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
+      }
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
-      // Expression parameters are owned by the MewNook v2 rig, not by
-      // third-party preset names from the older Aka test runtime.
+      // MewNook parameters are owned by the rig, not by Aka preset names.
       controllerReadyRef.current=true
-      onStatus('ready')
+      onStatus('ready',fellBackToV2?'v3 无法加载，已自动使用 v2 模型':'')
     })().catch(e=>{
       if(!disposed)onStatus('error',e instanceof Error?e.message:String(e))
     })
@@ -145,6 +153,13 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       set('ParamHeadX',focused?-.3:Math.sin(t*.42)*.18)
       set('ParamHeadY',focused?.33:sleepy?.17:Math.sin(t*.34)*.13)
       set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
+      // Real native Inochi2D per-vertex deform. No CSS animation or
+      // transform-position fallback; amplitudes remain deliberately small.
+      const motion=focused?.4:sleepy?.3:1
+      set('ParamHairLeft',Math.sin(t*.82)*.33*motion)
+      set('ParamHairRight',Math.sin(t*.73+1.1)*.29*motion)
+      set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
+      set('ParamTailDeform',Math.sin(t*.94+1.7)*.36*motion)
       set('ParamEarLeft',touched?.8:Math.sin(t*1.8)*.25)
       set('ParamEarRight',touched?-.8:Math.sin(t*1.7+.4)*.25)
       set('ParamSmile',state.smile)
@@ -155,5 +170,5 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook Inochi2D v2 稳定模型" />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook Inochi2D v3 多顶点动画模型" />
 }
