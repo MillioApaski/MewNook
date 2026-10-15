@@ -38,6 +38,7 @@ jobs:
             > /tmp/inochi-rendered.html 2> /tmp/inochi-browser.log || true
           if ! grep -q 'data-state="ready"' /tmp/inochi-rendered.html; then
             echo "::error::Inochi2D WebGL2 smoke test did not render the model"
+            grep -o '<span id="status"[^<]*</span>' /tmp/inochi-rendered.html || true
             tail -c 1800 /tmp/inochi-rendered.html || true
             tail -n 45 /tmp/inochi-browser.log || true
             exit 1
