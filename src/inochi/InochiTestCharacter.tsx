@@ -70,12 +70,12 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       if(disposed)return
       let fellBackToV2=false
       try {
-        await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx')
+        await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx?rig=tilted-face-20261015')
       } catch {
         if(disposed)return
         fellBackToV2=true
         // Keep the known-good rig as a fallback if v3 loading fails.
-        await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
+        await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx?rig=tilted-face-20261015')
       }
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
