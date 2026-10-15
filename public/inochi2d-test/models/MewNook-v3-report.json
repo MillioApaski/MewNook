@@ -12,10 +12,10 @@
     "ParamHairFront",
     "ParamTailDeform"
   ],
-  "modelBytes": 2282143,
+  "modelBytes": 2241445,
   "limitations": [
     "Flattened illustration used",
-    "Hidden areas approximated, not hand-painted",
+    "Occluded areas retained as base source, not painted",
     "New portrait layered art has not yet been imported into repository"
   ]
 }
