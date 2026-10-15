@@ -79,14 +79,9 @@ def deform_param(name,part, cols,rows, strength,axis):
         'axis_points':[[0.,.5,1.],[0.,1.]],
         'merge_mode':'Additive',
         'bindings':[
+            # No transform-position fallback: only per-vertex deformation.
+            # Browser screenshot tests must fail if the real mesh does not bend.
             {'node':part['uuid'],'param_name':'deform','values':offsets,
-             'isSet':[[True,True] for _ in range(3)],
-             'interpolate_mode':'Linear'},
-            # The pinned 2026 WebGL bridge currently renders these deforms
-            # unchanged in the pixel regression. Preserve a visible, subtle
-            # transform fallback instead of silently shipping inert movement.
-            {'node':part['uuid'],'param_name':'transform.t.x',
-             'values':[[-strength*.45]*2,[0.,0.],[strength*.45]*2],
              'isSet':[[True,True] for _ in range(3)],
              'interpolate_mode':'Linear'}
         ]
