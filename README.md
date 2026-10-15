@@ -113,3 +113,7 @@ npm run deploy
 - 模型生成：`python scripts/build-mewnook-v2.py` 然后 `python scripts/build-mewnook-v3.py`，配套 `check-mewnook-v2.py`、`check-mewnook-v3.py` 与 `scripts/diagnose-inochi-v3.mjs`。
 - Web 运行时及旧版 Aka 样例由 [AITuber OnAir](https://github.com/shinshin86/aituber-onair) 提供，固定哈希下载且在仓库内保留依赖许可。Aka 作者 seagetch，CC BY 4.0，仅作兼容对照，不作为 MewNook 原创模型。
 - **局限**：当前仍然用扁平原画半自动抽取图层，没有对隐藏部分全面手工补画，也不是由 Inochi Creator 艺术家逐网格绑定的完成品。此前生成的另一套角色分层素材尚未替换成正式工程源图；大幅度头部转向、书本/打字动作仍待制作。默认仍然为静态 PNG，以免初次打开网站就加载模型。
+
+### 斜头人物口型匹配
+
+`scripts/mewnook_face_art.py` 现在从原版白发猫娘的歪头立绘提取静态微笑，在原图约 (525,540) 坐标、沿 −29° 倾斜轴构造说话 A/B 和困倦嘴型。张嘴素材保留原画嘴部线条而不再额外贴一个正脸圆形嘴巴；通过五段参数关键帧切换，并限制伪装头部旋转的眼睛漂移。自动化浏览器测试另检查嘴部变化区域和保存三种嘴型截图。模型仍非完全手工绘制与绑定。

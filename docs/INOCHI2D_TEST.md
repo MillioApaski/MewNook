@@ -124,3 +124,27 @@ loads the model in the full day room.
 Known remaining work: paint truly layered replacement art from the newer
 character portrait; refine vertex topology, masks, and hidden surfaces in
 Inochi Creator; author full focus/typing/rest motion clips.
+
+## Tilted-face source artwork alignment
+
+The MewNook day scene companion is intentionally illustrated with a tilted
+head: the left iris sits below the right iris, and the mouth rises toward the
+right. The old animated mouth was a nearly horizontal, artificial ellipse.
+
+The generated model now imports `scripts/mewnook_face_art.py`, using a
+source-measured mouth anchor (525,540), orientation −29°, based on the
+original 1086×1448 artwork. Neutral mouth art is an extracted part of the
+**original picture** rather than redrawn linework. Speech mouth A and B
+follow the same local frame and reuse the original colored ink as an upper
+lip. The sleepy mouth is authored separately, all as transparent images with
+premultiplied-alpha handling in the existing exporter.
+
+`ParamMouthOpen` now has five keyforms selecting idle / A / B while
+`ParamSleepy` controls the small yawn mouth; iris movements are severely
+restricted, since moving the irises is not a substitute for a head turn.
+The browser screenshot regression checks the speech mouth remains in the
+appropriate face region, and saves neutral, small and large mouth frames.
+
+This is source-matched generated art, **not** a professional manually rigged
+Inochi Creator face. Full manual redraw and hidden-area overpainting remain
+future work.

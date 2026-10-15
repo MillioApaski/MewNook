@@ -27,7 +27,29 @@ try{
      await set(1)
      const second=PNG.sync.read(await figure.screenshot())
      const pixels=pixelmatch(first.data,second.data,null,first.width,first.height,{threshold:0.1,includeAA:true})
-     const item={model,param:name,pixels}
+     // A correct speaking mouth must stay on the tilted face, not float
+    // near the chin or deform a big rectangle around the character.
+    if(model==='v3' && name==='ParamMouthOpen'){
+      let minX=first.width,minY=first.height,maxX=0,maxY=0,count=0
+      for(let y=0;y<first.height;y++)for(let x=0;x<first.width;x++){
+        const ix=(y*first.width+x)*4
+        const delta=Math.abs(first.data[ix]-second.data[ix])
+          +Math.abs(first.data[ix+1]-second.data[ix+1])
+          +Math.abs(first.data[ix+2]-second.data[ix+2])
+        if(delta>55){minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+          minY=Math.min(minY,y);maxY=Math.max(maxY,y);count++}
+      }
+      console.log('TILTED MOUTH REGION:',JSON.stringify({minX,minY,maxX,maxY,count}))
+      if(count<10 || minX<275 || maxX>370 || minY<270 || maxY>380)
+        throw Error('Mouth is absent or outside the tilted face')
+      await set(0)
+      await figure.screenshot({path:'/tmp/inochi-v3-shots/mouth-neutral.png'})
+      await set(.5)
+      await figure.screenshot({path:'/tmp/inochi-v3-shots/mouth-small-open.png'})
+      await set(1)
+      await figure.screenshot({path:'/tmp/inochi-v3-shots/mouth-wide-open.png'})
+    }
+    const item={model,param:name,pixels}
      results.push(item)
      console.log('REAL FRAME COMPARISON:',JSON.stringify(item))
      if(name==='ParamEyeBlinkLeft'||name==='ParamHairLeft'||name==='ParamTailDeform'||name==='ParamEarLeft'||name==='ParamSleepy'||name==='ParamMouthOpen'){
