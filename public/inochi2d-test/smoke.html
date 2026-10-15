@@ -71,6 +71,7 @@ try {
    if(changed<70) throw new Error('眨眼控制未造成足够的画面变化：'+changed+' pixels')
    await controller.setParameter?.('ParamEyeBlinkLeft',0)
    await controller.setParameter?.('ParamEyeBlinkRight',0)
+   await controller.setParameter?.('ParamTailSwing',-1)
    await controller.setParameter?.('ParamEyeDeformLeft',-1)
    await controller.setParameter?.('ParamEyeDeformRight',-1)
    await controller.setParameter?.('ParamHairLeft',-1)
@@ -78,6 +79,7 @@ try {
    await controller.setParameter?.('ParamTailDeform',-1)
    await wait(300)
    const deformA=snapshot()
+   await controller.setParameter?.('ParamTailSwing',1)
    await controller.setParameter?.('ParamEyeDeformLeft',1)
    await controller.setParameter?.('ParamEyeDeformRight',1)
    await controller.setParameter?.('ParamHairLeft',1)
@@ -93,7 +95,8 @@ try {
      if(diff>35)moved++
    }
    node.dataset.motionChangedPixels=String(moved)
-   if(moved<55)throw new Error('动态参数（含兼容变换）没有产生足够的画面变化：'+moved+' pixels')
+   if(moved<55)throw new Error('尾巴基础旋转与附加动态参数均未产生可见变化：'+moved+' pixels')
+   await controller.setParameter?.('ParamTailSwing',0)
    await controller.setParameter?.('ParamEyeDeformLeft',0)
    await controller.setParameter?.('ParamEyeDeformRight',0)
    await controller.setParameter?.('ParamHairLeft',0)
