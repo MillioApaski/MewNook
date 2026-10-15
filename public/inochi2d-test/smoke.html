@@ -92,8 +92,8 @@ try {
        +Math.abs(deformA[i+2]-deformB[i+2])
      if(diff>35)moved++
    }
-   node.dataset.deformChangedPixels=String(moved)
-   if(moved<55)throw new Error('网格变形没有产生足够的画面变化：'+moved+' pixels')
+   node.dataset.motionChangedPixels=String(moved)
+   if(moved<55)throw new Error('动态参数（含兼容变换）没有产生足够的画面变化：'+moved+' pixels')
    await controller.setParameter?.('ParamEyeDeformLeft',0)
    await controller.setParameter?.('ParamEyeDeformRight',0)
    await controller.setParameter?.('ParamHairLeft',0)
