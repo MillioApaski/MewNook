@@ -38,13 +38,8 @@ jobs:
             > /tmp/inochi-rendered.html 2> /tmp/inochi-browser.log || true
           if ! grep -q 'data-state="ready"' /tmp/inochi-rendered.html; then
             echo "::error::Inochi2D WebGL2 smoke test did not render the model"
-            python - <<'PY'
-            from pathlib import Path
-            import re
-            dom=Path('/tmp/inochi-rendered.html').read_text(errors='replace')
-            print('HTML length',len(dom),'initial:',repr(dom[:1700]))
-            print('STATUS:',re.findall(r'<[^<>]+id="status"[^<>]*>[^<>]*',dom)[:2])
-            PY
+            grep -o 'id="status"[^<]*</span>' /tmp/inochi-rendered.html || true
+            head -c 1400 /tmp/inochi-rendered.html || true
             tail -c 1800 /tmp/inochi-rendered.html || true
             tail -n 45 /tmp/inochi-browser.log || true
             exit 1
