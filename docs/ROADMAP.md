@@ -70,3 +70,10 @@
 - [x] Generate a minimal original MewNook .inx puppet from existing artwork, with real textured meshes and 8 parameter bindings; verify its parsing in Chromium.
 - [ ] Refine the new 14-layer white-haired catgirl illustration: paint hidden parts, adjust vertex meshes and rig it manually in Inochi Creator to replace the programmatic prototype.
 - [ ] Integrate mature focus/rest/chat behavior after model action names are confirmed.
+
+## Phase 2 rig milestone
+- [x] Replace rectangular eye snippets with bounded feathered ellipses and reconstructed face behind eyes.
+- [x] Introduce distinct closed eyelid line meshes, mouth art, and state parameters.
+- [x] Add generated model validation and browser loading smoke test.
+- [ ] Full hand-painted layered source with concealed faces and individually deformable eyelids in Inochi Creator.
+- [ ] Real motion clips and visual baseline screenshot comparison on desktop and phone.

@@ -74,3 +74,23 @@ Chromium WebGL2 CI now loads `MewNook-test.inx`, not Aka. The
 third-party Aka model remains bundled solely for historical/compatibility
 testing and keeps its CC BY attribution. The test model is generated
 from preexisting artwork inside this MewNook repository.
+
+## 2026-10-15 Inochi2D v2 rig
+
+Generated artifact `public/inochi2d-test/models/MewNook-v2.inx` is
+built reproducibly from the repository's owned day scene source using
+`scripts/build-mewnook-v2.py`.
+
+- Separate feathered elliptical open-eye textures.
+- Inpainted skin behind eye sprites, separately drawn closed lash curves.
+- Face/alpha edge cleanup and lower-amplitude independent ear and tail motion.
+- 14 parameters including focus and sleep expression inputs, speech mouth,
+  smile, blush, and subtle body/head offset.
+- Interactive smoke controls for blink, touch, speech and drowsy state.
+- A scripted test validates INX structure plus the existing Chromium WebGL2
+  loader smoke test.
+
+**Known limitation:** This source is still a flattened illustration; the
+eye background repair, tongue and hidden surfaces are estimated and have
+not been manually repainted. v2 is an engineering rig, not a finished
+Inochi Creator artist-authored deformation rig.

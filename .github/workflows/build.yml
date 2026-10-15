@@ -21,8 +21,9 @@ jobs:
         run: npm run prepare:inochi
       - name: Generate original simplified Inochi2D rig
         run: |
-          python -m pip install --user pillow --quiet
-          python scripts/build-mewnook-inx.py
+          python -m pip install --user pillow opencv-python-headless --quiet
+          python scripts/build-mewnook-v2.py
+          python scripts/check-mewnook-v2.py
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA

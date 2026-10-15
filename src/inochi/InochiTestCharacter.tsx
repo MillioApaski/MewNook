@@ -23,7 +23,7 @@ export type InochiTestStatus = 'off'|'loading'|'ready'|'error'
 interface Props {
   active: boolean
   scale: number
-  activity: 'focus'|'rest'|'idle'
+  activity: 'focus'|'rest'|'idle'|'chat'|'sleepy'
   touches: number
   onStatus: (status:InochiTestStatus,error?:string)=>void
 }
@@ -35,6 +35,8 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
   const firstTouchRef=useRef(touches)
   const tapUntilRef=useRef(0)
   const controllerReadyRef=useRef(false)
+  const manualBlinkUntil=useRef(0)
+  const smoothed=useRef({smile:0,sleepy:0,mouth:0})
 
   useEffect(()=>{
     if(!active)return
@@ -65,12 +67,13 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
-      await controller.loadModel('/inochi2d-test/models/MewNook-test.inx')
+      await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
-      void controller.setExpressionPreset?.(activity==='focus'?'focused':activity==='rest'?'relaxed':'neutral')
+      // Expression parameters are owned by the MewNook v2 rig, not by
+      // third-party preset names from the older Aka test runtime.
       controllerReadyRef.current=true
       onStatus('ready')
     })().catch(e=>{
@@ -97,8 +100,8 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
   useEffect(()=>{
     const c=controllerRef.current
     if(!c)return
-    const expression=activity==='focus'?'focused':activity==='rest'?'relaxed':'neutral'
-    void Promise.resolve(c.setExpressionPreset?.(expression)).catch(()=>{})
+    // Changed activity is applied on the next 70 ms animation tick.
+    void c.setParameter?.('ParamSmile',activity==='rest'||activity==='chat'?0.75:0)
   },[activity])
 
   useEffect(()=>{
@@ -107,6 +110,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     const c=controllerRef.current
     if(!c)return
     tapUntilRef.current=Date.now()+650
+    manualBlinkUntil.current=Date.now()+230
     void c.applyInteractionImpulse?.(5,-3)
     const names=namesRef.current
     if(names.includes('Yatta Celebration'))
@@ -118,20 +122,38 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     const clock=window.setInterval(()=>{
       const c=controllerRef.current
       if(!c || !controllerReadyRef.current)return
-      const t=Date.now()/1000
-      const blinkPhase=t%4.1
-      const blink=blinkPhase<0.16 ? Math.sin(Math.PI*blinkPhase/0.16) : 0
-      void c.setParameter?.('Eye:: Left:: Blink',blink)
-      void c.setParameter?.('Eye:: Right:: Blink',blink)
-      void c.setParameter?.('Body:: Breath',Math.sin(t*2.2))
-      void c.setParameter?.('Tail:: Sway',Math.sin(t*1.5))
-      const tapped=Date.now()<tapUntilRef.current
-      void c.setParameter?.('Ear:: Left:: Wiggle',tapped ? .8 : Math.sin(t*1.9)*.25)
-      void c.setParameter?.('Ear:: Right:: Wiggle',tapped ? -.8 : Math.sin(t*1.8+.4)*.25)
-      void c.setParameter?.('Head:: Look',activity==='focus'?-.3:Math.sin(t*.45)*.3)
+      if(document.visibilityState==='hidden')return
+      const current=Date.now()
+      const t=current/1000
+      const resting=activity==='rest',focused=activity==='focus'
+      const sleepy=activity==='sleepy',talking=activity==='chat'
+      const interval=sleepy?6.2:focused?5.2:3.9
+      const phase=t%interval
+      const blink=phase<0.18 ? Math.sin(Math.PI*phase/0.18) : 0
+      const blinkValue=current<manualBlinkUntil.current?1:blink
+      const touched=current<tapUntilRef.current
+      const state=smoothed.current
+      state.smile+=(resting||talking?0.65:focused?0.10:0.22-state.smile)*0.12
+      state.sleepy+=((sleepy?0.85:focused?0.16:0)-state.sleepy)*0.12
+      state.mouth+=((talking?Math.abs(Math.sin(t*8)):0)-state.mouth)*0.38
+      const set=(name:string,val:number)=>void c.setParameter?.(name,val)
+      set('ParamEyeBlinkLeft',blinkValue)
+      set('ParamEyeBlinkRight',blinkValue)
+      set('ParamBreath',Math.sin(t*(sleepy?1.25:2.0))*(focused?.42:.65))
+      set('ParamBodyY',Math.sin(t*1.0)*.16)
+      set('ParamBodyZ',Math.sin(t*.7)*.12)
+      set('ParamHeadX',focused?-.3:Math.sin(t*.42)*.18)
+      set('ParamHeadY',focused?.33:sleepy?.17:Math.sin(t*.34)*.13)
+      set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
+      set('ParamEarLeft',touched?.8:Math.sin(t*1.8)*.25)
+      set('ParamEarRight',touched?-.8:Math.sin(t*1.7+.4)*.25)
+      set('ParamSmile',state.smile)
+      set('ParamSleepy',state.sleepy)
+      set('ParamMouthOpen',state.mouth)
+      set('ParamEmbarrassed',touched && !focused?.6:0)
     },70)
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="Inochi2D 示例测试模型" />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook 原创 Inochi2D v2 模型" />
 }
