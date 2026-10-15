@@ -56,8 +56,13 @@ for eye in ['Left','Right']:
     assert oi.getpixel((0,0)) < 30 and oi.getpixel((oi.width-1,0)) < 30, 'Eye must have a non-rectangular alpha'
     assert ci.getbbox() and ci.width>20 and ci.height>3, 'Closed eyelid art missing'
     blink=params[f'ParamEyeBlink{eye}']['bindings']
-    assert {entry['node'] for entry in blink}=={opened['uuid'],closed['uuid']}
-    assert all(entry['param_name']=='transform.s.y' for entry in blink)
+    cover=parts[f'Eye {eye} Upper Lid']
+    sleepy=parts[f'Eye {eye} Drowsy Lid']
+    assert {entry['node'] for entry in blink}=={cover['uuid'],closed['uuid']}
+    assert opened['uuid'] not in {entry['node'] for entry in blink}, 'Iris must stay fixed'
+    assert [entry['param_name'] for entry in blink]==['transform.s.y','transform.t.y','transform.s.y']
+    assert any(entry['node']==sleepy['uuid'] for entry in params['ParamSleepy']['bindings'])
+assert 'Neutral Smile' in parts and 'Talking Mouth' in parts
 assert 250000 < len(b) < 9000000, 'Unexpected file size'
 print('MewNook Inochi2D v2: valid header,',len(parts),'parts,',
       len(params),'parameters,',len(textures),'PNG textures, bytes:',len(b))

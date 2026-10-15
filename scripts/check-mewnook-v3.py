@@ -37,7 +37,9 @@ for side in ('Left','Right'):
     for label in (f'Eye {side} Iris',f'Eye {side} Closed Lash'):
         assert len(byname[label]['mesh']['verts'])==8, (label, 'unexpected eye geometry')
     blink=next(p for p in params if p['name']==f'ParamEyeBlink{side}')
-    assert len(blink['bindings'])==2 and all(b['param_name']=='transform.s.y' for b in blink['bindings'])
+    assert len(blink['bindings'])==3
+    assert all(binding['node']!=byname[f'Eye {side} Iris']['uuid'] for binding in blink['bindings'])
+    assert any(binding['node']==byname[f'Eye {side} Upper Lid']['uuid'] for binding in blink['bindings'])
 
 assert len(blob)<8_000_000
 # Each v3 art texture must also respect the premultiplied alpha contract.

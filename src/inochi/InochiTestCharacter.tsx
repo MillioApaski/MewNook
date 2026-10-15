@@ -117,8 +117,8 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     firstTouchRef.current=touches
     const c=controllerRef.current
     if(!c)return
-    tapUntilRef.current=Date.now()+650
-    manualBlinkUntil.current=Date.now()+230
+    tapUntilRef.current=Date.now()+1400
+    manualBlinkUntil.current=Date.now()+470
     void c.applyInteractionImpulse?.(5,-3)
     const names=namesRef.current
     if(names.includes('Yatta Celebration'))
@@ -137,13 +137,13 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       const sleepy=activity==='sleepy',talking=activity==='chat'
       const interval=sleepy?6.2:focused?5.2:3.9
       const phase=t%interval
-      const blink=phase<0.18 ? Math.sin(Math.PI*phase/0.18) : 0
+      const blink=phase<0.29 ? Math.sin(Math.PI*phase/0.29) : 0
       const blinkValue=current<manualBlinkUntil.current?1:blink
       const touched=current<tapUntilRef.current
       const state=smoothed.current
       state.smile+=((resting||talking?0.65:focused?0.10:0.22)-state.smile)*0.12
-      state.sleepy+=((sleepy?0.85:focused?0.16:0)-state.sleepy)*0.12
-      state.mouth+=((talking?Math.abs(Math.sin(t*8)):0)-state.mouth)*0.38
+      state.sleepy+=((sleepy?0.95:focused?0.12:0)-state.sleepy)*0.12
+      state.mouth+=((talking?Math.abs(Math.sin(t*7.2))*.87:sleepy?.18:0)-state.mouth)*0.35
       const set=(name:string,val:number)=>void c.setParameter?.(name,val)
       set('ParamEyeBlinkLeft',blinkValue)
       set('ParamEyeBlinkRight',blinkValue)
@@ -160,8 +160,8 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       set('ParamHairRight',Math.sin(t*.73+1.1)*.29*motion)
       set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
       set('ParamTailDeform',Math.sin(t*.94+1.7)*.36*motion)
-      set('ParamEarLeft',touched?.8:Math.sin(t*1.8)*.25)
-      set('ParamEarRight',touched?-.8:Math.sin(t*1.7+.4)*.25)
+      set('ParamEarLeft',touched?.95:Math.sin(t*1.8)*.17)
+      set('ParamEarRight',touched?-.95:Math.sin(t*1.7+.4)*.17)
       set('ParamSmile',state.smile)
       set('ParamSleepy',state.sleepy)
       set('ParamMouthOpen',state.mouth)
