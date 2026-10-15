@@ -40,6 +40,10 @@ for index in range(count):
     png=b[pos+5:pos+5+n]
     assert png.startswith(b'\x89PNG'),f'Texture {index} is not PNG'
     im=Image.open(io.BytesIO(png)).convert('RGBA')
+    # All generated textures must be premultiplied (Inox2D GL blend ONE).
+    from numpy import array
+    pixels=array(im,dtype='uint16')
+    assert (pixels[:,:,:3] <= pixels[:,:,3:4]+1).all(),f'Texture {index} has non-premultiplied color'
     textures.append(im)
     pos+=5+n
 assert pos==len(b),'Trailing or missing texture data'

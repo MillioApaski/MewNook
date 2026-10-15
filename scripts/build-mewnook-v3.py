@@ -130,6 +130,10 @@ for name,points,depth,strength,param_name in regions:
     alpha=(remaining[:,:,3].astype(np.float32)*mask/255).astype(np.uint8)
     if alpha.max()<10:continue
     layer=np.array(remaining).copy()
+    # remaining has already been premultiplied by the v2 generator. Scale
+    # BOTH alpha and RGB by the new strand mask to maintain premultiplication.
+    layer[:,:,:3] = ((layer[:,:,:3].astype(np.uint16)
+        * mask[:,:,None].astype(np.uint16) + 127)//255).astype(np.uint8)
     layer[:,:,3]=alpha
     bbox=Image.fromarray(layer).getbbox()
     if not bbox:continue

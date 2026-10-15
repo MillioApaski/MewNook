@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Fail CI when Inochi2D v3 grid meshes or deform tracks regress."""
-import json,struct
+import json,struct,io
+import numpy as np
+from PIL import Image
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 blob=(root/'public/inochi2d-test/models/MewNook-v3.inx').read_bytes()
@@ -37,4 +39,16 @@ for side in ('Left','Right'):
     assert len(blink['bindings'])==2 and all(b['param_name']=='transform.s.y' for b in blink['bindings'])
 
 assert len(blob)<8_000_000
+# Each v3 art texture must also respect the premultiplied alpha contract.
+pos=12+jlen
+assert blob[pos:pos+8]==b'TEX_SECT'
+texcount=struct.unpack('>I',blob[pos+8:pos+12])[0]
+pos+=12
+for n in range(texcount):
+    size=struct.unpack('>I',blob[pos:pos+4])[0]
+    tex=np.asarray(Image.open(io.BytesIO(blob[pos+5:pos+5+size])).convert('RGBA')).astype(np.uint16)
+    assert (tex[:,:,:3]<=tex[:,:,3:4]+1).all(),f'texture {n} violates premultiplied alpha'
+    pos+=5+size
+assert pos==len(blob)
+
 print(f'MewNook v3 validated: {len(nodes)} parts, {len(params)} params, {len(deform)} vertex-deformation tracks')

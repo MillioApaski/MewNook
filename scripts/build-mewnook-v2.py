@@ -161,7 +161,13 @@ def add_part(name, picture, mask=None, z=0):
     if rgba[:, :, 3].max() == 0: raise ValueError(name+' is empty')
     bbox = Image.fromarray(rgba).getbbox()
     l,t,r,b = bbox
-    crop = Image.fromarray(rgba[t:b,l:r]).convert('RGBA')
+    # Inox2D Normal blend uses GL_ONE, GL_ONE_MINUS_SRC_ALPHA.
+    # Store premultiplied RGB. Without this, alpha=0 pixels still contribute
+    # their white source color and create rectangular opaque ghost patches.
+    sub = rgba[t:b,l:r].copy()
+    sub[:, :, :3] = ((sub[:, :, :3].astype(np.uint16)
+        * sub[:, :, 3:4].astype(np.uint16) + 127) // 255).astype(np.uint8)
+    crop = Image.fromarray(sub,'RGBA')
     data = io.BytesIO()
     crop.save(data,format='PNG',optimize=True)
     textures.append(data.getvalue())
