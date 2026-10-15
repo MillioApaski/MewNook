@@ -59,6 +59,28 @@ try{
      await set(0)
    }
  }
+ // Capture the three eye states in a stable browser scene with no idle tick.
+ await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3&probe=1')
+ await page.locator('#status[data-state=ready]').waitFor({timeout:60000})
+ const eyes=page.locator('figure')
+ const setEye=async (name,value)=>{
+   await page.evaluate(async ([id,val])=>window.__inochiProbe.set(id,val),[name,value])
+   await page.waitForTimeout(250)
+ }
+ await setEye('ParamEyeBlinkLeft',0)
+ await setEye('ParamEyeBlinkRight',0)
+ await setEye('ParamSleepy',0)
+ const wideOpen=PNG.sync.read(await eyes.screenshot({path:'/tmp/inochi-v3-shots/eyes-open.png'}))
+ await setEye('ParamSleepy',1)
+ const halfClosed=PNG.sync.read(await eyes.screenshot({path:'/tmp/inochi-v3-shots/eyes-drowsy.png'}))
+ await setEye('ParamSleepy',0)
+ await setEye('ParamEyeBlinkLeft',1)
+ await setEye('ParamEyeBlinkRight',1)
+ const fullyClosed=PNG.sync.read(await eyes.screenshot({path:'/tmp/inochi-v3-shots/eyes-closed.png'}))
+ const sleepyDelta=pixelmatch(wideOpen.data,halfClosed.data,null,wideOpen.width,wideOpen.height,{threshold:.1,includeAA:true})
+ const blinkDelta=pixelmatch(wideOpen.data,fullyClosed.data,null,wideOpen.width,wideOpen.height,{threshold:.1,includeAA:true})
+ console.log('EYE STATE REVIEW:',JSON.stringify({sleepyDelta,blinkDelta}))
+ if(sleepyDelta<70||blinkDelta<70)throw Error('Eyes do not react to drowsy / blink states')
  // Check the actual smoke-page buttons, not just direct parameter writes.
  await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3')
  await page.locator('#status[data-state=ready]').waitFor({timeout:60000})

@@ -62,6 +62,14 @@ for eye in ['Left','Right']:
     assert opened['uuid'] not in {entry['node'] for entry in blink}, 'Iris must stay fixed'
     assert [entry['param_name'] for entry in blink]==['transform.s.y','transform.t.y','transform.s.y']
     assert any(entry['node']==sleepy['uuid'] for entry in params['ParamSleepy']['bindings'])
+    # Unlike a large skin oval, the drowsy mask stays inside its iris.
+    drowsy_alpha=textures[sleepy['textures'][0]].getchannel('A')
+    drowsy_lash=parts[f'Eye {eye} Drowsy Lash']
+    assert textures[drowsy_lash['textures'][0]].getchannel('A').getbbox()
+    assert drowsy_alpha.width < oi.width*.85,(eye,'drowsy skin patch too wide')
+    assert drowsy_alpha.height < oi.height*.88,(eye,'drowsy skin patch too tall')
+    assert drowsy_alpha.getbbox(),(eye,'drowsy eyelid missing')
+
 # The neutral mouth must be recovered from source artwork, not recreated as
 # a horizontal ellipse. A and B mouth variants use five pose keys in an
 # angled local frame, whereas all other channels still have three.
