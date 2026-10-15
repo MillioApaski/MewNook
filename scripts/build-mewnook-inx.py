@@ -121,7 +121,7 @@ puppet={
          'artist':'Original MewNook artwork','rights':None,'copyright':'MewNook',
          'licenseURL':'','contact':'','reference':'','thumbnailId':TRANSPARENT,
          'preservePixels':False},
- 'physics':{},'nodes':root,'param':params,'automation':[],'animations':[],
+ 'physics':{'pixelsPerMeter':2000.0,'gravity':9.8},'nodes':root,'param':params,'automation':[],'animations':[],
  'groups':[]
 }
 payload=json.dumps(puppet,separators=(',',':'),ensure_ascii=False).encode('utf-8')
