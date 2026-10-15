@@ -62,7 +62,31 @@ for eye in ['Left','Right']:
     assert opened['uuid'] not in {entry['node'] for entry in blink}, 'Iris must stay fixed'
     assert [entry['param_name'] for entry in blink]==['transform.s.y','transform.t.y','transform.s.y']
     assert any(entry['node']==sleepy['uuid'] for entry in params['ParamSleepy']['bindings'])
-assert 'Neutral Smile' in parts and 'Talking Mouth' in parts
+# The neutral mouth must be recovered from source artwork, not recreated as
+# a horizontal ellipse. A and B mouth variants use five pose keys in an
+# angled local frame, whereas all other channels still have three.
+names=('Neutral Smile','Talking Mouth A','Talking Mouth B','Sleepy Mouth')
+assert all(n in parts for n in names)
+mouth=params['ParamMouthOpen']
+assert len(mouth['axis_points'][0])==5
+assert len(mouth['bindings'])==3
+assert all(len(item['values'])==5 for item in mouth['bindings'])
+assert {item['node'] for item in mouth['bindings']}=={parts[n]['uuid'] for n in names[:3]}
+assert any(item['node']==parts['Sleepy Mouth']['uuid'] for item in params['ParamSleepy']['bindings'])
+from numpy import asarray, nonzero, cov
+for name in names:
+    part=parts[name]
+    cx=1086/2+part['transform']['trans'][0]
+    cy=1448/2+part['transform']['trans'][1]
+    assert abs(cx-525)<12 and abs(cy-540)<13,(name,cx,cy)
+    pixels=asarray(textures[part['textures'][0]].getchannel('A'))
+    yy,xx=nonzero(pixels>110)
+    assert len(xx)>10,name
+    # Each mouth follows the face's rising-to-the-right direction, rather
+    # than the old front-facing circular crop.
+    if name!='Sleepy Mouth':
+        assert cov(xx,yy)[0,1]<0,(name,'wrong mouth angle')
+
 assert 250000 < len(b) < 9000000, 'Unexpected file size'
 print('MewNook Inochi2D v2: valid header,',len(parts),'parts,',
       len(params),'parameters,',len(textures),'PNG textures, bytes:',len(b))

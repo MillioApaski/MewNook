@@ -142,11 +142,11 @@ try {
       ]:[]),
       ['ParamEarLeft',performance.now()<tapUntil?.9:Math.sin(t*1.8)*.4],
       ['ParamEarRight',performance.now()<tapUntil?-.9:Math.sin(t*1.7+.4)*.4],
-      ['ParamHeadX',Math.sin(t*.4)*.2],
-      ['ParamHeadY',Math.sin(t*.3)*.2],
+      ['ParamHeadX',Math.sin(t*.4)*.04],
+      ['ParamHeadY',Math.sin(t*.3)*.03],
       ['ParamSmile',performance.now()<expressionUntil&&currentExpression==='chat'?.8:0.16],
       ['ParamSleepy',performance.now()<expressionUntil&&currentExpression==='sleep'?.95:0],
-      ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?Math.abs(Math.sin(t*6.7))*.88:performance.now()<expressionUntil&&currentExpression==='sleep'?.22:0],
+      ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?.52+.38*Math.abs(Math.sin(t*4.8)):0],
       ['ParamEmbarrassed',performance.now()<tapUntil?.7:0]
     ]) void controller.setParameter?.(id,val)
  },80)

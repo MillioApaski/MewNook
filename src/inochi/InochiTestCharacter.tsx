@@ -143,15 +143,19 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       const state=smoothed.current
       state.smile+=((resting||talking?0.65:focused?0.10:0.22)-state.smile)*0.12
       state.sleepy+=((sleepy?0.95:focused?0.12:0)-state.sleepy)*0.12
-      state.mouth+=((talking?Math.abs(Math.sin(t*7.2))*.87:sleepy?.18:0)-state.mouth)*0.35
+      // A subtle A/B mouth cycle fitted to the original tilted smile. The
+      // sleepy mouth is controlled by ParamSleepy instead.
+      state.mouth+=((talking?(0.52+0.38*Math.abs(Math.sin(t*4.8))):0)-state.mouth)*0.25
       const set=(name:string,val:number)=>void c.setParameter?.(name,val)
       set('ParamEyeBlinkLeft',blinkValue)
       set('ParamEyeBlinkRight',blinkValue)
       set('ParamBreath',Math.sin(t*(sleepy?1.25:2.0))*(focused?.42:.65))
       set('ParamBodyY',Math.sin(t*1.0)*.16)
       set('ParamBodyZ',Math.sin(t*.7)*.12)
-      set('ParamHeadX',focused?-.3:Math.sin(t*.42)*.18)
-      set('ParamHeadY',focused?.33:sleepy?.17:Math.sin(t*.34)*.13)
+      // The character was painted with a tilted head. Never simulate a
+      // frontal head turn by sliding only the irises.
+      set('ParamHeadX',focused?-.055:Math.sin(t*.42)*.035)
+      set('ParamHeadY',focused?.055:sleepy?.035:Math.sin(t*.34)*.025)
       set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
       // Real native Inochi2D per-vertex deform. No CSS animation or
       // transform-position fallback; amplitudes remain deliberately small.
