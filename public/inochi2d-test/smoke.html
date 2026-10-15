@@ -21,7 +21,7 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
 <main>
 <header><h2>Inochi2D WebGL2 测试</h2><span id="status" data-state="loading">正在初始化…</span><a href="/">返回 MewNook</a></header>
 <figure><canvas id="puppet" aria-label="MewNook 原创简化 Inochi2D 模型"/></figure>
-<div><button id="tap" disabled>播放点击反应</button> <button id="idle" disabled>恢复待机</button>
+<div><button id="tap" disabled>摸摸猫耳</button> <button id="idle" disabled>立即眨眼</button>
  <label>缩放 <input id="scale" type="range" min="0.1" max="0.9" step="0.01" value="0.32"/></label></div>
 <p id="details">MewNook 原创简化绑定测试模型，使用已有猫娘立绘制作。运行时基于 Inox2D（BSD-2-Clause）。眼睛、猫耳、尾巴可独立调整，但这还不是精细绘制和绑定完成的正式模型。</p>
 </main>
@@ -45,25 +45,25 @@ try {
  setStatus('ready','原创模型加载成功 · 网格与参数绑定已初始化')
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
+ let tapUntil=0, manualBlinkUntil=0
  const ticker=setInterval(()=>{
     const t=performance.now()/1000,phase=t%4.2,blink=phase<.17?Math.sin(Math.PI*phase/.17):0
     for(const [id,val] of [
-      ['Eye:: Left:: Blink',blink],['Eye:: Right:: Blink',blink],
+      ['Eye:: Left:: Blink',performance.now()<manualBlinkUntil?1:blink],['Eye:: Right:: Blink',performance.now()<manualBlinkUntil?1:blink],
       ['Body:: Breath',Math.sin(t*2)],['Tail:: Sway',Math.sin(t*1.3)],
-      ['Ear:: Left:: Wiggle',Math.sin(t*1.8)*.4],
-      ['Ear:: Right:: Wiggle',Math.sin(t*1.7+.4)*.4]
+      ['Ear:: Left:: Wiggle',performance.now()<tapUntil?.9:Math.sin(t*1.8)*.4],
+      ['Ear:: Right:: Wiggle',performance.now()<tapUntil?-.9:Math.sin(t*1.7+.4)*.4]
     ]) void controller.setParameter?.(id,val)
  },80)
 window.addEventListener('pagehide',()=>clearInterval(ticker),{once:true})
  document.querySelector('#tap').onclick=()=>{
+   tapUntil=performance.now()+700
    void controller.applyInteractionImpulse?.(6,-4)
    void controller.setParameter?.('Ear:: Left:: Wiggle',.8)
    void controller.setParameter?.('Ear:: Right:: Wiggle',-.8)
    if(names.includes('Yatta Celebration'))void controller.playAnimation?.('Yatta Celebration',{restart:true,kind:'reaction'})
  }
- document.querySelector('#idle').onclick=()=>{
-   if(names.includes('Energetic Sway'))void controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- }
+ document.querySelector('#idle').onclick=()=>{manualBlinkUntil=performance.now()+230}
  document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,120,Number(e.target.value))
 } catch(e) {
  setStatus('error','加载失败：'+(e?.message||e))

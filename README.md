@@ -107,10 +107,12 @@ npm run deploy
 
 在 **设置 → 虚拟房间 → Inochi2D 实验模式** 手动启用。原来的 PNG 三层房间仍然默认生效，测试模式会尝试在人物层加载真正的 Inochi2D WebGL2 WASM 模型，背景、桌面遮挡和 UI 保持不变。加载失败或未开启时自动使用原有 PNG。使用「测试模型缩放」调整取景。
 
-**重要：当前只是运行时可行性测试，不是 MewNook 原创白发猫娘的已绑定模型。** 暂时使用由 seagetch 创建、按 CC BY 4.0 署名的 **Aka** 示例模型（在 AITuber OnAir 中改进的 Inochi2D 绑定与动画）。源项目及著作权/修改说明见 `public/inochi2d-test/models/Aka.ATTRIBUTION.md` 和 `docs/INOCHI2D_TEST.md`。运行时基于 Inox2D（BSD-2-Clause），包含依赖许可说明。
+**当前已接入原创简化测试模型** `public/inochi2d-test/models/MewNook-test.inx`，用仓库内置的白发猫娘白天立绘自动拆成 8 个独立纹理网格，包含左右眼眨眼、猫耳抖动、尾巴摇摆、呼吸等 8 个参数。模型通过 Chromium WebGL2 自动化加载测试；这是工程验证版而非精细手绘绑定，局部运动可能有裁切瑕疵。生成器：`scripts/build-mewnook-inx.py`。
 
-测试资源以固定 Git 修订版和 SHA-1 Git blob 校验下载：`npm run prepare:inochi`。GitHub Actions 首次构建会把验证通过的 WASM、JS 与模型一起保存到公开仓库；后续部署无需手动下载。示例模型约 18 MB，只在测试模式开启后请求，不参与 PWA precache。测试模型有自己的许可，不得将其当成 MewNook 原创角色素材。
+此前使用的 **Aka** 第三方示例模型仍保留用于兼容测试，作者 seagetch，CC BY 4.0，详见 `public/inochi2d-test/models/Aka.ATTRIBUTION.md`；运行时基于 Inox2D（BSD-2-Clause），包含依赖许可说明。
 
-正式 Inochi2D 猫娘模型制作仍需要单独的分层美术与 Inochi Creator 参数绑定；本阶段主要验收浏览器运行、真实骨骼/网格变形、动作调用与图层集成。
+运行库和 Aka 兼容模型使用固定 Git 修订版及哈希校验：`npm run prepare:inochi`；原创简化模型由 `python scripts/build-mewnook-inx.py` 生成。两种模型文件已写入 GitHub。当前页面只加载原创简化模型，Aka 不在默认路径下请求。测试资源不加入 PWA precache。
+
+新生成的白发蓝瞳半身原画另已拆成 14 个独立图层，供后续精细绑定使用；它与此处使用仓库既有白天立绘制作的工程测试模型不是同一套源图。正式模型仍需补画遮挡面、专业网格、平滑参数绑定与专注/休息动作。
 
 独立的 Inochi2D 验证页面：`/inochi2d-test/smoke.html`。无需启用 MewNook 主页面的实验开关，可以直接测试 WebGL2、模型加载、点击动画及缩放。

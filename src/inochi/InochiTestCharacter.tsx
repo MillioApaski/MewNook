@@ -1,8 +1,9 @@
 import {useEffect, useRef} from 'react'
 
 /**
- * Experimental Inochi2D WEBGL2 runtime. The compiled JS/WASM and the Aka
- * .inx file are pinned, license-attributed test assets; NOT a MewNook model.
+ * Inochi2D WebGL2 runtime. The browser JS/WASM is third-party licensed;
+ * MewNook-test.inx is our own minimal, procedurally rigged catgirl model,
+ * generated from existing artwork. An older Aka test model remains attributed.
  */
 interface Controller {
   mount(canvas: HTMLCanvasElement): Promise<void> | void
@@ -32,6 +33,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
   const controllerRef=useRef<Controller|null>(null)
   const namesRef=useRef<string[]>([])
   const firstTouchRef=useRef(touches)
+  const tapUntilRef=useRef(0)
   const controllerReadyRef=useRef(false)
 
   useEffect(()=>{
@@ -104,6 +106,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     firstTouchRef.current=touches
     const c=controllerRef.current
     if(!c)return
+    tapUntilRef.current=Date.now()+650
     void c.applyInteractionImpulse?.(5,-3)
     const names=namesRef.current
     if(names.includes('Yatta Celebration'))
@@ -122,8 +125,9 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       void c.setParameter?.('Eye:: Right:: Blink',blink)
       void c.setParameter?.('Body:: Breath',Math.sin(t*2.2))
       void c.setParameter?.('Tail:: Sway',Math.sin(t*1.5))
-      void c.setParameter?.('Ear:: Left:: Wiggle',Math.sin(t*1.9)*.25)
-      void c.setParameter?.('Ear:: Right:: Wiggle',Math.sin(t*1.8+.4)*.25)
+      const tapped=Date.now()<tapUntilRef.current
+      void c.setParameter?.('Ear:: Left:: Wiggle',tapped ? .8 : Math.sin(t*1.9)*.25)
+      void c.setParameter?.('Ear:: Right:: Wiggle',tapped ? -.8 : Math.sin(t*1.8+.4)*.25)
       void c.setParameter?.('Head:: Look',activity==='focus'?-.3:Math.sin(t*.45)*.3)
     },70)
     return()=>window.clearInterval(clock)
