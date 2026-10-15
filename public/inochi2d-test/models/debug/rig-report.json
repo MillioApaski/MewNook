@@ -8,10 +8,12 @@
     "Eye Left Iris",
     "Eye Left Upper Lid",
     "Eye Left Drowsy Lid",
+    "Eye Left Drowsy Lash",
     "Eye Left Closed Lash",
     "Eye Right Iris",
     "Eye Right Upper Lid",
     "Eye Right Drowsy Lid",
+    "Eye Right Drowsy Lash",
     "Eye Right Closed Lash",
     "Neutral Smile",
     "Talking Mouth",
@@ -33,7 +35,7 @@
     "ParamSleepy",
     "ParamEmbarrassed"
   ],
-  "textureCount": 15,
-  "modelBytes": 1520304,
+  "textureCount": 17,
+  "modelBytes": 1523803,
   "notes": "Source-driven, not manually painted; eye crops are nonrectangular."
 }
