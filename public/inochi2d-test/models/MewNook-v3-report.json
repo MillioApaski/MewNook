@@ -1,5 +1,5 @@
 {
-  "parts": 13,
+  "parts": 18,
   "parameters": 18,
   "newParts": [
     "Hair Left Outer",
@@ -12,7 +12,7 @@
     "ParamHairFront",
     "ParamTailDeform"
   ],
-  "modelBytes": 2118405,
+  "modelBytes": 2142137,
   "limitations": [
     "Flattened illustration used",
     "Occluded areas retained as base source, not painted",

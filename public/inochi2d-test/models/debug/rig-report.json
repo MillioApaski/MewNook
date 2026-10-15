@@ -6,9 +6,14 @@
     "Right Cat Ear",
     "Cat Tail",
     "Eye Left Iris",
+    "Eye Left Upper Lid",
+    "Eye Left Drowsy Lid",
     "Eye Left Closed Lash",
     "Eye Right Iris",
+    "Eye Right Upper Lid",
+    "Eye Right Drowsy Lid",
     "Eye Right Closed Lash",
+    "Neutral Smile",
     "Talking Mouth",
     "Shy Blush"
   ],
@@ -28,7 +33,7 @@
     "ParamSleepy",
     "ParamEmbarrassed"
   ],
-  "textureCount": 10,
-  "modelBytes": 1491476,
+  "textureCount": 15,
+  "modelBytes": 1520304,
   "notes": "Source-driven, not manually painted; eye crops are nonrectangular."
 }
