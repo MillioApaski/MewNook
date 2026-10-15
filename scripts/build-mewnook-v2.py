@@ -91,7 +91,7 @@ body,mouth_art,mouth_frame=build_face_mouth_art(source,body)
 
 # A cheek-colored eyelid replaces the blue iris as the open eye contracts.
 # Only the dark curved eyelash line is painted, with transparent surroundings.
-def lash_sprite(eye):
+def lash_sprite(eye, drowsy=False):
     mask = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(mask)
     p0, p1, p2, p3 = eye['stroke']
@@ -103,15 +103,19 @@ def lash_sprite(eye):
         y = ((1 - t)**3 * p0[1] + 3 * (1 - t)**2 * t * p1[1]
              + 3 * (1 - t) * t*t * p2[1] + t**3 * p3[1])
         points.append(xy(x, y))
+    if drowsy:
+        # Half-closed eyes need softer, shorter contours aligned to the
+        # already tilted lids, not two thick floating straight eyebrows.
+        width=max(2,round(W/1086*3))
+        d.line(points[5:36],fill=(113,75,105,191),width=width,joint='curve')
+        return np.asarray(mask.filter(ImageFilter.GaussianBlur(.5))).copy()
     width = max(4, round(W / 1086 * 6))
     d.line(points, fill=(79, 54, 85, 255), width=width, joint='curve')
-    # Closed lashes must remain visible when the iris is entirely covered.
     d.line(points[5:36], fill=(118, 81, 113, 240),
            width=max(2,width//2),joint='curve')
-    # Small outer lash, attached to the closed eyelid rather than a box.
     tip = points[-1]
     d.line((tip, xy(p3[0]+5, p3[1]-9)),
-           fill=(85, 60, 89, 200), width=max(2, width-1))
+           fill=(85,60,89,200),width=max(2,width-1))
     return np.asarray(mask.filter(ImageFilter.GaussianBlur(.22))).copy()
 
 def tint_mask(mask, color):
@@ -219,7 +223,7 @@ for i,eye in enumerate(eyes):
     cover=add_part('Eye '+eye['name']+' Upper Lid',body,eye['mask'],z=7+i*5)
     # A separate half-closed upper lid gives drowsy mode a persistent pose.
     drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,eye['mask'],z=8+i*6)
-    sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lash_sprite(eye),z=9+i*6)
+    sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lash_sprite(eye,drowsy=True),z=9+i*6)
     lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=10+i*6)
     eye_parts[eye['name']]=(iris,cover,drowsy,sleepy_lash,lash)
 neutral=add_part('Neutral Smile',mouth_art['Neutral Smile'],z=20)
@@ -286,7 +290,7 @@ param('ParamSleepy',[
         bind(sleepy_lash,'transform.s.y',[.002,.002,.74]),
         # Match the downward motion of the tilted upper eyelid instead of
         # floating as a second eyebrow above the blue iris.
-        bind(sleepy_lash,'transform.t.y',[0.,0.,7.])
+        bind(sleepy_lash,'transform.t.y',[0.,0.,12.])
     )
 ] + [
     bind(neutral,'transform.s.x',[1.,1.,.003]),
