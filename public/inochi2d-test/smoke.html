@@ -46,6 +46,46 @@ try {
    : '/inochi2d-test/models/MewNook-v2.inx')
  const names=controller.getAnimationNames?.()||[]
  const selftest = new URLSearchParams(location.search).has('selftest')
+ const diagnose = new URLSearchParams(location.search).has('diagnose')
+ if(diagnose) {
+   const gl=canvas.getContext('webgl2')
+   const wait=(ms)=>new Promise(resolve=>setTimeout(resolve,ms))
+   const take=()=>{
+     const p=new Uint8Array(gl.drawingBufferWidth*gl.drawingBufferHeight*4)
+     gl.readPixels(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight,gl.RGBA,gl.UNSIGNED_BYTE,p)
+     return p
+   }
+   const diff=(a,b)=>{
+     let n=0,score=0
+     for(let i=0;i<a.length;i+=4){
+       const d=Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])
+       if(d>35){n++;score+=d}
+     }
+     return {pixels:n,score}
+   }
+   const report=[]
+   for(const name of ['ParamEyeBlinkLeft','ParamHairLeft','ParamHairRight','ParamHairFront','ParamTailDeform','ParamEyeDeformLeft','ParamLidCurveLeft']){
+     await controller.setParameter(name,0)
+     await wait(280)
+     const baseline=take()
+     await controller.setParameter(name,1)
+     await wait(300)
+     const after=take()
+     const d=diff(baseline,after)
+     report.push(name+'='+d.pixels+'/'+d.score)
+     await controller.setParameter(name,0)
+     await wait(180)
+   }
+   const debugState=controller.getDebugState?.()
+   node.dataset.diagnostic=report.join(' | ')
+   node.dataset.paramDebug=JSON.stringify({
+     unresolved:debugState?.unresolvedParameterHandleIds,
+     lastWritten:debugState?.lastRuntimeParameterValues,
+     active:debugState?.activeAnimation
+   }).slice(0,900)
+   console.log('MewNook v3 per-parameter diagnostic',report,debugState)
+ }
+
  if(selftest) {
    const gl=canvas.getContext('webgl2')
    if(!gl) throw new Error('WebGL2 context unavailable in pixel verification')

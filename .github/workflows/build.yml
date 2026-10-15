@@ -52,6 +52,14 @@ jobs:
             exit 1
           fi
           echo "Inochi2D v2 visible blink verified. V3 remains an isolated candidate."
+      - name: Diagnose Inochi2D v3 render params
+        run: |
+          google-chrome --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-unsafe-swiftshader --use-angle=swiftshader --enable-webgl \
+            --virtual-time-budget=25000 --dump-dom \
+            'http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3&diagnose=1' \
+            > /tmp/inochi-v3-diagnostic.html 2> /tmp/inochi-v3-browser.log || true
+          python -c "import re; s=open('/tmp/inochi-v3-diagnostic.html').read(); m=re.search(r'data-diagnostic=\\\"([^\\\"]+)',s); print('V3 DIAGNOSTIC:',m.group(1) if m else 'Missing!'); print('V3 STATUS:',re.findall(r'<span id=\\\"status\\\"[^>]*>[^<]*',s)[:1])"
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
