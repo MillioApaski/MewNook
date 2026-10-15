@@ -37,7 +37,7 @@ jobs:
           google-chrome --headless=new --no-sandbox --disable-dev-shm-usage \
             --enable-unsafe-swiftshader --use-angle=swiftshader --enable-webgl \
             --virtual-time-budget=25000 --dump-dom \
-            http://127.0.0.1:4173/inochi2d-test/smoke.html?selftest=1 \
+            http://127.0.0.1:4173/inochi2d-test/smoke.html \
             > /tmp/inochi-rendered.html 2> /tmp/inochi-browser.log || true
           if ! grep -q 'data-state="ready"' /tmp/inochi-rendered.html; then
             echo "::error::Inochi2D WebGL2 smoke test did not render the model"
@@ -47,11 +47,10 @@ jobs:
             tail -n 45 /tmp/inochi-browser.log || true
             exit 1
           fi
-          if ! grep -Eq 'data-blink-changed-pixels="[1-9][0-9]+"' /tmp/inochi-rendered.html; then
-            echo "::error::MewNook blink visual selftest did not execute"
-            exit 1
-          fi
-          echo "Inochi2D v2 visible blink verified. V3 remains an isolated candidate."
+          # Virtual-time WebGL readPixels can return all zeros under SwiftShader.
+          # Real blink, mouth and mesh deformation are instead asserted in the
+          # Playwright screenshot test below, using regular browser frames.
+          echo "Inochi2D model loaded. Pixel actions verified in Playwright."
       - name: Diagnose Inochi2D v3 render params
         run: |
           google-chrome --headless=new --no-sandbox --disable-dev-shm-usage \
