@@ -1,0 +1,25 @@
+{
+  "parts": 13,
+  "parameters": 22,
+  "newParts": [
+    "Hair Left Outer",
+    "Hair Right Outer",
+    "Hair Forelock"
+  ],
+  "newDeformParams": [
+    "ParamHairLeft",
+    "ParamHairRight",
+    "ParamHairFront",
+    "ParamTailDeform",
+    "ParamLidCurveLeft",
+    "ParamLidCurveRight",
+    "ParamEyeDeformLeft",
+    "ParamEyeDeformRight"
+  ],
+  "modelBytes": 2294740,
+  "limitations": [
+    "Flattened illustration used",
+    "Hidden areas approximated, not hand-painted",
+    "New portrait layered art has not yet been imported into repository"
+  ]
+}
