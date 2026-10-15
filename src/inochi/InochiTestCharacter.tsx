@@ -67,7 +67,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
-      await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx')
+      await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx')
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
@@ -144,7 +144,15 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       set('ParamBodyZ',Math.sin(t*.7)*.12)
       set('ParamHeadX',focused?-.3:Math.sin(t*.42)*.18)
       set('ParamHeadY',focused?.33:sleepy?.17:Math.sin(t*.34)*.13)
-      set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
+      set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.28))
+      set('ParamTailDeform',Math.sin(t*(sleepy?.72:1.18))*(focused?.22:.55))
+      set('ParamHairLeft',Math.sin(t*.96)*.38)
+      set('ParamHairRight',Math.sin(t*.88+.7)*.35)
+      set('ParamHairFront',Math.sin(t*1.11+.35)*.28)
+      set('ParamLidCurveLeft',blinkValue*.35)
+      set('ParamLidCurveRight',blinkValue*.35)
+      set('ParamEyeDeformLeft',Math.sin(t*.5)*.18)
+      set('ParamEyeDeformRight',Math.sin(t*.5)*.18)
       set('ParamEarLeft',touched?.8:Math.sin(t*1.8)*.25)
       set('ParamEarRight',touched?-.8:Math.sin(t*1.7+.4)*.25)
       set('ParamSmile',state.smile)
@@ -155,5 +163,5 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook 原创 Inochi2D v2 模型" />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook Inochi2D v3 多顶点模型" />
 }

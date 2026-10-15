@@ -77,3 +77,12 @@
 - [x] Add generated model validation and browser loading smoke test.
 - [ ] Full hand-painted layered source with concealed faces and individually deformable eyelids in Inochi Creator.
 - [ ] Real motion clips and visual baseline screenshot comparison on desktop and phone.
+
+## Inochi2D v3 multi-vertex deform milestone
+
+- [x] Subdivide hair, tail, eyes, and eyelids into textured grid ArtMeshes.
+- [x] Use native INX `deform` keyframe tracks with per-vertex displacements.
+- [x] Integrate animation tick with focus, rest, chat, sleepy, and touch states.
+- [x] Add contract and WebGL pixel-difference tests for mesh deformation.
+- [ ] Merge new portrait layered source into repository and manually repaint concealed artwork.
+- [ ] Finish manually authored Inochi Creator motion curves and visual proof across four rooms.
