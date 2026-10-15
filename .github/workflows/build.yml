@@ -69,7 +69,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: inochi-v3-probe
-          path: /tmp/inochi-v3-shots
+          path: |
+            /tmp/inochi-v3-shots
+            public/inochi2d-test/models/MewNook-v2.inx
+            public/inochi2d-test/models/MewNook-v3.inx
           if-no-files-found: ignore
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
