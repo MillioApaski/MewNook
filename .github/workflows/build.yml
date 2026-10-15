@@ -26,7 +26,7 @@ jobs:
           data = urllib.request.urlopen('https://raw.githubusercontent.com/Inochi2D/inochi2d/main/examples/empty08.inx').read()
           for name,b in [('empty08',data),('aka',pathlib.Path('public/inochi2d-test/models/Aka.inx').read_bytes())]:
               print('==',name,'bytes',len(b),'header',repr(b[:24]))
-              if b[:8] == b'TRNSRTS\\0':
+              if b[:7] == b'TRNSRTS':
                   n=struct.unpack('>I',b[8:12])[0]
                   j=json.loads(b[12:12+n])
                   print('root keys',list(j))
