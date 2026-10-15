@@ -135,10 +135,11 @@ for name,points,depth,strength,param_name in regions:
     if not bbox:continue
     x0,y0,x1,y1=bbox
     tex=Image.fromarray(layer[y0:y1,x0:x1])
-    # Put opaque art under the moving lock. Outlines won't expose a hole.
-    # This is a content-aware approximation, not artist-painted occluded hair.
-    cleanmask=cv2.erode(mask,np.ones((7,7),np.uint8))
-    remaining[:,:,:3]=cv2.inpaint(remaining[:,:,:3],(cleanmask>60).astype('uint8')*255,10,cv2.INPAINT_TELEA)
+    # Keep the original body colors fully intact. The old color-only
+    # inpainting pass overwrote large portions of face and hair, creating
+    # visibly corrupted white smears and black transparent fringes.
+    # Strands are small, feathered duplicates on top of the untouched body;
+    # behind-the-hair painting remains a separate artist task.
     texid=len(textures);textures.append(tex)
     item={
       'uuid':uid(),'name':name,'type':'Part','enabled':True,'zsort':depth,
@@ -153,8 +154,8 @@ for name,points,depth,strength,param_name in regions:
     cols,rows=mesh_grid(item,7,9)
     deform_param(param_name,item,cols,rows,strength,'x')
     added.append(name)
-# Original body texture keeps underlying colors where strands move, with no
-# alpha hole; the new hair alpha layers sit on top and are deformable.
+# The original body texture remains unaltered; hair alpha overlays are soft.
+# Avoid destructive inpainting until matching painted occluded layers exist.
 bbox=Image.fromarray(remaining).getbbox()
 assert bbox
 # Keep old texture origin and bounding box identical.
@@ -178,6 +179,6 @@ TARGET.write_bytes(binary)
 REPORT.write_text(json.dumps({'parts':len(nodes),'parameters':len(params),'newParts':added,
   'newDeformParams':[x['name'] for x in params if any(b.get('param_name')=='deform' for b in x['bindings'])],
   'modelBytes':len(binary),
-  'limitations':['Flattened illustration used','Hidden areas approximated, not hand-painted',
+  'limitations':['Flattened illustration used','Occluded areas retained as base source, not painted',
   'New portrait layered art has not yet been imported into repository']},ensure_ascii=False,indent=2))
 print('MewNook v3:',len(nodes),'ArtMeshes',len(params),'parameters',len(binary),'bytes')
