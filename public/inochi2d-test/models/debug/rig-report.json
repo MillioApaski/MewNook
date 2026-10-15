@@ -1,0 +1,34 @@
+{
+  "source": "public/assets/rooms/day/character.webp",
+  "parts": [
+    "Retouched body and face",
+    "Left Cat Ear",
+    "Right Cat Ear",
+    "Cat Tail",
+    "Eye Left Iris",
+    "Eye Left Closed Lash",
+    "Eye Right Iris",
+    "Eye Right Closed Lash",
+    "Talking Mouth",
+    "Shy Blush"
+  ],
+  "parameters": [
+    "ParamEyeBlinkLeft",
+    "ParamEyeBlinkRight",
+    "ParamEarLeft",
+    "ParamEarRight",
+    "ParamTailSwing",
+    "ParamBreath",
+    "ParamBodyY",
+    "ParamBodyZ",
+    "ParamHeadX",
+    "ParamHeadY",
+    "ParamMouthOpen",
+    "ParamSmile",
+    "ParamSleepy",
+    "ParamEmbarrassed"
+  ],
+  "textureCount": 10,
+  "modelBytes": 1644725,
+  "notes": "Source-driven, not manually painted; eye crops are nonrectangular."
+}
