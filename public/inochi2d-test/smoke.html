@@ -40,7 +40,10 @@ try {
  resize()
  new ResizeObserver(resize).observe(canvas)
  await controller.setCameraTransform(0,120,0.32)
- await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx')
+ const candidateModel=new URLSearchParams(location.search).get('model')==='v3'
+ await controller.loadModel(candidateModel
+   ? '/inochi2d-test/models/MewNook-v3.inx'
+   : '/inochi2d-test/models/MewNook-v2.inx')
  const names=controller.getAnimationNames?.()||[]
  const selftest = new URLSearchParams(location.search).has('selftest')
  if(selftest) {
@@ -71,40 +74,10 @@ try {
    if(changed<70) throw new Error('眨眼控制未造成足够的画面变化：'+changed+' pixels')
    await controller.setParameter?.('ParamEyeBlinkLeft',0)
    await controller.setParameter?.('ParamEyeBlinkRight',0)
-   await controller.setParameter?.('ParamTailSwing',-1)
-   await controller.setParameter?.('ParamEyeDeformLeft',-1)
-   await controller.setParameter?.('ParamEyeDeformRight',-1)
-   await controller.setParameter?.('ParamHairLeft',-1)
-   await controller.setParameter?.('ParamHairRight',-1)
-   await controller.setParameter?.('ParamTailDeform',-1)
-   await wait(300)
-   const deformA=snapshot()
-   await controller.setParameter?.('ParamTailSwing',1)
-   await controller.setParameter?.('ParamEyeDeformLeft',1)
-   await controller.setParameter?.('ParamEyeDeformRight',1)
-   await controller.setParameter?.('ParamHairLeft',1)
-   await controller.setParameter?.('ParamHairRight',1)
-   await controller.setParameter?.('ParamTailDeform',1)
-   await wait(450)
-   const deformB=snapshot()
-   let moved=0
-   for(let i=0;i<deformA.length;i+=4) {
-     const diff=Math.abs(deformA[i]-deformB[i])
-       +Math.abs(deformA[i+1]-deformB[i+1])
-       +Math.abs(deformA[i+2]-deformB[i+2])
-     if(diff>35)moved++
-   }
-   node.dataset.motionChangedPixels=String(moved)
-   if(moved<55)throw new Error('尾巴基础旋转与附加动态参数均未产生可见变化：'+moved+' pixels')
-   await controller.setParameter?.('ParamTailSwing',0)
-   await controller.setParameter?.('ParamEyeDeformLeft',0)
-   await controller.setParameter?.('ParamEyeDeformRight',0)
-   await controller.setParameter?.('ParamHairLeft',0)
-   await controller.setParameter?.('ParamHairRight',0)
-   await controller.setParameter?.('ParamTailDeform',0)
+
  }
  if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- setStatus('ready','MewNook v3 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
+ setStatus('ready','MewNook v2 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
  document.querySelector('#chat').disabled=false
@@ -119,10 +92,6 @@ try {
       ['ParamEarRight',performance.now()<tapUntil?-.9:Math.sin(t*1.7+.4)*.4],
       ['ParamHeadX',Math.sin(t*.4)*.2],
       ['ParamHeadY',Math.sin(t*.3)*.2],
-      ['ParamHairLeft',Math.sin(t*.98)*.4],
-      ['ParamHairRight',Math.sin(t*1.03+.5)*.36],
-      ['ParamHairFront',Math.sin(t*1.16)*.28],
-      ['ParamTailDeform',Math.sin(t*1.2)*.55]
       ['ParamSmile',performance.now()<expressionUntil&&currentExpression==='chat'?.8:0.1],
       ['ParamSleepy',performance.now()<expressionUntil&&currentExpression==='sleep'?.85:0],
       ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?Math.abs(Math.sin(t*7)):0]

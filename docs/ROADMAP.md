@@ -86,3 +86,5 @@
 - [x] Add contract and WebGL pixel-difference tests for mesh deformation.
 - [ ] Merge new portrait layered source into repository and manually repaint concealed artwork.
 - [ ] Finish manually authored Inochi Creator motion curves and visual proof across four rooms.
+
+- [ ] v3 verification: per-vertex keys parse but produce 0 changed pixels in existing headless harness. Investigate runtime/render loop and texture z-order before enabling v3 by default.

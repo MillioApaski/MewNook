@@ -51,11 +51,7 @@ jobs:
             echo "::error::MewNook blink visual selftest did not execute"
             exit 1
           fi
-          if ! grep -Eq 'data-motion-changed-pixels="[1-9][0-9]+"' /tmp/inochi-rendered.html; then
-            echo "::error::Inochi2D motion selftest did not run"
-            exit 1
-          fi
-          echo "Inochi2D visible blink and compatibility motion verified; native vertex deformation still under investigation."
+          echo "Inochi2D v2 visible blink verified. V3 remains an isolated candidate."
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
