@@ -16,7 +16,9 @@
     "Eye Right Drowsy Lash",
     "Eye Right Closed Lash",
     "Neutral Smile",
-    "Talking Mouth",
+    "Talking Mouth A",
+    "Talking Mouth B",
+    "Sleepy Mouth",
     "Shy Blush"
   ],
   "parameters": [
@@ -35,7 +37,19 @@
     "ParamSleepy",
     "ParamEmbarrassed"
   ],
-  "textureCount": 17,
-  "modelBytes": 1523803,
-  "notes": "Source-driven, not manually painted; eye crops are nonrectangular."
+  "textureCount": 19,
+  "modelBytes": 1532772,
+  "faceFrame": {
+    "center": [
+      525.0,
+      540.0
+    ],
+    "angle_deg": -29.0,
+    "radius": [
+      31.0,
+      13.0
+    ],
+    "original_neutral": true
+  },
+  "notes": "Source-derived original angled mouth, A/B speech, separate drowsy mouth; eye crops remain nonrectangular."
 }
