@@ -21,6 +21,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from mewnook_face_art import build_face_mouth_art
+from mewnook_eye_art import make_drowsy_eye_art
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'public/assets/rooms/day/character.webp'
@@ -221,9 +222,12 @@ for i,eye in enumerate(eyes):
     # never squeezed in the Y axis; this fixes the "eye disappears vertically"
     # regression. The cover contains the reconstructed face under the iris.
     cover=add_part('Eye '+eye['name']+' Upper Lid',body,eye['mask'],z=7+i*5)
-    # A separate half-closed upper lid gives drowsy mode a persistent pose.
-    drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,eye['mask'],z=8+i*6)
-    sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lash_sprite(eye,drowsy=True),z=9+i*6)
+    # Face-tilt-aware drowsy lid: mask only the iris's *upper strip*, not
+    # the complete oval. Full-ellipse skin covers looked like pasted-on
+    # rectangles / thick detached eyebrows in the previous browser review.
+    lid_alpha,lid_stroke=make_drowsy_eye_art(eye,body,(W,H))
+    drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,lid_alpha,z=8+i*6)
+    sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lid_stroke,z=9+i*6)
     lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=10+i*6)
     eye_parts[eye['name']]=(iris,cover,drowsy,sleepy_lash,lash)
 neutral=add_part('Neutral Smile',mouth_art['Neutral Smile'],z=20)
@@ -285,12 +289,10 @@ param('ParamSleepy',[
     binding
     for _,(_,_,drowsy,sleepy_lash,_) in eye_parts.items()
     for binding in (
-        bind(drowsy,'transform.s.y',[.008,.008,.56]),
-        bind(drowsy,'transform.t.y',[-26,-26,-11]),
-        bind(sleepy_lash,'transform.s.y',[.002,.002,.74]),
-        # Match the downward motion of the tilted upper eyelid instead of
-        # floating as a second eyebrow above the blue iris.
-        bind(sleepy_lash,'transform.t.y',[0.,0.,12.])
+        bind(drowsy,'transform.s.y',[.008,.008,1.]),
+        bind(drowsy,'transform.t.y',[-8.,-8.,0.]),
+        bind(sleepy_lash,'transform.s.y',[.002,.002,1.]),
+        bind(sleepy_lash,'transform.t.y',[-8.,-8.,0.])
     )
 ] + [
     bind(neutral,'transform.s.x',[1.,1.,.003]),
