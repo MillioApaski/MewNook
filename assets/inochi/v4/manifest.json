@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "model_id": "mewnook-v4-upright",
+  "stage": "directory_scaffold_only",
+  "reference": {
+    "path": "source/pose_reference.png",
+    "width": 1122,
+    "height": 1402,
+    "alpha": true,
+    "status": "not_committed"
+  },
+  "editable_master": {
+    "path": "source/mewnook_v4_master.ora",
+    "status": "not_created"
+  },
+  "coordinate_system": {
+    "origin": "top-left",
+    "left_right": "screen/viewer left-right",
+    "canvas": [
+      1122,
+      1402
+    ]
+  },
+  "color_pipeline": {
+    "working": "straight-alpha sRGB RGBA",
+    "runtime": "premultiplied-alpha PNG textures for Inox2D"
+  },
+  "rig": {
+    "source": "rig/mewnook_v4_project.inp",
+    "status": "not_created"
+  },
+  "release": {
+    "path": "public/inochi2d/v4/models/MewNook-v4.inx",
+    "status": "not_created",
+    "default": "retain v3 until checked"
+  },
+  "expressions": [
+    "neutral",
+    "smile",
+    "talk_a",
+    "talk_b",
+    "sleepy",
+    "blink",
+    "blush"
+  ],
+  "motions": [
+    "idle",
+    "touch_ear",
+    "chat",
+    "focus",
+    "rest",
+    "sleepy"
+  ],
+  "required_parts": [
+    {
+      "id": "face_base",
+      "group": "head",
+      "path": "parts/head/face_base.png",
+      "status": "not_created"
+    },
+    {
+      "id": "neck",
+      "group": "head",
+      "path": "parts/head/neck.png",
+      "status": "not_created"
+    },
+    {
+      "id": "brow_left",
+      "group": "head",
+      "path": "parts/head/brow_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "brow_right",
+      "group": "head",
+      "path": "parts/head/brow_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "blush_left",
+      "group": "head",
+      "path": "parts/head/blush_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "blush_right",
+      "group": "head",
+      "path": "parts/head/blush_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_white",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_white.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_iris",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_iris.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_pupil",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_pupil.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_highlight",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_highlight.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_upper_lid",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_upper_lid.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_lower_lid",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_lower_lid.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_left_closed",
+      "group": "eyes",
+      "path": "parts/eyes/eye_left_closed.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_white",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_white.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_iris",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_iris.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_pupil",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_pupil.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_highlight",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_highlight.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_upper_lid",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_upper_lid.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_lower_lid",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_lower_lid.png",
+      "status": "not_created"
+    },
+    {
+      "id": "eye_right_closed",
+      "group": "eyes",
+      "path": "parts/eyes/eye_right_closed.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_neutral",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_neutral.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_smile",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_smile.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_talk_a",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_talk_a.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_talk_b",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_talk_b.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_sleepy",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_sleepy.png",
+      "status": "not_created"
+    },
+    {
+      "id": "mouth_yawn",
+      "group": "mouth",
+      "path": "parts/mouth/mouth_yawn.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_back_left",
+      "group": "hair",
+      "path": "parts/hair/hair_back_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_back_right",
+      "group": "hair",
+      "path": "parts/hair/hair_back_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_front_left",
+      "group": "hair",
+      "path": "parts/hair/hair_front_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_front_center",
+      "group": "hair",
+      "path": "parts/hair/hair_front_center.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_front_right",
+      "group": "hair",
+      "path": "parts/hair/hair_front_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_side_left",
+      "group": "hair",
+      "path": "parts/hair/hair_side_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_side_right",
+      "group": "hair",
+      "path": "parts/hair/hair_side_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_tip_left",
+      "group": "hair",
+      "path": "parts/hair/hair_tip_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hair_tip_right",
+      "group": "hair",
+      "path": "parts/hair/hair_tip_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ahoge",
+      "group": "hair",
+      "path": "parts/hair/ahoge.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hairpin_x",
+      "group": "hair",
+      "path": "parts/hair/hairpin_x.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ribbon_left",
+      "group": "hair",
+      "path": "parts/hair/ribbon_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ribbon_right",
+      "group": "hair",
+      "path": "parts/hair/ribbon_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ear_left_outer",
+      "group": "ears",
+      "path": "parts/ears/ear_left_outer.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ear_left_inner",
+      "group": "ears",
+      "path": "parts/ears/ear_left_inner.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ear_right_outer",
+      "group": "ears",
+      "path": "parts/ears/ear_right_outer.png",
+      "status": "not_created"
+    },
+    {
+      "id": "ear_right_inner",
+      "group": "ears",
+      "path": "parts/ears/ear_right_inner.png",
+      "status": "not_created"
+    },
+    {
+      "id": "torso",
+      "group": "body",
+      "path": "parts/body/torso.png",
+      "status": "not_created"
+    },
+    {
+      "id": "collar",
+      "group": "body",
+      "path": "parts/body/collar.png",
+      "status": "not_created"
+    },
+    {
+      "id": "chest_bow",
+      "group": "body",
+      "path": "parts/body/chest_bow.png",
+      "status": "not_created"
+    },
+    {
+      "id": "skirt",
+      "group": "body",
+      "path": "parts/body/skirt.png",
+      "status": "not_created"
+    },
+    {
+      "id": "arm_left_upper",
+      "group": "arms",
+      "path": "parts/arms/arm_left_upper.png",
+      "status": "not_created"
+    },
+    {
+      "id": "arm_left_forearm",
+      "group": "arms",
+      "path": "parts/arms/arm_left_forearm.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hand_left",
+      "group": "arms",
+      "path": "parts/arms/hand_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "arm_right_upper",
+      "group": "arms",
+      "path": "parts/arms/arm_right_upper.png",
+      "status": "not_created"
+    },
+    {
+      "id": "arm_right_forearm",
+      "group": "arms",
+      "path": "parts/arms/arm_right_forearm.png",
+      "status": "not_created"
+    },
+    {
+      "id": "hand_right",
+      "group": "arms",
+      "path": "parts/arms/hand_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "leg_left",
+      "group": "legs",
+      "path": "parts/legs/leg_left.png",
+      "status": "not_created"
+    },
+    {
+      "id": "leg_right",
+      "group": "legs",
+      "path": "parts/legs/leg_right.png",
+      "status": "not_created"
+    },
+    {
+      "id": "tail_root",
+      "group": "tail",
+      "path": "parts/tail/tail_root.png",
+      "status": "not_created"
+    },
+    {
+      "id": "tail_middle",
+      "group": "tail",
+      "path": "parts/tail/tail_middle.png",
+      "status": "not_created"
+    },
+    {
+      "id": "tail_tip",
+      "group": "tail",
+      "path": "parts/tail/tail_tip.png",
+      "status": "not_created"
+    },
+    {
+      "id": "chair_back",
+      "group": "chair",
+      "path": "parts/chair/chair_back.png",
+      "status": "not_created"
+    },
+    {
+      "id": "chair_seat",
+      "group": "chair",
+      "path": "parts/chair/chair_seat.png",
+      "status": "not_created"
+    },
+    {
+      "id": "chair_front",
+      "group": "chair",
+      "path": "parts/chair/chair_front.png",
+      "status": "not_created"
+    }
+  ]
+}
