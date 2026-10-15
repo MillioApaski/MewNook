@@ -84,6 +84,15 @@ removal = cv2.dilate(removal, cv2.getStructuringElement(
 body = source.copy()
 body[:, :, :3] = cv2.inpaint(source[:, :, :3], removal, 18, cv2.INPAINT_TELEA)
 
+# The source contains a permanent painted smile. Remove only that tiny area
+# from the base face, then redraw a neutral smile + separate speaking mouth.
+# Otherwise the speech cavity appears on TOP of the original painted mouth.
+mouth_removal = np.zeros((H,W),np.uint8)
+cv2.ellipse(mouth_removal,xy(509,531),xy(34,18),-23,0,360,255,-1)
+mouth_removal=cv2.GaussianBlur(mouth_removal,(0,0),2)
+body[:,:,:3]=cv2.inpaint(body[:,:,:3],(mouth_removal>24).astype('uint8')*255,9,cv2.INPAINT_TELEA)
+
+
 # A cheek-colored eyelid replaces the blue iris as the open eye contracts.
 # Only the dark curved eyelash line is painted, with transparent surroundings.
 def lash_sprite(eye):
@@ -98,8 +107,11 @@ def lash_sprite(eye):
         y = ((1 - t)**3 * p0[1] + 3 * (1 - t)**2 * t * p1[1]
              + 3 * (1 - t) * t*t * p2[1] + t**3 * p3[1])
         points.append(xy(x, y))
-    width = max(2, round(W / 1086 * 4))
-    d.line(points, fill=(85, 60, 89, 240), width=width, joint='curve')
+    width = max(4, round(W / 1086 * 6))
+    d.line(points, fill=(79, 54, 85, 255), width=width, joint='curve')
+    # Closed lashes must remain visible when the iris is entirely covered.
+    d.line(points[5:36], fill=(118, 81, 113, 240),
+           width=max(2,width//2),joint='curve')
     # Small outer lash, attached to the closed eyelid rather than a box.
     tip = points[-1]
     d.line((tip, xy(p3[0]+5, p3[1]-9)),
@@ -112,12 +124,18 @@ def tint_mask(mask, color):
     out[:, :, 3] = (mask.astype(np.float32) * color[3]/255).astype(np.uint8)
     return out
 
-# Transparent, hand-authored mouth and shy blush shapes.
-mouth_image = Image.new('RGBA', (W, H), (0,0,0,0))
-draw = ImageDraw.Draw(mouth_image)
-draw.ellipse((*xy(497, 527), *xy(529, 544)), fill=(119, 56, 91, 240))
-draw.arc((*xy(499, 531), *xy(527, 544)), 5, 175, fill=(250, 159, 180, 235),
-         width=max(2, round(W / 500)))
+# A small, painted smile and a separate inner mouth texture.
+# Original smile pixels were removed from the base face above.
+neutral_mouth=Image.new('RGBA',(W,H),(0,0,0,0))
+draw=ImageDraw.Draw(neutral_mouth)
+points=[xy(x,531-0.25*(x-495)+3*math.sin((x-495)/36*math.pi)) for x in range(495,532,2)]
+draw.line(points,fill=(135,75,97,205),width=max(2,round(W/450)),joint='curve')
+mouth_image = Image.new('RGBA', (W,H), (0,0,0,0))
+draw=ImageDraw.Draw(mouth_image)
+draw.ellipse((*xy(496,518),*xy(528,550)), fill=(123,65,100,250))
+draw.ellipse((*xy(499,536),*xy(524,548)), fill=(233,143,172,248))
+draw.arc((*xy(497,519),*xy(529,540)),185,345,fill=(252,219,218,220),
+         width=max(2,round(W/360)))
 blush_image = Image.new('RGBA',(W,H),(0,0,0,0))
 draw = ImageDraw.Draw(blush_image)
 for center in [(345, 546),(586, 468)]:
@@ -190,6 +208,13 @@ def add_part(name, picture, mask=None, z=0):
     texture_nodes.append(item)
     return item
 
+# The base no longer keeps an unmoving full-strength duplicate of each ear.
+# Preserve ~10% at edges to avoid pinholes during rotation. The ear art
+# remains real textured parts with a clearly visible, separate reaction.
+for ear_mask in ears.values():
+    factor=ear_mask.astype(np.float32)/255
+    body[:,:,3]=np.clip(body[:,:,3].astype(np.float32)*(1-.93*factor),0,255).astype(np.uint8)
+
 base = add_part('Retouched body and face', body, z=0)
 # These independent mesh parts are deliberately modest in range while the
 # artwork's underlying occluded surfaces are unfinished.
@@ -198,12 +223,18 @@ earR = add_part('Right Cat Ear',source,ears['Right'],2)
 tailPart = add_part('Cat Tail',source,tail,3)
 eye_parts = {}
 for i,eye in enumerate(eyes):
-    eye_mask = eye['mask']
-    eye_open = add_part('Eye '+eye['name']+' Iris', source,eye_mask,6+i*3)
-    lid = add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=7+i*3)
-    eye_parts[eye['name']] = (eye_open,lid)
-mouth = add_part('Talking Mouth',np.asarray(mouth_image),z=15)
-blush = add_part('Shy Blush',np.asarray(blush_image),z=16)
+    iris=add_part('Eye '+eye['name']+' Iris',source,eye['mask'],z=6+i*5)
+    # Skin-colored upper eyelid closes OVER the fixed iris. The eye itself is
+    # never squeezed in the Y axis; this fixes the "eye disappears vertically"
+    # regression. The cover contains the reconstructed face under the iris.
+    cover=add_part('Eye '+eye['name']+' Upper Lid',body,eye['mask'],z=7+i*5)
+    # A separate half-closed upper lid gives drowsy mode a persistent pose.
+    drowsy=add_part('Eye '+eye['name']+' Drowsy Lid',body,eye['mask'],z=8+i*5)
+    lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=9+i*5)
+    eye_parts[eye['name']]=(iris,cover,drowsy,lash)
+neutral=add_part('Neutral Smile',np.asarray(neutral_mouth),z=20)
+mouth=add_part('Talking Mouth',np.asarray(mouth_image),z=21)
+blush=add_part('Shy Blush',np.asarray(blush_image),z=22)
 
 def param(name, bindings, limits=(-1,1), initial=0):
     # Scalar control with 3 horizontal keyforms. Use neutral 0 for idle.
@@ -224,25 +255,38 @@ def param(name, bindings, limits=(-1,1), initial=0):
     })
 def bind(node,kind,values): return (node,kind,values)
 
-for name,(eye,lid) in eye_parts.items():
+for name,(iris,cover,drowsy,lash) in eye_parts.items():
+    # -1 and 0: open. +1: fully covered by skin + closed eyelash.
+    # Translate the eyelid from above the eye to its final centered position
+    # while expanding downwards. This is occlusion, not iris compression.
     param('ParamEyeBlink'+name,[
-        bind(eye,'transform.s.y',[1.0,1.0,.03]),
-        bind(lid,'transform.s.y',[.002,.002,1.0])
-    ],limits=(-1,1),initial=0)
-param('ParamEarLeft',[bind(earL,'transform.r.z',[-.045,0,.045])])
-param('ParamEarRight',[bind(earR,'transform.r.z',[.045,0,-.045])])
-param('ParamTailSwing',[bind(tailPart,'transform.r.z',[-.045,0,.045])])
+        bind(cover,'transform.s.y',[.008,.008,1.]),
+        bind(cover,'transform.t.y',[-28,-28,0]),
+        bind(lash,'transform.s.y',[.002,.002,1.])
+    ])
+param('ParamEarLeft',[bind(earL,'transform.r.z',[-.27,0,.27])])
+param('ParamEarRight',[bind(earR,'transform.r.z',[.27,0,-.27])])
+param('ParamTailSwing',[bind(tailPart,'transform.r.z',[-.085,0,.085])])
 param('ParamBreath',[bind(base,'transform.s.y',[.995,1.,1.005])])
 param('ParamBodyY',[bind(base,'transform.t.y',[-2.,0.,2.])])
 param('ParamBodyZ',[bind(base,'transform.r.z',[-.002,0.,.002])])
-param('ParamHeadX',[bind(eye,'transform.t.x',[-2,0,2])
-                   for eye,_ in eye_parts.values()])
-param('ParamHeadY',[bind(eye,'transform.t.y',[-2,0,2])
-                   for eye,_ in eye_parts.values()])
-param('ParamMouthOpen',[bind(mouth,'transform.s.y',[.003,.003,1.])])
-param('ParamSmile',[bind(mouth,'transform.t.y',[0,0,1.])])
-param('ParamSleepy',[bind(lid,'transform.s.y',[.002,.002,.45])
-                     for _,lid in eye_parts.values()])
+param('ParamHeadX',[bind(iris,'transform.t.x',[-2,0,2])
+                   for iris,_,_,_ in eye_parts.values()])
+param('ParamHeadY',[bind(iris,'transform.t.y',[-2,0,2])
+                   for iris,_,_,_ in eye_parts.values()])
+param('ParamMouthOpen',[
+    bind(mouth,'transform.s.y',[.008,.008,1.]),
+    bind(mouth,'transform.t.y',[-9,-9,0])
+])
+param('ParamSmile',[bind(neutral,'transform.s.x',[.94,1.,1.08])])
+param('ParamSleepy',[
+    binding
+    for _,(_,_,drowsy,_) in eye_parts.items()
+    for binding in (
+        bind(drowsy,'transform.s.y',[.008,.008,.80]),
+        bind(drowsy,'transform.t.y',[-26,-26,-9])
+    )
+])
 param('ParamEmbarrassed',[bind(blush,'transform.s.y',[.002,.002,1.])])
 
 root={'uuid':next_id(),'name':'Root','type':'Node','enabled':True,
