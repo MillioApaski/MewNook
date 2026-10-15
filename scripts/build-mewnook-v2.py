@@ -283,7 +283,10 @@ param('ParamSleepy',[
     for binding in (
         bind(drowsy,'transform.s.y',[.008,.008,.56]),
         bind(drowsy,'transform.t.y',[-26,-26,-11]),
-        bind(sleepy_lash,'transform.s.y',[.002,.002,.74])
+        bind(sleepy_lash,'transform.s.y',[.002,.002,.74]),
+        # Match the downward motion of the tilted upper eyelid instead of
+        # floating as a second eyebrow above the blue iris.
+        bind(sleepy_lash,'transform.t.y',[0.,0.,7.])
     )
 ] + [
     bind(neutral,'transform.s.x',[1.,1.,.003]),

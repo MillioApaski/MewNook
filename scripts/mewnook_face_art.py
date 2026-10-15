@@ -31,7 +31,8 @@ def _rotated_point(u:float,v:float,w:int,h:int,scale:int=1)->tuple[int,int]:
     x,y=_canvas_xy(x,y,w,h)
     return x*scale,y*scale
 
-def _draw_open(w:int,h:int,halfwidth:float,opening:float,sleepy:bool=False)->np.ndarray:
+def _draw_open(w:int,h:int,halfwidth:float,opening:float,
+               sleepy:bool=False,reference:np.ndarray|None=None)->np.ndarray:
     aa=3
     image=Image.new('RGBA',(w*aa,h*aa),(0,0,0,0))
     draw=ImageDraw.Draw(image)
@@ -52,7 +53,20 @@ def _draw_open(w:int,h:int,halfwidth:float,opening:float,sleepy:bool=False)->np.
     draw.line(upper,fill=(129,76,98,218),width=aa*2,joint='curve')
     if sleepy:
         draw.line(lower[9:24],fill=(212,127,153,180),width=aa*2,joint='curve')
-    return np.asarray(image.resize((w,h),Image.Resampling.LANCZOS)).copy()
+    art=np.asarray(image.resize((w,h),Image.Resampling.LANCZOS)).copy()
+    if reference is not None and not sleepy:
+        # Retain the original author's small upward smile stroke as the
+        # *upper lip* of the opening. The earlier solid ellipse looked pasted
+        # on because it had no linework from the existing tilted face.
+        original_mask=_ellipse_mask(w,h,*MOUTH_RADIUS,0)
+        green=reference[:,:,1].astype(np.float32)
+        ink=np.clip((215-green)/95,0,1)
+        lip=reference.copy()
+        lip[:,:,3]=np.round(reference[:,:,3].astype(np.float32)
+                     *original_mask.astype(np.float32)/255*ink).astype(np.uint8)
+        art=np.asarray(Image.alpha_composite(Image.fromarray(art,'RGBA'),
+                           Image.fromarray(lip,'RGBA'))).copy()
+    return art
 
 def build_face_mouth_art(original:np.ndarray,base:np.ndarray)->tuple[np.ndarray,dict[str,np.ndarray],dict]:
     """Return corrected base, transparent local-space poses, and pose metadata."""
@@ -65,8 +79,8 @@ def build_face_mouth_art(original:np.ndarray,base:np.ndarray)->tuple[np.ndarray,
     neutral[:,:,3]=np.round(original[:,:,3].astype(np.float32)
                            *neutral_mask.astype(np.float32)/255).astype(np.uint8)
     art={'Neutral Smile':neutral,
-         'Talking Mouth A':_draw_open(w,h,15,8),
-         'Talking Mouth B':_draw_open(w,h,17,14),
+         'Talking Mouth A':_draw_open(w,h,15,8,reference=original),
+         'Talking Mouth B':_draw_open(w,h,17,14,reference=original),
          'Sleepy Mouth':_draw_open(w,h,11,6,True)}
     return cleaned,art,{'center':MOUTH_CENTER,'angle_deg':MOUTH_ANGLE,
            'radius':MOUTH_RADIUS,'original_neutral':True}
