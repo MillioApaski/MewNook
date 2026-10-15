@@ -163,16 +163,9 @@ textures[body_tex_id]=Image.fromarray(remaining[top:top+bh,left:left+bw])
 tail=byname['Cat Tail']
 cols,rows=mesh_grid(tail,5,8)
 deform_param('ParamTailDeform',tail,cols,rows,15.,'x')
-# Eyelid line is a real grid, capable of independent eyelid curvature.
-for side in ('Left','Right'):
-    lid=byname[f'Eye {side} Closed Lash']
-    cols,rows=mesh_grid(lid,6,3)
-    deform_param('ParamLidCurve'+side,lid,cols,rows,2.4,'y')
-# Subdivide eye iris for gaze-like elastic deformation independent of eye crop.
-for side in ('Left','Right'):
-    eye=byname[f'Eye {side} Iris']
-    cols,rows=mesh_grid(eye,6,5)
-    deform_param('ParamEyeDeform'+side,eye,cols,rows,2.1,'x')
+# Preserve the verified v2 4-vertex iris and closed-eyelid meshes.
+# The v3 subdivision made blink changes invisible in real-frame Chromium tests.
+# Reintroduce eye deformation only with proper painted meshes and regression proof.
 puppet['meta']['name']='MewNook Original Engineering Rig v3'
 puppet['meta']['rigger']='MewNook reproducible mesh and rig builder'
 assert len({x['uuid'] for x in nodes})==len(nodes)

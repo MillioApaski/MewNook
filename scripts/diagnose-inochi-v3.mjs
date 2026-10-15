@@ -28,7 +28,7 @@ try{
     return PNG.sync.read(await figure.screenshot({animations:'disabled'}))
   }
   for(const name of ['ParamEyeBlinkLeft','ParamHairLeft','ParamHairRight',
-     'ParamHairFront','ParamTailDeform','ParamEyeDeformLeft','ParamLidCurveLeft']){
+     'ParamHairFront','ParamTailDeform']){
     await set(name,-1)
     const a=await shot()
     await set(name,1)
@@ -37,6 +37,9 @@ try{
     const metric={param:name,pixels,dimensions:`${a.width}x${a.height}`}
     results.push(metric)
     console.log('REAL FRAME COMPARISON:',JSON.stringify(metric))
+    if(name==='ParamEyeBlinkLeft'&&pixels<80)throw new Error('v3 blink regression: '+pixels+' changed pixels')
+    if(['ParamHairLeft','ParamHairRight','ParamTailDeform'].includes(name)&&pixels<70)
+      throw new Error(name+' deformation produced too few pixels: '+pixels)
     if(name==='ParamEyeBlinkLeft'||name==='ParamHairLeft'){
       await writeFile('/tmp/inochi-v3-shots/'+name+'-minus.png',PNG.sync.write(a))
       await writeFile('/tmp/inochi-v3-shots/'+name+'-plus.png',PNG.sync.write(b))

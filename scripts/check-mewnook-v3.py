@@ -11,9 +11,7 @@ nodes=puppet['nodes']['children']
 node_by_id={n['uuid']:n for n in nodes}
 params=puppet['param']
 deform=[p for p in params for b in p['bindings'] if b['param_name']=='deform']
-expected={'ParamHairLeft','ParamHairRight','ParamHairFront',
-          'ParamTailDeform','ParamLidCurveLeft','ParamLidCurveRight',
-          'ParamEyeDeformLeft','ParamEyeDeformRight'}
+expected={'ParamHairLeft','ParamHairRight','ParamHairFront','ParamTailDeform'}
 assert {p['name'] for p in deform}==expected
 for p in deform:
     b=next(b for b in p['bindings'] if b['param_name']=='deform')
@@ -29,6 +27,13 @@ for p in deform:
     middle=b['values'][1][0]
     assert all(abs(x)<1e-5 for xy in middle for x in xy)
     assert any(abs(x)>.5 for cell in b['values'][2] for xy in cell for x in xy)
-assert len(nodes)>=12 and len(params)>=20
+assert len(nodes)>=12 and len(params)>=18
+byname={part['name']:part for part in nodes}
+for side in ('Left','Right'):
+    for label in (f'Eye {side} Iris',f'Eye {side} Closed Lash'):
+        assert len(byname[label]['mesh']['verts'])==8, (label, 'unexpected eye geometry')
+    blink=next(p for p in params if p['name']==f'ParamEyeBlink{side}')
+    assert len(blink['bindings'])==2 and all(b['param_name']=='transform.s.y' for b in blink['bindings'])
+
 assert len(blob)<8_000_000
 print(f'MewNook v3 validated: {len(nodes)} parts, {len(params)} params, {len(deform)} vertex-deformation tracks')
