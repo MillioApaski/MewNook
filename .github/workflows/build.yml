@@ -19,21 +19,10 @@ jobs:
         run: npm install --no-audit
       - name: Download and integrity-check pinned Inochi2D demo assets
         run: npm run prepare:inochi
-      - name: Inspect Inochi2D puppet structure for original rig
+      - name: Generate original simplified Inochi2D rig
         run: |
-          python - <<'PY'
-          import urllib.request, struct, json, pathlib
-          data = urllib.request.urlopen('https://raw.githubusercontent.com/Inochi2D/inochi2d/main/examples/empty08.inx').read()
-          for name,b in [('empty08',data),('aka',pathlib.Path('public/inochi2d-test/models/Aka.inx').read_bytes())]:
-              print('==',name,'bytes',len(b),'header',repr(b[:24]))
-              if b[:7] == b'TRNSRTS':
-                  n=struct.unpack('>I',b[8:12])[0]
-                  j=json.loads(b[12:12+n])
-                  print('root keys',list(j))
-                  print('meta',str(j.get('meta'))[:700])
-                  print('node template',json.dumps(j.get('nodes'),ensure_ascii=False)[:4500])
-                  print('param template',json.dumps(j.get('param') or j.get('parameters'),ensure_ascii=False)[:2400])
-          PY
+          python -m pip install --user pillow --quiet
+          python scripts/build-mewnook-inx.py
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA

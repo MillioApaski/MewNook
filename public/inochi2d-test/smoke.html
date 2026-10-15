@@ -20,10 +20,10 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
 <body>
 <main>
 <header><h2>Inochi2D WebGL2 测试</h2><span id="status" data-state="loading">正在初始化…</span><a href="/">返回 MewNook</a></header>
-<figure><canvas id="puppet" aria-label="Inochi2D Aka 模型"/></figure>
+<figure><canvas id="puppet" aria-label="MewNook 原创简化 Inochi2D 模型"/></figure>
 <div><button id="tap" disabled>播放点击反应</button> <button id="idle" disabled>恢复待机</button>
  <label>缩放 <input id="scale" type="range" min="0.1" max="0.9" step="0.01" value="0.32"/></label></div>
-<p id="details">模型 Aka © seagetch（CC BY 4.0），运行时基于 Inox2D（BSD-2-Clause）。页面只用于验证已绑定示例模型的渲染和动画，不代表原创角色已完成。</p>
+<p id="details">MewNook 原创简化绑定测试模型，使用已有猫娘立绘制作。运行时基于 Inox2D（BSD-2-Clause）。眼睛、猫耳、尾巴可独立调整，但这还不是精细绘制和绑定完成的正式模型。</p>
 </main>
 <script type="module">
 const node=document.querySelector('#status')
@@ -38,21 +38,33 @@ try {
  const resize=()=>controller.resize(canvas.clientWidth,canvas.clientHeight,Math.min(devicePixelRatio||1,1.25))
  resize()
  new ResizeObserver(resize).observe(canvas)
- await controller.setCameraTransform(0,1450,0.32)
- await controller.loadModel('/inochi2d-test/models/Aka.inx')
+ await controller.setCameraTransform(0,120,0.32)
+ await controller.loadModel('/inochi2d-test/models/MewNook-test.inx')
  const names=controller.getAnimationNames?.()||[]
  if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- setStatus('ready','模型加载成功 · '+names.length+' 个动作')
+ setStatus('ready','原创模型加载成功 · 网格与参数绑定已初始化')
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
+ const ticker=setInterval(()=>{
+    const t=performance.now()/1000,phase=t%4.2,blink=phase<.17?Math.sin(Math.PI*phase/.17):0
+    for(const [id,val] of [
+      ['Eye:: Left:: Blink',blink],['Eye:: Right:: Blink',blink],
+      ['Body:: Breath',Math.sin(t*2)],['Tail:: Sway',Math.sin(t*1.3)],
+      ['Ear:: Left:: Wiggle',Math.sin(t*1.8)*.4],
+      ['Ear:: Right:: Wiggle',Math.sin(t*1.7+.4)*.4]
+    ]) void controller.setParameter?.(id,val)
+ },80)
+window.addEventListener('pagehide',()=>clearInterval(ticker),{once:true})
  document.querySelector('#tap').onclick=()=>{
    void controller.applyInteractionImpulse?.(6,-4)
+   void controller.setParameter?.('Ear:: Left:: Wiggle',.8)
+   void controller.setParameter?.('Ear:: Right:: Wiggle',-.8)
    if(names.includes('Yatta Celebration'))void controller.playAnimation?.('Yatta Celebration',{restart:true,kind:'reaction'})
  }
  document.querySelector('#idle').onclick=()=>{
    if(names.includes('Energetic Sway'))void controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
  }
- document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,1450,Number(e.target.value))
+ document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,120,Number(e.target.value))
 } catch(e) {
  setStatus('error','加载失败：'+(e?.message||e))
  console.error('Inochi2D smoke test failed:',e)
