@@ -20,6 +20,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+from mewnook_face_art import build_face_mouth_art
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'public/assets/rooms/day/character.webp'
@@ -84,14 +85,9 @@ removal = cv2.dilate(removal, cv2.getStructuringElement(
 body = source.copy()
 body[:, :, :3] = cv2.inpaint(source[:, :, :3], removal, 18, cv2.INPAINT_TELEA)
 
-# The source contains a permanent painted smile. Remove only that tiny area
-# from the base face, then redraw a neutral smile + separate speaking mouth.
-# Otherwise the speech cavity appears on TOP of the original painted mouth.
-mouth_removal = np.zeros((H,W),np.uint8)
-cv2.ellipse(mouth_removal,xy(509,531),xy(34,18),-23,0,360,255,-1)
-mouth_removal=cv2.GaussianBlur(mouth_removal,(0,0),2)
-body[:,:,:3]=cv2.inpaint(body[:,:,:3],(mouth_removal>24).astype('uint8')*255,9,cv2.INPAINT_TELEA)
-
+# Mouth correction is authored from the actual tilted original artwork,
+# not a front-facing ellipse positioned by screen-space guesses.
+body,mouth_art,mouth_frame=build_face_mouth_art(source,body)
 
 # A cheek-colored eyelid replaces the blue iris as the open eye contracts.
 # Only the dark curved eyelash line is painted, with transparent surroundings.
@@ -124,18 +120,8 @@ def tint_mask(mask, color):
     out[:, :, 3] = (mask.astype(np.float32) * color[3]/255).astype(np.uint8)
     return out
 
-# A small, painted smile and a separate inner mouth texture.
-# Original smile pixels were removed from the base face above.
-neutral_mouth=Image.new('RGBA',(W,H),(0,0,0,0))
-draw=ImageDraw.Draw(neutral_mouth)
-points=[xy(x,531-0.25*(x-495)+3*math.sin((x-495)/36*math.pi)) for x in range(495,532,2)]
-draw.line(points,fill=(135,75,97,205),width=max(2,round(W/450)),joint='curve')
-mouth_image = Image.new('RGBA', (W,H), (0,0,0,0))
-draw=ImageDraw.Draw(mouth_image)
-draw.ellipse((*xy(496,518),*xy(528,550)), fill=(123,65,100,250))
-draw.ellipse((*xy(499,536),*xy(524,548)), fill=(233,143,172,248))
-draw.arc((*xy(497,519),*xy(529,540)),185,345,fill=(252,219,218,220),
-         width=max(2,round(W/360)))
+# Neutral smile is recovered from source pixels; new A/B/yawn mouths use the
+# same slanted facial coordinate system (see mewnook_face_art.py).
 blush_image = Image.new('RGBA',(W,H),(0,0,0,0))
 draw = ImageDraw.Draw(blush_image)
 for center in [(345, 546),(586, 468)]:
@@ -236,14 +222,19 @@ for i,eye in enumerate(eyes):
     sleepy_lash=add_part('Eye '+eye['name']+' Drowsy Lash',lash_sprite(eye),z=9+i*6)
     lash=add_part('Eye '+eye['name']+' Closed Lash',lash_sprite(eye),z=10+i*6)
     eye_parts[eye['name']]=(iris,cover,drowsy,sleepy_lash,lash)
-neutral=add_part('Neutral Smile',np.asarray(neutral_mouth),z=20)
-mouth=add_part('Talking Mouth',np.asarray(mouth_image),z=21)
-blush=add_part('Shy Blush',np.asarray(blush_image),z=22)
+neutral=add_part('Neutral Smile',mouth_art['Neutral Smile'],z=20)
+mouth_a=add_part('Talking Mouth A',mouth_art['Talking Mouth A'],z=21)
+mouth_b=add_part('Talking Mouth B',mouth_art['Talking Mouth B'],z=22)
+sleepy_mouth=add_part('Sleepy Mouth',mouth_art['Sleepy Mouth'],z=23)
+blush=add_part('Shy Blush',np.asarray(blush_image),z=24)
 
 def param(name, bindings, limits=(-1,1), initial=0):
     # Scalar control with 3 horizontal keyforms. Use neutral 0 for idle.
     mn,mx=limits
     params=[]
+    steps=len(bindings[0][2])
+    if steps<3 or any(len(keys)!=steps for _,_,keys in bindings):
+        raise ValueError('Parameter bindings must have matching 3+ keyforms: '+name)
     for node,property_name,keys in bindings:
         params.append({
           'node':node['uuid'],'param_name':property_name,
@@ -254,7 +245,7 @@ def param(name, bindings, limits=(-1,1), initial=0):
       'uuid':next_id(),'name':name,'is_vec2':False,
       'min':[float(mn),0.],'max':[float(mx),1.],
       'defaults':[float(initial),.5],
-      'axis_points':[[0.,.5,1.],[0.,1.]],
+      'axis_points':[[i/(steps-1) for i in range(steps)],[0.,1.]],
       'merge_mode':'Additive','bindings':params
     })
 def bind(node,kind,values): return (node,kind,values)
@@ -278,11 +269,14 @@ param('ParamHeadX',[bind(iris,'transform.t.x',[-2,0,2])
                    for iris,_,_,_,_ in eye_parts.values()])
 param('ParamHeadY',[bind(iris,'transform.t.y',[-2,0,2])
                    for iris,_,_,_,_ in eye_parts.values()])
+# At 0 show the EXACT original tilted smile. Between 0.5 and 1 show
+# locally oriented speech poses A and B. No unrotated open ellipse.
 param('ParamMouthOpen',[
-    bind(mouth,'transform.s.y',[.008,.008,1.]),
-    bind(mouth,'transform.t.y',[-9,-9,0])
+    bind(neutral,'transform.s.y',[1.,1.,1.,.003,.003]),
+    bind(mouth_a,'transform.s.y',[.003,.003,.003,1.,.003]),
+    bind(mouth_b,'transform.s.y',[.003,.003,.003,.003,1.])
 ])
-param('ParamSmile',[bind(neutral,'transform.s.x',[.94,1.,1.08])])
+param('ParamSmile',[bind(neutral,'transform.t.y',[.5,0.,-.5])])
 param('ParamSleepy',[
     binding
     for _,(_,_,drowsy,sleepy_lash,_) in eye_parts.items()
@@ -291,6 +285,9 @@ param('ParamSleepy',[
         bind(drowsy,'transform.t.y',[-26,-26,-11]),
         bind(sleepy_lash,'transform.s.y',[.002,.002,.74])
     )
+] + [
+    bind(neutral,'transform.s.x',[1.,1.,.003]),
+    bind(sleepy_mouth,'transform.s.y',[.003,.003,1.])
 ])
 param('ParamEmbarrassed',[bind(blush,'transform.s.y',[.002,.002,1.])])
 
@@ -322,7 +319,8 @@ for eye in eyes:
 (DEBUG/'rig-report.json').write_text(json.dumps({
   'source':str(SOURCE.relative_to(ROOT)),'parts':[p['name'] for p in texture_nodes],
   'parameters':[p['name'] for p in parameters],'textureCount':len(textures),
-  'modelBytes':len(binary),'notes':'Source-driven, not manually painted; eye crops are nonrectangular.',
+  'modelBytes':len(binary),'faceFrame':mouth_frame,
+  'notes':'Source-derived original angled mouth, A/B speech, separate drowsy mouth; eye crops remain nonrectangular.',
 },indent=2))
 print('Created',MODEL,'bytes',len(binary),
       'parts',len(texture_nodes),'parameters',len(parameters))
