@@ -83,7 +83,8 @@
 - [x] Subdivide hair, tail, eyes, and eyelids into textured grid ArtMeshes.
 - [x] Use native INX `deform` keyframe tracks with per-vertex displacements.
 - [x] Integrate animation tick with focus, rest, chat, sleepy, and touch states.
-- [x] Add contract and WebGL pixel-difference tests for mesh deformation.
+- [x] Add structural tests for native deformation keyframe tracks.
+- [ ] Verify native per-vertex deformation changes rendered pixels in the pinned WebGL runtime.
 - [ ] Merge new portrait layered source into repository and manually repaint concealed artwork.
 - [ ] Finish manually authored Inochi Creator motion curves and visual proof across four rooms.
 
