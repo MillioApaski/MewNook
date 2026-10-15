@@ -142,7 +142,7 @@ for name,points,depth,strength,param_name in regions:
     # behind-the-hair painting remains a separate artist task.
     texid=len(textures);textures.append(tex)
     item={
-      'uuid':uid(),'name':name,'type':'Part','enabled':True,'zsort':depth,
+      'uuid':uid(),'name':name,'type':'Part','enabled':True,'zsort':-depth,
       'transform':{'trans':[(x0+x1-W)/2.,(y0+y1-H)/2.,-1.],
                    'rot':[0.,0.,0.],'scale':[1.,1.]},'lockToRoot':False,
       'mesh':{},'textures':[texid,4294967295,4294967295],

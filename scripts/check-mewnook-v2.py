@@ -24,6 +24,11 @@ required=[
 ]
 assert all(name in params for name in required), set(required)-params.keys()
 assert len(parts) >= 10 and len(set(x['uuid'] for x in nodes))==len(nodes)
+# Inox2D draws high zsort first. The eye overlays must render in front.
+assert parts['Retouched body and face']['zsort']==0
+for side in ('Left','Right'):
+    assert parts[f'Eye {side} Iris']['zsort'] < 0
+    assert parts[f'Eye {side} Closed Lash']['zsort'] < parts[f'Eye {side} Iris']['zsort']
 section=12+json_size
 assert b[section:section+8]==b'TEX_SECT', 'Missing texture section'
 count=struct.unpack('>I',b[section+8:section+12])[0]

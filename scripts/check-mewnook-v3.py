@@ -28,6 +28,7 @@ for p in deform:
     assert all(abs(x)<1e-5 for xy in middle for x in xy)
     assert any(abs(x)>.5 for cell in b['values'][2] for xy in cell for x in xy)
 assert len(nodes)>=12 and len(params)>=18
+assert all(x['zsort']<0 for x in nodes if x['name'].startswith('Hair '))
 byname={part['name']:part for part in nodes}
 for side in ('Left','Right'):
     for label in (f'Eye {side} Iris',f'Eye {side} Closed Lash'):

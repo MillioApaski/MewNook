@@ -38,6 +38,9 @@ try{
  }
  await writeFile('/tmp/inochi-v3-shots/report.json',JSON.stringify(results,null,2))
 }finally{await browser.close()}
-if(!results.find(x=>x.model==='v2'&&x.param==='ParamEyeBlinkLeft'))throw Error('Missing known-good control')
+if(results.find(x=>x.model==='v2'&&x.param==='ParamEyeBlinkLeft')?.pixels<40)
+ throw Error('V2 eye overlays are still behind base or not visible')
+if(results.find(x=>x.model==='v3'&&x.param==='ParamEyeBlinkLeft')?.pixels<40)
+ throw Error('V3 eye blink has no visible effect')
 if(results.filter(x=>x.model==='v3'&&['ParamHairLeft','ParamHairRight','ParamTailDeform'].includes(x.param)).some(x=>x.pixels<80))
  throw Error('V3 hair/tail params have insufficient visible pixel changes')

@@ -168,7 +168,7 @@ def add_part(name, picture, mask=None, z=0):
     width,height = r-l,b-t
     item = {
       'uuid':next_id(), 'name':name,'type':'Part','enabled':True,
-      'zsort':float(z), 'transform':{
+      'zsort':-float(z), 'transform':{
         'trans':[(l+r-W)/2,(t+b-H)/2,-1.0],
         'rot':[0.,0.,0.],'scale':[1.,1.]},
       'lockToRoot':False,
@@ -180,6 +180,7 @@ def add_part(name, picture, mask=None, z=0):
       'tint':[1.,1.,1.],'screenTint':[0.,0.,0.],'emissionStrength':1.,
       'masks':[],'mask_threshold':0.5,'opacity':1.,'psdLayerPath':name
     }
+    # Inox2D renders from higher zsort to lower; negative values are FRONT.
     texture_nodes.append(item)
     return item
 
