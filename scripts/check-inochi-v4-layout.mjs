@@ -5,7 +5,7 @@ const root=new URL('../',import.meta.url)
 const read=async p=>readFile(new URL(p,root),'utf8')
 const dir='assets/inochi/v4'
 const data=JSON.parse(await read(dir+'/manifest.json'))
-if(data.stage!=='directory_scaffold_only')throw Error('Unexpected project stage')
+if(!['directory_scaffold_only','prototype_generator_ready_reference_upload_pending'].includes(data.stage))throw Error('Unexpected project stage')
 if(data.reference.width!==1122||data.reference.height!==1402)throw Error('Wrong reference canvas')
 const ids=new Set(),paths=new Set(),groups=new Set()
 for(const p of data.required_parts){
