@@ -26,9 +26,9 @@ OUT = ROOT / "assets/inochi/v4/rig/MewNook-v4-prototype.inx"
 NULL = 4294967295
 EYES = {
     "Left": {"center": (518, 278), "axes": (51, 32), "angle": -16,
-             "curve": ((472, 289), (493, 268), (523, 264), (559, 270))},
+             "curve": ((482, 284), (503, 278), (531, 276), (553, 280))},
     "Right": {"center": (622, 247), "axes": (49, 31), "angle": -14,
-              "curve": ((580, 258), (596, 234), (634, 224), (664, 228))}
+              "curve": ((586, 254), (606, 243), (633, 237), (657, 242))}
 }
 
 def elliptical(center, axes, angle, w, h, sigma=1.2):
@@ -53,7 +53,7 @@ def closed_lash(curve, w, h):
                             3*(1-t)*t*t*c[0]+t**3*d[0]),
                        round((1-t)**3*a[1]+3*(1-t)**2*t*b[1]+
                              3*(1-t)*t*t*c[1]+t**3*d[1])))
-    draw.line(points, fill=(101,69,94,238), width=4, joint="curve")
+    draw.line(points, fill=(105,75,104,218), width=2, joint="curve")
     return np.asarray(layer.filter(ImageFilter.GaussianBlur(.25))).copy()
 
 def mouth_pose(w, h, halfwidth, opening):

@@ -47,6 +47,12 @@ def main():
     picture=np.asarray(Image.open(args.source).convert('RGBA')).copy()
     H,W=picture.shape[:2]
     assert (W,H)==(1122,1402), 'v4 requires new 1122x1402 upright art'
+    # Match the base builder's alpha cleanup so the exported animated
+    # hair/tail cutouts cannot resurrect the source's stray detached speck.
+    alpha=picture[:,:,3].copy()
+    count,labels,stats,_=cv2.connectedComponentsWithStats((alpha>4).astype(np.uint8),8)
+    largest=1+int(np.argmax(stats[1:,cv2.CC_STAT_AREA]))
+    picture[:,:,3]=np.where(labels==largest,alpha,0)
     model,textures=load_inx(args.input)
     parts=model['nodes']['children'];params=model['param']
     byname={p['name']:p for p in parts}
