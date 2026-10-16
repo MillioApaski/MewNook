@@ -26,16 +26,27 @@ jobs:
           python scripts/check-mewnook-v2.py
           python scripts/build-mewnook-v3.py
           python scripts/check-mewnook-v3.py
-      - name: Validate v4 source tooling (v3 unaffected)
+      - name: Verify v4 source and native mesh rig tooling (without deploying)
         run: |
-          python -m py_compile scripts/build-mewnook-v4.py scripts/check-mewnook-v4.py
+          python -m py_compile scripts/build-mewnook-v4.py scripts/upgrade-mewnook-v4.py scripts/check-mewnook-v4.py scripts/check-mewnook-v4-motion.py
           node scripts/check-inochi-v4-layout.mjs
           if [ -f assets/inochi/v4/source/pose_reference.png ]; then
-            python scripts/build-mewnook-v4.py
-            python scripts/check-mewnook-v4.py
+            SOURCE=assets/inochi/v4/source/pose_reference.png
+            echo "Using actual upright reference from GitHub."
           else
-            echo "V4 reference image not yet committed; generator dry-run skipped."
+            echo "::notice::Actual upright v4 reference is still missing in GitHub. Testing code with a synthetic fixture only, NOT the intended model artwork."
+            python - <<'PY'
+          from PIL import Image, ImageDraw
+          image=Image.new('RGBA',(1122,1402),(190,180,205,255))
+          ImageDraw.Draw(image).ellipse((468,207,668,350),fill=(218,185,192,255))
+          image.save('/tmp/v4-ci-synthetic.png')
+          PY
+            SOURCE=/tmp/v4-ci-synthetic.png
           fi
+          python scripts/build-mewnook-v4.py --input "$SOURCE" --output /tmp/MewNook-v4-base.inx
+          python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
+          python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output /tmp/MewNook-v4-motion.inx --report /tmp/v4-motion-structural-report.json
+          python scripts/check-mewnook-v4-motion.py /tmp/MewNook-v4-motion.inx
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA

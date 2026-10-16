@@ -36,3 +36,17 @@ scripts/check-inochi-v4-layout.mjs
 **不能误读的状态：** 本提交不会改动现有 React 模型路径；没有创建 v4 .ora、.inp 或 .inx；新正坐姿 PNG 还未提交进仓库。manifest 中 required_parts 是待交付清单，不是实际文件清单。
 
 **检查命令：** node scripts/check-inochi-v4-layout.mjs，仅校验约定中的目录和 JSON，不验证尚未存在的素材质量。
+
+## v4 Motion engineering prototype
+
+Added `scripts/upgrade-mewnook-v4.py`, which extends the upright `build-mewnook-v4.py` INX with 5 genuine native `deform` ArtMesh regions: left/right ears, left/right outer hair and tail. Adds 10 new scalar controls (ear/hair/tail, ear tilt, each sleepy eye and breathing), for **16 total parts and 14 total parameters**. Each deform is a grid, not an entire rectangle being translated.
+
+Reproduce after adding the **real** `source/pose_reference.png`:
+
+```bash
+python scripts/build-mewnook-v4.py --output /tmp/MewNook-v4-base.inx
+python scripts/upgrade-mewnook-v4.py --source assets/inochi/v4/source/pose_reference.png --input /tmp/MewNook-v4-base.inx --output assets/inochi/v4/rig/MewNook-v4-motion.inx
+python scripts/check-mewnook-v4-motion.py assets/inochi/v4/rig/MewNook-v4-motion.inx
+```
+
+CI executes the same generator using the real image when present, or an explicitly labeled synthetic fixture while the actual image is absent. **Synthetic-fixture CI cannot establish visual quality or production readiness.** The editor `.inp` and painted hidden areas remain to be made. Current live UI stays v3/PNG.
