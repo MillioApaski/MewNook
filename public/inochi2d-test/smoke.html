@@ -25,7 +25,7 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
  <button id="chat" disabled>聊天表情</button> <button id="sleep" disabled>困倦表情</button>
  <span id="action-label" aria-live="polite"></span>
  <label>缩放 <input id="scale" type="range" min="0.1" max="0.9" step="0.01" value="0.32"/></label></div>
-<p id="details">MewNook 原创简化绑定测试模型，使用已有猫娘立绘制作。运行时基于 Inox2D（BSD-2-Clause）。眼睛、猫耳、尾巴可独立调整，但这还不是精细绘制和绑定完成的正式模型。</p>
+<p id="details">MewNook Inochi2D 工程模型测试，基于 Inox2D（BSD-2-Clause）。使用 ?model=v4 测试新正坐姿角色，默认仍为 v3；v4 的可动部件来自扁平立绘自动分层，尚未完成遮挡补画、原生 Creator 工程和正式美术验收。</p>
 </main>
 <script type="module">
 const node=document.querySelector('#status')
@@ -41,10 +41,13 @@ try {
  resize()
  new ResizeObserver(resize).observe(canvas)
  await controller.setCameraTransform(0,120,0.32)
- const candidateModel=new URLSearchParams(location.search).get('model')!=='v2'
- await controller.loadModel(candidateModel
-   ? '/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'
-   : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015')
+ const requestModel=new URLSearchParams(location.search).get('model')
+ const isV4=requestModel==='v4'
+ const candidateModel=requestModel!=='v2' && !isV4
+ const modelUrl=isV4?'/inochi2d-test/models/MewNook-v4.inx?rig=upright-source-20261016'
+   : candidateModel?'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'
+   : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'
+ await controller.loadModel(modelUrl)
  const names=controller.getAnimationNames?.()||[]
  const probe = new URLSearchParams(location.search).has('probe')
  if(probe)window.__inochiProbe={set:async(name,value)=>controller.setParameter(name,value),
@@ -122,7 +125,7 @@ try {
 
  }
  if(names.includes('Energetic Sway'))await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
- setStatus('ready','MewNook '+(candidateModel?'v3':'v2')+' 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
+ setStatus('ready','MewNook '+(isV4?'v4 工程候选':candidateModel?'v3':'v2')+' 加载成功 · '+(selftest?'眨眼画面差异 '+node.dataset.blinkChangedPixels+' 像素':'独立眼皮及表情参数已初始化'))
  document.querySelector('#tap').disabled=false
  document.querySelector('#idle').disabled=false
  document.querySelector('#chat').disabled=false
@@ -134,7 +137,7 @@ try {
     for(const [id,val] of [
       ['ParamEyeBlinkLeft',performance.now()<manualBlinkUntil?1:blink],['ParamEyeBlinkRight',performance.now()<manualBlinkUntil?1:blink],
       ['ParamBreath',Math.sin(t*2)],['ParamTailSwing',Math.sin(t*1.3)],
-      ...(candidateModel?[
+      ...((candidateModel||isV4)?[
         ['ParamHairLeft',Math.sin(t*.82)*.23],
         ['ParamHairRight',Math.sin(t*.73+1.1)*.20],
         ['ParamHairFront',Math.sin(t*1.07+.5)*.15],
@@ -146,6 +149,10 @@ try {
       ['ParamHeadY',Math.sin(t*.3)*.03],
       ['ParamSmile',performance.now()<expressionUntil&&currentExpression==='chat'?.8:0.16],
       ['ParamSleepy',performance.now()<expressionUntil&&currentExpression==='sleep'?.95:0],
+      ...(isV4?[
+        ['ParamSleepyLeft',performance.now()<expressionUntil&&currentExpression==='sleep'?.75:0],
+        ['ParamSleepyRight',performance.now()<expressionUntil&&currentExpression==='sleep'?.75:0],
+      ]:[]),
       ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?.52+.38*Math.abs(Math.sin(t*4.8)):0],
       ['ParamEmbarrassed',performance.now()<tapUntil?.7:0]
     ]) void controller.setParameter?.(id,val)

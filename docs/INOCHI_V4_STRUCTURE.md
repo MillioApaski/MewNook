@@ -50,3 +50,9 @@ python scripts/check-mewnook-v4-motion.py assets/inochi/v4/rig/MewNook-v4-motion
 ```
 
 CI executes the same generator using the real image when present, or an explicitly labeled synthetic fixture while the actual image is absent. **Synthetic-fixture CI cannot establish visual quality or production readiness.** The editor `.inp` and painted hidden areas remain to be made. Current live UI stays v3/PNG.
+
+## 正坐姿母版已入库、独立 v4 测试入口
+
+已将 1122 × 1402 的正坐姿透明立绘 **原始 PNG** 放入 `assets/inochi/v4/source/pose_reference.png`，SHA-256 为 `5c47238062e6b7f99e95c14658d3af87f1a147ada44173375c90a1cf0f479231`。GitHub Actions 在真实原图上生成 v4 工程模型、严格验证预乘 Alpha 和 5 组原生网格变形，并通过 `?model=v4&probe=1` 运行 Chromium 实际截图测试。测试结果保存在 Actions 的 `inochi-v4-candidate` 附件。
+
+**未通过视觉审查以前，v4 只在独立页面 `inochi2d-test/smoke.html?model=v4` 中使用，MewNook 主场景继续 v3/PNG。** 这不是完成的手工 Inochi Creator `.inp` 工程；重新绘制遮挡区域、提高眼睑与口型的观感仍是待办。

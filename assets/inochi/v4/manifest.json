@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "model_id": "mewnook-v4-upright",
-  "stage": "motion_generator_ready_reference_upload_pending",
+  "stage": "v4_source_committed_candidate_in_CI",
   "reference": {
     "path": "source/pose_reference.png",
     "width": 1122,
     "height": 1402,
     "alpha": true,
-    "status": "not_committed"
+    "status": "committed_sha256_5c47238062e6b7f99e95c14658d3af87f1a147ada44173375c90a1cf0f479231"
   },
   "editable_master": {
     "path": "source/mewnook_v4_master.ora",
@@ -30,9 +30,9 @@
     "status": "prototype_generation_script_only_not_Inochi_Creator"
   },
   "release": {
-    "path": "public/inochi2d/v4/models/MewNook-v4.inx",
-    "status": "not_published_no_webgl_validation",
-    "default": "retain v3 until checked"
+    "path": "public/inochi2d-test/models/MewNook-v4.inx",
+    "status": "generated_in_CI_candidate_unapproved",
+    "default": "v3 production / v4 only ?model=v4"
   },
   "expressions": [
     "neutral",

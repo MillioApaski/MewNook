@@ -26,27 +26,16 @@ jobs:
           python scripts/check-mewnook-v2.py
           python scripts/build-mewnook-v3.py
           python scripts/check-mewnook-v3.py
-      - name: Verify v4 source and native mesh rig tooling (without deploying)
+      - name: Build v4 upright candidate from original illustration
         run: |
+          SOURCE=assets/inochi/v4/source/pose_reference.png
+          test -f "$SOURCE" || { echo "::error::v4 upright source image is required"; exit 1; }
           python -m py_compile scripts/build-mewnook-v4.py scripts/upgrade-mewnook-v4.py scripts/check-mewnook-v4.py scripts/check-mewnook-v4-motion.py
           node scripts/check-inochi-v4-layout.mjs
-          if [ -f assets/inochi/v4/source/pose_reference.png ]; then
-            SOURCE=assets/inochi/v4/source/pose_reference.png
-            echo "Using actual upright reference from GitHub."
-          else
-            echo "::notice::Actual upright v4 reference is still missing in GitHub. Testing code with a synthetic fixture only, NOT the intended model artwork."
-            python - <<'PY'
-          from PIL import Image, ImageDraw
-          image=Image.new('RGBA',(1122,1402),(190,180,205,255))
-          ImageDraw.Draw(image).ellipse((468,207,668,350),fill=(218,185,192,255))
-          image.save('/tmp/v4-ci-synthetic.png')
-          PY
-            SOURCE=/tmp/v4-ci-synthetic.png
-          fi
           python scripts/build-mewnook-v4.py --input "$SOURCE" --output /tmp/MewNook-v4-base.inx
           python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
-          python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output /tmp/MewNook-v4-motion.inx --report /tmp/v4-motion-structural-report.json
-          python scripts/check-mewnook-v4-motion.py /tmp/MewNook-v4-motion.inx
+          python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
+          python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA
@@ -93,6 +82,18 @@ jobs:
             /tmp/inochi-v3-shots
             public/inochi2d-test/models/MewNook-v2.inx
             public/inochi2d-test/models/MewNook-v3.inx
+          if-no-files-found: ignore
+      - name: Verify v4 upright animation in real Chromium (candidate only)
+        run: node scripts/diagnose-inochi-v4.mjs
+      - name: Upload v4 candidate screenshots and model
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inochi-v4-candidate
+          path: |
+            /tmp/inochi-v4-shots
+            /tmp/v4-motion-report.json
+            public/inochi2d-test/models/MewNook-v4.inx
           if-no-files-found: ignore
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
