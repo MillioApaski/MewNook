@@ -70,6 +70,7 @@
 - [x] Generate a minimal original MewNook .inx puppet from existing artwork, with real textured meshes and 8 parameter bindings; verify its parsing in Chromium.
 - [ ] Refine the new 14-layer white-haired catgirl illustration: paint hidden parts, adjust vertex meshes and rig it manually in Inochi Creator to replace the programmatic prototype.
 - [ ] Integrate mature focus/rest/chat behavior after model action names are confirmed.
+- [x] Bound text-driven mouth animation to new dialogue and streaming output; resume focus/rest/night/idle afterwards, including cancel/error paths. This is not audio lip-sync or a finished action rig.
 
 ## Phase 2 rig milestone
 - [x] Replace rectangular eye snippets with bounded feathered ellipses and reconstructed face behind eyes.
