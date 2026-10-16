@@ -1,7 +1,7 @@
 import {chromium} from 'playwright-core'
 import {PNG} from 'pngjs'
 import pixelmatch from 'pixelmatch'
-import {mkdir} from 'node:fs/promises'
+import {mkdir,writeFile} from 'node:fs/promises'
 
 const browser=await chromium.launch({
  executablePath:'/usr/bin/google-chrome',headless:true,
@@ -42,5 +42,39 @@ try{
  const failed=results.filter(x=>x.pixels<x.minimum)
  if(failed.length)throw Error('v4 parameter visual regression '+JSON.stringify(failed))
  console.log('V4 ENGINEERING RENDER SUCCESS:',results.length,'controls caused real pixel changes.')
+ await writeFile('/tmp/inochi-v4-shots/report.json',JSON.stringify(results,null,2))
+
+ // Test the user-facing buttons. Pixel-only parameter checks missed several
+ // no-op reactions in the earlier tilted rig.
+ await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v4')
+ await page.locator('#status[data-state=ready]').waitFor({timeout:60000})
+ for(const [button,label,delay] of [
+   ['tap','猫耳抖动中',300],
+   ['idle','上眼皮闭合中',160],
+   ['chat','正在说话',450],
+   ['sleep','困倦半睁眼',450]
+ ]){
+   await page.locator('#'+button).click()
+   await page.getByText(label,{exact:true}).waitFor()
+   await page.waitForTimeout(delay)
+   await page.locator('figure').screenshot({path:'/tmp/inochi-v4-shots/button-'+button+'.png'})
+   console.log('V4 UI BUTTON CHECK:',button)
+ }
+
+ // Keep production v3 unchanged, but verify v4 works in the actual MewNook
+ // React room when the user explicitly selects the upright experiment.
+ await page.addInitScript(()=>{
+   const old=JSON.parse(localStorage.getItem('mewnook:settings')||'{}')
+   localStorage.setItem('mewnook:settings',JSON.stringify({
+     ...old,inochiTestMode:true,inochiModel:'v4',inochiScale:0.32,scene:'day'
+   }))
+ })
+ await page.goto('http://127.0.0.1:4173/')
+ await page.locator('canvas.inochi-demo-canvas[data-model-version="v4"]').waitFor({timeout:60000})
+ await page.locator('.art-character.inochi-ready').waitFor({timeout:60000})
+ const roomStatus=await page.locator('canvas.inochi-demo-canvas').getAttribute('data-inochi2d-model-status')
+ if(roomStatus!=='loaded')throw Error('v4 not loaded in real room: '+roomStatus)
+ await page.locator('.art-stage').screenshot({path:'/tmp/inochi-v4-shots/mewnook-upright-room.png'})
+ console.log('V4 REAL ROOM INTEGRATION: passed. v4 explicitly selected and loaded.')
  console.log('Artistic acceptability, hidden-area painting and Creator project not tested.')
 }finally{await browser.close()}

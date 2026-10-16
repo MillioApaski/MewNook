@@ -90,6 +90,8 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       }
       if(!loadedModel)throw lastError ?? new Error('Inochi2D 模型加载失败')
       loadedModelRef.current=loadedModel
+      canvas.dataset.modelVersion=loadedModel
+      canvas.dataset.requestedModel=model
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
@@ -104,6 +106,8 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       disposed=true
       controllerReadyRef.current=false
       loadedModelRef.current=''
+      delete canvas.dataset.modelVersion
+      delete canvas.dataset.requestedModel
       observer?.disconnect()
       if(resizeHandler)window.removeEventListener('resize',resizeHandler)
       if(controllerRef.current===controller)controllerRef.current=null
