@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { InochiTestCharacter, type InochiTestStatus } from './inochi/InochiTestCharacter'
+import { companionActivity, speechDuration } from './inochi/companionActivity'
 import { boundedOutputTokens, chatContext, requestAI } from './aiChat'
 import { Companion, type Mood } from './Companion'
 import {
@@ -105,6 +106,7 @@ export default function App() {
   const [chatLoading, setChatLoading] = useState(false)
   const [chatError, setChatError] = useState('')
   const [streamingText, setStreamingText] = useState('')
+  const [speechUntil, setSpeechUntil] = useState(0)
   const [memoryLoading, setMemoryLoading] = useState(false)
   const [proactiveState, setProactiveState] = useSavedState<{day:string;count:number;last:number}>('proactiveState',
     {day:localDate(),count:0,last:Date.now()})
@@ -145,6 +147,7 @@ export default function App() {
 
   // The collapsed Galgame line is a temporary notification, not a permanent HUD.
   const showDialogue = (line: string | null = null, durationMs = 6500) => {
+    if (line) setSpeechUntil(Date.now() + speechDuration(line))
     setSceneLine(line)
     setDialogueOffset(0)
     setDialogueTimeoutMs(durationMs)
@@ -160,10 +163,16 @@ export default function App() {
     setUtilityPanel(null)
   }
   const closeChat = () => {
+    setSpeechUntil(0)
     setChatExpanded(false)
     setDialogueVisible(false)
     setMoodOverride(null)
   }
+  useEffect(() => {
+    if (!speechUntil) return
+    const timeout = window.setTimeout(() => setSpeechUntil(0), Math.max(0, speechUntil-Date.now()))
+    return () => window.clearTimeout(timeout)
+  }, [speechUntil])
   useEffect(() => {
     if (!dialogueVisible || chatExpanded) return
     const timeout = window.setTimeout(() => setDialogueVisible(false), dialogueTimeoutMs)
@@ -367,7 +376,7 @@ export default function App() {
       setChat(previous => [...previous,{id:uid(),role:'user' as const,content}].slice(-100))
       setChatDraft('')
     }
-    setChatError('');setStreamingText('');setDialogueOffset(0)
+    setChatError('');setStreamingText('');setSpeechUntil(0);setDialogueOffset(0)
     setMoodOverride('chat')
     setDialogueVisible(true)
     if (!aiReady()) {
@@ -387,13 +396,18 @@ export default function App() {
         url:settings.aiUrl, model:settings.aiModel, key,
         signal:controller.signal, maxTokens:settings.aiMaxTokens, streaming:settings.aiStreaming !== false,
         messages:[{role:'system',content:currentSystemPrompt()},...chatContext(history,settings.aiContextTurns)],
-        onDelta:setStreamingText
+        onDelta:text=>{
+          if (controller.signal.aborted) return
+          setStreamingText(text)
+          if (text.trim()) setSpeechUntil(Date.now()+1200)
+        }
       })
       if (controller.signal.aborted) return
       setChat(previous => [...previous,{id:uid(),role:'assistant' as const,content:answer}].slice(-100))
       failedContent.current = null
       showDialogue(answer)
     } catch (error) {
+      setSpeechUntil(0)
       setChatError(controller.signal.aborted ? '已停止生成，可以重试。' :
         error instanceof TypeError ? '网络请求失败：请检查 API、网络及 CORS 设置。' :
         error instanceof Error ? error.message : '请求失败')
@@ -403,7 +417,10 @@ export default function App() {
       setChatLoading(false);setStreamingText('')
     }
   }
-  const stopGeneration = () => requestController.current?.abort()
+  const stopGeneration = () => {
+    setSpeechUntil(0)
+    requestController.current?.abort()
+  }
 
   async function summarizeMemory() {
     if (!aiReady() || requestBusy.current) return
@@ -489,7 +506,7 @@ export default function App() {
         </button>
         {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
-            activity={chatExpanded?'chat':timer.phase==='focus' && timer.running?'focus':timer.phase!=='focus'?'rest':roomScene==='night'?'sleepy':'idle'}
+            activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
         <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>

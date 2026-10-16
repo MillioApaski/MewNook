@@ -36,8 +36,13 @@ jobs:
           python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
           python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
+          python scripts/build-mewnook-v4-review.py
+      - name: Standalone action timeline tests
+        run: node --test tests/inochiActions.test.mjs
       - name: AI protocol unit tests
         run: npm run test:ai
+      - name: Companion activity regression tests
+        run: npm run test:companion
       - name: Typecheck and build PWA
         run: npm run build
       - name: Inochi2D real-browser WebGL2 smoke test
@@ -85,6 +90,10 @@ jobs:
           if-no-files-found: ignore
       - name: Verify v4 upright animation in real Chromium (candidate only)
         run: node scripts/diagnose-inochi-v4.mjs
+      - name: Verify companion chat activity in real Chromium
+        run: node scripts/check-companion-chat.mjs
+      - name: Verify standalone v4 action regions and recovery
+        run: node scripts/check-v4-review.mjs
       - name: Upload v4 candidate screenshots and model
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,7 +103,25 @@ jobs:
             /tmp/inochi-v4-shots
             /tmp/v4-motion-report.json
             public/inochi2d-test/models/MewNook-v4.inx
+            /tmp/inochi-v4-review
+            public/inochi2d-test/models/MewNook-v4-review.inx
           if-no-files-found: ignore
+      - name: Save validated standalone candidate on internal PR branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          REVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
+          REVIEW_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch origin "$REVIEW_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$REVIEW_HEAD" || { echo "Branch moved; skip stale candidate"; exit 0; }
+          git checkout -B review-candidate "$REVIEW_HEAD"
+          git add public/inochi2d-test/models/MewNook-v4-review.inx
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: save verified standalone v4 visual candidate"
+            git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+          fi
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |

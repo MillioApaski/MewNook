@@ -20,14 +20,16 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
 <body>
 <main>
 <header><h2>Inochi2D WebGL2 测试</h2><span id="status" data-state="loading">正在初始化…</span><a href="/">返回 MewNook</a></header>
+<nav aria-label="实验模型"><a href="/inochi2d-test/smoke?model=v4">v4 正坐姿（实验）</a> · <a href="/inochi2d-test/smoke?model=v3">v3 旧斜头</a> · <a href="/inochi2d-test/smoke?model=v2">v2 对照</a></nav>
 <figure><canvas id="puppet" aria-label="MewNook 原创简化 Inochi2D 模型"/></figure>
 <div><button id="tap" disabled>摸摸猫耳</button> <button id="idle" disabled>立即眨眼</button>
- <button id="chat" disabled>聊天表情</button> <button id="sleep" disabled>困倦表情</button>
+ <button id="chat" disabled>聊天表情</button> <button id="sleep" disabled>困倦表情</button> <button id="reset" disabled>恢复待机</button> <button id="closeup" disabled>脸部近看</button>
  <span id="action-label" aria-live="polite"></span>
  <label>缩放 <input id="scale" type="range" min="0.1" max="0.9" step="0.01" value="0.32"/></label></div>
-<p id="details">MewNook Inochi2D 工程模型测试，基于 Inox2D（BSD-2-Clause）。使用 ?model=v4 测试新正坐姿角色，默认仍为 v3；v4 的可动部件来自扁平立绘自动分层，尚未完成遮挡补画、原生 Creator 工程和正式美术验收。</p>
+<p id="details">MewNook Inochi2D 工程模型测试，基于 Inox2D（BSD-2-Clause）。使用 ?model=v4 测试新正坐姿角色，默认仍为 v3；v4 为独立视觉修订候选（review-1），仅在本测试页加载，不替换主页面模型。可点击「脸部近看」检查嘴型与眼皮。可动部件来自扁平立绘自动分层，尚未完成遮挡补画、原生 Creator 工程和正式美术验收。</p>
 </main>
 <script type="module">
+import {sampleAction} from './actions.js'
 const node=document.querySelector('#status')
 const canvas=document.querySelector('#puppet')
 const setStatus=(status,text)=>{node.dataset.state=status;node.textContent=text}
@@ -44,7 +46,7 @@ try {
  const requestModel=new URLSearchParams(location.search).get('model')
  const isV4=requestModel==='v4'
  const candidateModel=requestModel!=='v2' && !isV4
- const modelUrl=isV4?'/inochi2d-test/models/MewNook-v4.inx?rig=upright-source-20261016'
+ const modelUrl=isV4?'/inochi2d-test/models/MewNook-v4-review.inx?rig=visual-review-1'
    : candidateModel?'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'
    : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'
  await controller.loadModel(modelUrl)
@@ -130,45 +132,44 @@ try {
  document.querySelector('#idle').disabled=false
  document.querySelector('#chat').disabled=false
  document.querySelector('#sleep').disabled=false
- let tapUntil=0, manualBlinkUntil=0, expressionUntil=0, currentExpression='idle'
+ let action='none',started=0
  const announce=text=>{document.querySelector('#action-label').textContent=text}
- const ticker=probe?null:setInterval(()=>{
-    const t=performance.now()/1000,phase=t%4.2,blink=phase<.27?Math.sin(Math.PI*phase/.27):0
-    for(const [id,val] of [
-      ['ParamEyeBlinkLeft',performance.now()<manualBlinkUntil?1:blink],['ParamEyeBlinkRight',performance.now()<manualBlinkUntil?1:blink],
-      ['ParamBreath',Math.sin(t*2)],['ParamTailSwing',Math.sin(t*1.3)],
-      ...((candidateModel||isV4)?[
-        ['ParamHairLeft',Math.sin(t*.82)*.23],
-        ['ParamHairRight',Math.sin(t*.73+1.1)*.20],
-        ['ParamHairFront',Math.sin(t*1.07+.5)*.15],
-        ['ParamTailDeform',Math.sin(t*.94+1.7)*.28]
-      ]:[]),
-      ['ParamEarLeft',performance.now()<tapUntil?.9:Math.sin(t*1.8)*.4],
-      ['ParamEarRight',performance.now()<tapUntil?-.9:Math.sin(t*1.7+.4)*.4],
-      ['ParamHeadX',Math.sin(t*.4)*.04],
-      ['ParamHeadY',Math.sin(t*.3)*.03],
-      ['ParamSmile',performance.now()<expressionUntil&&currentExpression==='chat'?.8:0.16],
-      ['ParamSleepy',performance.now()<expressionUntil&&currentExpression==='sleep'?.95:0],
-      ...(isV4?[
-        ['ParamSleepyLeft',performance.now()<expressionUntil&&currentExpression==='sleep'?.75:0],
-        ['ParamSleepyRight',performance.now()<expressionUntil&&currentExpression==='sleep'?.75:0],
-      ]:[]),
-      ['ParamMouthOpen',performance.now()<expressionUntil&&currentExpression==='chat'?.52+.38*Math.abs(Math.sin(t*4.8)):0],
-      ['ParamEmbarrassed',performance.now()<tapUntil?.7:0]
-    ]) void controller.setParameter?.(id,val)
- },80)
-window.addEventListener('pagehide',()=>{if(ticker)clearInterval(ticker)},{once:true})
- document.querySelector('#tap').onclick=()=>{
-   tapUntil=performance.now()+1400
-   announce('猫耳抖动中')
-   void controller.applyInteractionImpulse?.(6,-4)
-   void controller.setParameter?.('ParamEarLeft',.95)
-   void controller.setParameter?.('ParamEarRight',-.95)
-   if(names.includes('Yatta Celebration'))void controller.playAnimation?.('Yatta Celebration',{restart:true,kind:'reaction'})
+ const apply=(name,value)=>controller.setParameter?.(name,value)
+ function frame(now){
+   const t=probe?0:now/1000,state=sampleAction(action,now-started)
+   if(action!=='none'&&state.done){action='none';announce('已恢复待机')}
+   const naturalBlink=!probe&&(t%4.2)<.27?Math.sin(Math.PI*(t%4.2)/.27):0
+   const blink=action==='idle'||action==='tap'?state.blink:naturalBlink
+   const values={
+     ParamEyeBlinkLeft:blink,ParamEyeBlinkRight:blink,
+     ParamBreath:Math.sin(t*2)*.65,
+     ParamTailSwing:Math.sin(t*1.3)*.3,
+     ParamHairLeft:Math.sin(t*.82)*.23,ParamHairRight:Math.sin(t*.73+1.1)*.20,
+     ParamHairFront:Math.sin(t*1.07+.5)*.15,ParamTailDeform:Math.sin(t*.94+1.7)*.28,
+     ParamEarLeft:state.earLeft,ParamEarRight:state.earRight,
+     ParamHeadX:0,ParamHeadY:0,ParamSmile:action==='chat'?.65:.16,
+     ParamSleepy:isV4?0:state.sleepy,
+     ParamSleepyLeft:state.sleepy*(1-blink),ParamSleepyRight:state.sleepy*(1-blink),
+     ParamMouthOpen:state.mouth,ParamEmbarrassed:action==='tap'?.4:0
+   }
+   for(const [id,value] of Object.entries(values))void apply(id,value)
+   canvas.dataset.action=action
+   return values
  }
- document.querySelector('#idle').onclick=()=>{manualBlinkUntil=performance.now()+520;announce('上眼皮闭合中')}
- document.querySelector('#chat').onclick=()=>{currentExpression='chat';expressionUntil=performance.now()+5000;announce('正在说话')}
- document.querySelector('#sleep').onclick=()=>{currentExpression='sleep';expressionUntil=performance.now()+5000;announce('困倦半睁眼')}
+ const ticker=probe?null:setInterval(()=>frame(performance.now()),33)
+ window.addEventListener('pagehide',()=>{if(ticker)clearInterval(ticker)},{once:true})
+ const startAction=(name,label)=>{action=name;started=performance.now();announce(label);frame(started)}
+ for(const id of ['tap','idle','chat','sleep','reset','closeup'])document.querySelector('#'+id).disabled=false
+ document.querySelector('#tap').onclick=()=>startAction('tap','猫耳抖动中')
+ document.querySelector('#idle').onclick=()=>startAction('idle','上眼皮闭合中')
+ document.querySelector('#chat').onclick=()=>startAction('chat','正在说话')
+ document.querySelector('#sleep').onclick=()=>startAction('sleep','困倦半睁眼')
+ document.querySelector('#reset').onclick=()=>startAction('none','已恢复待机')
+ if(probe)window.__inochiProbe.actionFrame=async(name,elapsed)=>{
+   action=name;started=performance.now()-elapsed;return frame(performance.now())
+ }
+ let closeup=false
+ document.querySelector('#closeup').onclick=()=>{closeup=!closeup;const scale=closeup?.65:.32;document.querySelector('#scale').value=String(scale);document.querySelector('#closeup').textContent=closeup?'全身查看':'脸部近看';void controller.setCameraTransform(0,120,scale)}
  document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,120,Number(e.target.value))
 } catch(e) {
  setStatus('error','加载失败：'+(e?.message||e))
