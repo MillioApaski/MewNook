@@ -26,6 +26,16 @@ jobs:
           python scripts/check-mewnook-v2.py
           python scripts/build-mewnook-v3.py
           python scripts/check-mewnook-v3.py
+      - name: Validate v4 source tooling (v3 unaffected)
+        run: |
+          python -m py_compile scripts/build-mewnook-v4.py scripts/check-mewnook-v4.py
+          node scripts/check-inochi-v4-layout.mjs
+          if [ -f assets/inochi/v4/source/pose_reference.png ]; then
+            python scripts/build-mewnook-v4.py
+            python scripts/check-mewnook-v4.py
+          else
+            echo "V4 reference image not yet committed; generator dry-run skipped."
+          fi
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Typecheck and build PWA

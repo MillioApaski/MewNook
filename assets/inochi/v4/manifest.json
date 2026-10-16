@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "model_id": "mewnook-v4-upright",
-  "stage": "directory_scaffold_only",
+  "stage": "prototype_generator_ready_reference_upload_pending",
   "reference": {
     "path": "source/pose_reference.png",
     "width": 1122,
@@ -418,5 +418,13 @@
       "path": "parts/chair/chair_front.png",
       "status": "not_created"
     }
-  ]
+  ],
+  "prototype": {
+    "builder": "scripts/build-mewnook-v4.py",
+    "source": "source/pose_reference.png",
+    "output": "rig/MewNook-v4-prototype.inx",
+    "status": "locally_generated_not_committed_or_browser_verified",
+    "part_count": 11,
+    "param_count": 4
+  }
 }
