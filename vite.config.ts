@@ -20,7 +20,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp}'],
-        navigateFallback: '/index.html'
+        navigateFallback: '/index.html',
+        // Independent runtime tests must not be replaced by the PWA app shell.
+        navigateFallbackDenylist: [/^\/inochi2d-test(?:\/|$)/]
       }
     })
   ]
