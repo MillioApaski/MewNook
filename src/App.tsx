@@ -488,7 +488,7 @@ export default function App() {
             draggable={false}/>
         </button>
         {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
-          <InochiTestCharacter active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
+          <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
             activity={chatExpanded?'chat':timer.phase==='focus' && timer.running?'focus':timer.phase!=='focus'?'rest':roomScene==='night'?'sleepy':'idle'}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
@@ -585,12 +585,18 @@ export default function App() {
             <Field label="场景"><select value={settings.scene} onChange={e=>saveSettings({scene:e.target.value as Scene})}>{(Object.keys(sceneName) as Scene[]).map(scene=><option key={scene} value={scene}>{sceneName[scene]}</option>)}</select></Field>
             <Field label="主题配色"><select value={settings.accent} onChange={e=>saveSettings({accent:e.target.value as Settings['accent']})}><option value="blue">雾蓝</option><option value="pink">樱粉</option><option value="lavender">淡紫</option></select></Field>
           </div><div className="inochi-test-settings">
-            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用真正的 Inochi2D WebGL2 模型测试动画与分层遮挡。默认不加载，v3 模型约 2.3 MB。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
+            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用 WebGL2 验证动态角色。默认关闭；v3 是旧斜头工程版，v4 为新正坐姿工程候选（还未完成手工补画）。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
             {settings.inochiTestMode && <>
+              <Field label="实验模型" hint="v4 使用新正坐姿原画，尚属工程候选；切换时重新加载，失败自动回退旧版。">
+                <select value={settings.inochiModel === 'v4' ? 'v4' : 'v3'} onChange={e=>{saveSettings({inochiModel:e.target.value === 'v4' ? 'v4' : 'v3'});setInochiStatus('off');setInochiError('')}}>
+                  <option value="v3">v3 · 旧斜头（稳定）</option>
+                  <option value="v4">v4 · 正坐姿（实验）</option>
+                </select>
+              </Field>
               <Field label="测试模型缩放" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
               <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
               {inochiError && <p className="error-text">{inochiError}</p>}
-              <p className="footnote">当前使用 MewNook v3：已验证独立眨眼、原生多顶点头发及尾巴变形、预乘 Alpha 修复。加载失败自动回退 v2；精细手工绑定仍待完成。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/inochi2d" target="_blank" rel="noreferrer">Inochi2D 技术</a></p>
+              <p className="footnote">v3 为旧斜头工程模型；v4 使用新的正坐姿原画，已包含眼睛、嘴、猫耳、发尾和尾巴参数，但仍缺少专业手绘遮挡层。加载失败自动回退，静态 PNG 始终保留。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/inochi2d" target="_blank" rel="noreferrer">Inochi2D 技术</a></p>
             </>}
           </div><p className="footnote">天气数据：<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · 非商业使用请遵守其许可与署名要求。</p></section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon blue"><KeyRound size={20}/></span><strong>自定义 AI API</strong></div><span className="badge">BYOK · 可选</span></div>

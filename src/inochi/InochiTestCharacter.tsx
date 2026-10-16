@@ -22,6 +22,7 @@ type Bridge = {createInochi2DController(opts:{wasmUrl:string;debug?:boolean}):Pr
 export type InochiTestStatus = 'off'|'loading'|'ready'|'error'
 
 interface Props {
+  model: 'v3' | 'v4'
   active: boolean
   scale: number
   activity: 'focus'|'rest'|'idle'|'chat'|'sleepy'
@@ -29,13 +30,14 @@ interface Props {
   onStatus: (status:InochiTestStatus,error?:string)=>void
 }
 
-export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Props){
+export function InochiTestCharacter({model,active,scale,activity,touches,onStatus}:Props){
   const canvasRef=useRef<HTMLCanvasElement|null>(null)
   const controllerRef=useRef<Controller|null>(null)
   const namesRef=useRef<string[]>([])
   const firstTouchRef=useRef(touches)
   const tapUntilRef=useRef(0)
   const controllerReadyRef=useRef(false)
+  const loadedModelRef=useRef('')
   const manualBlinkUntil=useRef(0)
   const smoothed=useRef({smile:0,sleepy:0,mouth:0})
 
@@ -68,28 +70,40 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
-      let fellBackToV2=false
-      try {
-        await controller.loadModel('/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015')
-      } catch {
+      const candidates=model==='v4' ? [
+        {name:'v4',url:'/inochi2d-test/models/MewNook-v4.inx?rig=upright-motion-20261016'},
+        {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
+        {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
+      ] : [
+        {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
+        {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
+      ]
+      let loadedModel=''
+      let lastError:unknown
+      for(const candidate of candidates){
         if(disposed)return
-        fellBackToV2=true
-        // Keep the known-good rig as a fallback if v3 loading fails.
-        await controller.loadModel('/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015')
+        try {
+          await controller.loadModel(candidate.url)
+          loadedModel=candidate.name
+          break
+        }catch(error){lastError=error}
       }
+      if(!loadedModel)throw lastError ?? new Error('Inochi2D 模型加载失败')
+      loadedModelRef.current=loadedModel
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
       // MewNook parameters are owned by the rig, not by Aka preset names.
       controllerReadyRef.current=true
-      onStatus('ready',fellBackToV2?'v3 无法加载，已自动使用 v2 模型':'')
+      onStatus('ready',loadedModel===model?'':model+' 无法加载，已回退 '+loadedModel)
     })().catch(e=>{
       if(!disposed)onStatus('error',e instanceof Error?e.message:String(e))
     })
     return()=>{
       disposed=true
       controllerReadyRef.current=false
+      loadedModelRef.current=''
       observer?.disconnect()
       if(resizeHandler)window.removeEventListener('resize',resizeHandler)
       if(controllerRef.current===controller)controllerRef.current=null
@@ -140,6 +154,7 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       const blink=phase<0.29 ? Math.sin(Math.PI*phase/0.29) : 0
       const blinkValue=current<manualBlinkUntil.current?1:blink
       const touched=current<tapUntilRef.current
+      const v4=loadedModelRef.current==='v4'
       const state=smoothed.current
       state.smile+=((resting||talking?0.65:focused?0.10:0.22)-state.smile)*0.12
       state.sleepy+=((sleepy?0.95:focused?0.12:0)-state.sleepy)*0.12
@@ -150,29 +165,41 @@ export function InochiTestCharacter({active,scale,activity,touches,onStatus}:Pro
       set('ParamEyeBlinkLeft',blinkValue)
       set('ParamEyeBlinkRight',blinkValue)
       set('ParamBreath',Math.sin(t*(sleepy?1.25:2.0))*(focused?.42:.65))
-      set('ParamBodyY',Math.sin(t*1.0)*.16)
-      set('ParamBodyZ',Math.sin(t*.7)*.12)
+      if(!v4){
+        set('ParamBodyY',Math.sin(t*1.0)*.16)
+        set('ParamBodyZ',Math.sin(t*.7)*.12)
+      }
       // The character was painted with a tilted head. Never simulate a
       // frontal head turn by sliding only the irises.
-      set('ParamHeadX',focused?-.055:Math.sin(t*.42)*.035)
-      set('ParamHeadY',focused?.055:sleepy?.035:Math.sin(t*.34)*.025)
-      set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
+      if(!v4){
+        set('ParamHeadX',focused?-.055:Math.sin(t*.42)*.035)
+        set('ParamHeadY',focused?.055:sleepy?.035:Math.sin(t*.34)*.025)
+        set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
+      }
       // Real native Inochi2D per-vertex deform. No CSS animation or
       // transform-position fallback; amplitudes remain deliberately small.
       const motion=focused?.4:sleepy?.3:1
       set('ParamHairLeft',Math.sin(t*.82)*.33*motion)
       set('ParamHairRight',Math.sin(t*.73+1.1)*.29*motion)
-      set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
+      if(!v4)set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
       set('ParamTailDeform',Math.sin(t*.94+1.7)*.36*motion)
       set('ParamEarLeft',touched?.95:Math.sin(t*1.8)*.17)
       set('ParamEarRight',touched?-.95:Math.sin(t*1.7+.4)*.17)
-      set('ParamSmile',state.smile)
-      set('ParamSleepy',state.sleepy)
+      if(!v4){
+        set('ParamSmile',state.smile)
+        set('ParamEmbarrassed',touched && !focused?.6:0)
+      }
+      set('ParamSleepy',v4?(sleepy?0.82:0):state.sleepy)
+      if(v4){
+        set('ParamSleepyLeft',state.sleepy)
+        set('ParamSleepyRight',state.sleepy)
+        set('ParamEarLeftTilt',touched?.75:0)
+        set('ParamEarRightTilt',touched?-.75:0)
+      }
       set('ParamMouthOpen',state.mouth)
-      set('ParamEmbarrassed',touched && !focused?.6:0)
     },70)
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label="MewNook Inochi2D v3 多顶点动画模型" />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label={model==='v4'?'MewNook Inochi2D v4 正坐姿实验角色':'MewNook Inochi2D v3 角色'} />
 }
