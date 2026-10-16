@@ -120,13 +120,13 @@ def main():
                   [scalar(part,'transform.r.z',[-.055,0,.055])])
     for side in ('Left','Right'):
         lid=byname['Eye '+side+' Cover']
-        lash=byname['Eye '+side+' Closed']
+        lash=byname['Eye '+side+' Lash']
         blink=next(p for p in params if p['name']=='ParamEyeBlink'+side)
         blink['bindings'].append(scalar(lid,'transform.t.y',[-20,-20,0]))
         param('ParamSleepy'+side,[scalar(lid,'transform.s.y',[.002,.002,.48]),
               scalar(lid,'transform.t.y',[-20,-20,-8]),
               scalar(lash,'transform.s.y',[.002,.002,.18])])
-    param('ParamBreath',[scalar(byname['Base upright body + reconstructed face'],
+    param('ParamBreath',[scalar(byname['Upright Base'],
               'transform.s.y',[.997,1.,1.003])])
     model['meta']['name']='MewNook v4 Upright Motion Prototype'
     save_inx(args.output,model,textures)
