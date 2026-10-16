@@ -15,7 +15,7 @@ size=struct.unpack('>I',blob[8:12])[0]
 model=json.loads(blob[12:12+size])
 parts={part['name']:part for part in model['nodes']['children']}
 params={p['name']:p for p in model['param']}
-assert len(parts)==16 and len(params)==14,(len(parts),len(params))
+assert len(parts)==18 and len(params)==14,(len(parts),len(params))
 for name in ('ParamEarLeft','ParamEarRight','ParamHairLeft',
              'ParamHairRight','ParamTailDeform'):
     bindings=params[name]['bindings']
@@ -31,7 +31,11 @@ for side in ('Left','Right'):
     blink=params['ParamEyeBlink'+side]['bindings']
     assert len(blink)==3
     assert any(b['param_name']=='transform.t.y' for b in blink)
-    assert 'ParamSleepy'+side in params
+    sleepy=params['ParamSleepy'+side]['bindings']
+    assert len(sleepy)==2
+    drowsy=parts['Eye '+side+' Drowsy Cover']
+    assert all(item['node']==drowsy['uuid'] for item in sleepy)
+    assert all(item['node']!=parts['Eye '+side+' Cover']['uuid'] for item in sleepy)
 for name in ('ParamMouthOpen','ParamSleepy','ParamBreath'):
     assert name in params
 pos=12+size

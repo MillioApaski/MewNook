@@ -7,7 +7,7 @@ engineering rig from flattened art, not an artist-authored Inochi Creator
 project; movement behind cut-out parts still needs overpainting.
 """
 from __future__ import annotations
-import argparse, io, json, math, struct
+import argparse, copy, io, json, math, struct
 from pathlib import Path
 import cv2
 import numpy as np
@@ -120,12 +120,37 @@ def main():
                   [scalar(part,'transform.r.z',[-.055,0,.055])])
     for side in ('Left','Right'):
         lid=byname['Eye '+side+' Cover']
-        lash=byname['Eye '+side+' Lash']
+        # Blink is the full closed-eye cover and its closed lash. The old
+        # ParamSleepy bound these exact same transform fields and overwrote
+        # blink on every Inox2D evaluation frame.
         blink=next(p for p in params if p['name']=='ParamEyeBlink'+side)
         blink['bindings'].append(scalar(lid,'transform.t.y',[-20,-20,0]))
-        param('ParamSleepy'+side,[scalar(lid,'transform.s.y',[.002,.002,.48]),
-              scalar(lid,'transform.t.y',[-20,-20,-8]),
-              scalar(lash,'transform.s.y',[.002,.002,.18])])
+        original=Image.open(io.BytesIO(textures[lid['textures'][0]])).convert('RGBA')
+        layer=np.asarray(original).copy()
+        h,w=layer.shape[:2]
+        yy,xx=np.meshgrid(np.arange(h),np.arange(w),indexing='ij')
+        slope=-.16 if side=='Left' else -.14
+        # Only the iris's upper arc is concealed for drowsiness; the second
+        # part is an independent tinted layer, not a scale on the blink iris.
+        limit=.52*h+slope*(xx-w/2)
+        blend=np.clip((limit-yy)/max(2,h*.085),0,1)
+        layer=np.uint8(np.round(layer.astype(np.float32)*blend[:,:,None]))
+        encoded=io.BytesIO()
+        Image.fromarray(layer,'RGBA').save(encoded,'PNG',optimize=True)
+        texid=len(textures);textures.append(encoded.getvalue())
+        drowsy=copy.deepcopy(lid)
+        drowsy['uuid']=fresh()
+        drowsy['name']='Eye '+side+' Drowsy Cover'
+        drowsy['psdLayerPath']=drowsy['name']
+        drowsy['zsort']=-9.0
+        drowsy['textures']=[texid,NULL,NULL]
+        parts.append(drowsy)
+        # Sleepy now owns only the new part. It cannot overwrite the blink
+        # cover, so open, half-closed and fully-closed states are independent.
+        param('ParamSleepy'+side,[
+            scalar(drowsy,'transform.s.y',[.002,.002,1.]),
+            scalar(drowsy,'transform.t.y',[-12,-12,0])
+        ])
     param('ParamBreath',[scalar(byname['Upright Base'],
               'transform.s.y',[.997,1.,1.003])])
     model['meta']['name']='MewNook v4 Upright Motion Prototype'
