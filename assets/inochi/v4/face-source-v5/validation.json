@@ -1,0 +1,131 @@
+{
+  "stage": "source_eye_mattes_and_gaze_not_blink_or_rig",
+  "sides": {
+    "left": {
+      "stationary_iris_rim_residue_pixels": 0,
+      "source_visible_iris_pixels": 818,
+      "source_core_rgb_exact_pixels": 670,
+      "painted_white_clearance_pixels": 889,
+      "hidden_iris_pixels": 244
+    },
+    "right": {
+      "stationary_iris_rim_residue_pixels": 0,
+      "source_visible_iris_pixels": 894,
+      "source_core_rgb_exact_pixels": 755,
+      "painted_white_clearance_pixels": 1014,
+      "hidden_iris_pixels": 194
+    }
+  },
+  "neutral_visible_iris_rgb_mean_error_against_prior": {
+    "left": 0.0,
+    "right": 0.0
+  },
+  "gaze_cases": [
+    [
+      -2,
+      -2
+    ],
+    [
+      -2,
+      -1
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -2,
+      1
+    ],
+    [
+      -2,
+      2
+    ],
+    [
+      -1,
+      -2
+    ],
+    [
+      -1,
+      -1
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      2
+    ],
+    [
+      0,
+      -2
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      1,
+      -2
+    ],
+    [
+      1,
+      -1
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      -2
+    ],
+    [
+      2,
+      -1
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      2,
+      1
+    ],
+    [
+      2,
+      2
+    ]
+  ],
+  "outside_eye_regions_prior_visible_rgba_unchanged": true,
+  "remaining": [
+    "Inspect pupil seams, white openings and gaze extremes",
+    "Natural eyelid closure and brow/face/mouth work",
+    "Upright body layers and actual binding"
+  ]
+}
