@@ -1,0 +1,36 @@
+{
+  "stage": "upright_uncrossed_source_candidate_not_rigged",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "registration": {
+    "matches": 241,
+    "inliers": 184,
+    "median_native_error": 0.6339813470840454,
+    "p95_native_error": 1.7670655250549316,
+    "matrix": [
+      [
+        1.0009735035063823,
+        -0.00022187606787601972,
+        0.4108679849960927
+      ],
+      [
+        0.00022187606787601972,
+        1.0009735035063823,
+        -0.5511827032490281
+      ]
+    ]
+  },
+  "original_upper_rgba_exact_through_row": 862,
+  "seam_rows": [
+    863,
+    877
+  ],
+  "remaining": [
+    "Review skirt and seat seam at full scale",
+    "Restore original lower hair in complete layer assembly",
+    "Separate hips, skirt, legs and stool with hidden overlap",
+    "Bind upright body and validate actual motions"
+  ]
+}

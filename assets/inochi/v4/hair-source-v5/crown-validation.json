@@ -1,0 +1,31 @@
+{
+  "stage": "crown_hidden_repaint_static_candidate",
+  "registration": {
+    "inliers": 69,
+    "matches": 278,
+    "median_native_error": 0.285537987947464,
+    "p95_native_error": 0.45489105582237244,
+    "matrix": [
+      [
+        1.0058930743300343,
+        0.0051411150894800405,
+        -8.927481551767686
+      ],
+      [
+        -0.0051411150894800405,
+        1.0058930743300343,
+        5.944741005967888
+      ]
+    ]
+  },
+  "tested_parameters": [
+    -3,
+    0,
+    3
+  ],
+  "remaining": [
+    "Ear seam and root overlap joint review",
+    "Full side and back hair",
+    "Actual mesh binding"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "status": "art_review_only_not_a_layered_rig",
+  "source": "../source/pose_reference.png",
+  "method": "built_in_image_editing",
+  "assets": [
+    {
+      "file": "expression-closed.png",
+      "dimensions": [
+        1122,
+        1402
+      ],
+      "status": "painted_expression_candidate",
+      "mode": "RGBA"
+    },
+    {
+      "file": "expression-talking.png",
+      "dimensions": [
+        1122,
+        1402
+      ],
+      "status": "painted_expression_candidate",
+      "mode": "RGBA"
+    },
+    {
+      "file": "expression-sleepy.png",
+      "dimensions": [
+        1122,
+        1402
+      ],
+      "status": "painted_expression_candidate",
+      "mode": "RGBA"
+    },
+    {
+      "file": "skin-base-unregistered.png",
+      "dimensions": [
+        1122,
+        1402
+      ],
+      "status": "underpainting_candidate_not_registered",
+      "mode": "RGBA"
+    },
+    {
+      "file": "fringe-unregistered.png",
+      "dimensions": [
+        1312,
+        1199
+      ],
+      "status": "extraction_candidate_needs_alpha_cleanup_and_registration",
+      "mode": "RGBA"
+    }
+  ],
+  "rejected": "Both isolated facial-feature attempts have unwanted skin halos and are not included.",
+  "remaining": [
+    "pixel registration",
+    "individual eye-white, iris, upper-lash and lower-lid extraction",
+    "independent mouth layers",
+    "alpha edge cleanup",
+    "layer compositing validation",
+    "complete editable source project"
+  ],
+  "runtime_modified": false
+}

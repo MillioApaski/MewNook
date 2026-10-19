@@ -1,0 +1,308 @@
+{
+  "stage": "existing_fringe_edge_defects_repaired_not_a_finished_rig",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "parts": [
+    {
+      "file": "front-left.png",
+      "offset": [
+        464,
+        95
+      ],
+      "selection": "hand-traced source silhouette",
+      "repair": "only registered narrow eyebrow bands; original RGB elsewhere"
+    },
+    {
+      "file": "front-center.png",
+      "offset": [
+        493,
+        95
+      ],
+      "selection": "hand-traced source silhouette",
+      "repair": "only registered narrow eyebrow bands; original RGB elsewhere"
+    }
+  ],
+  "source_rgb_outside_brow_band_exact": true,
+  "brow_band_pixels": 2227,
+  "contours": {
+    "front-left": [
+      [
+        520,
+        98
+      ],
+      [
+        [
+          488,
+          100
+        ],
+        [
+          469,
+          144
+        ],
+        [
+          467,
+          194
+        ]
+      ],
+      [
+        [
+          464,
+          235
+        ],
+        [
+          471,
+          265
+        ],
+        [
+          484,
+          283
+        ]
+      ],
+      [
+        [
+          490,
+          271
+        ],
+        [
+          494,
+          250
+        ],
+        [
+          493,
+          225
+        ]
+      ],
+      [
+        [
+          491,
+          205
+        ],
+        [
+          494,
+          185
+        ],
+        [
+          497,
+          160
+        ]
+      ],
+      [
+        [
+          499,
+          130
+        ],
+        [
+          507,
+          110
+        ],
+        [
+          520,
+          98
+        ]
+      ]
+    ],
+    "front-center": [
+      [
+        530,
+        98
+      ],
+      [
+        [
+          509,
+          99
+        ],
+        [
+          494,
+          132
+        ],
+        [
+          496,
+          182
+        ]
+      ],
+      [
+        [
+          499,
+          216
+        ],
+        [
+          518,
+          245
+        ],
+        [
+          544,
+          262
+        ]
+      ],
+      [
+        [
+          555,
+          269
+        ],
+        [
+          566,
+          271
+        ],
+        [
+          575,
+          267
+        ]
+      ],
+      [
+        [
+          566,
+          264
+        ],
+        [
+          557,
+          258
+        ],
+        [
+          550,
+          252
+        ]
+      ],
+      [
+        [
+          564,
+          260
+        ],
+        [
+          578,
+          266
+        ],
+        [
+          590,
+          263
+        ]
+      ],
+      [
+        [
+          580,
+          260
+        ],
+        [
+          571,
+          254
+        ],
+        [
+          565,
+          249
+        ]
+      ],
+      [
+        [
+          578,
+          253
+        ],
+        [
+          588,
+          253
+        ],
+        [
+          596,
+          248
+        ]
+      ],
+      [
+        [
+          590,
+          248
+        ],
+        [
+          586,
+          245
+        ],
+        [
+          583,
+          242
+        ]
+      ],
+      [
+        [
+          592,
+          220
+        ],
+        [
+          592,
+          192
+        ],
+        [
+          585,
+          170
+        ]
+      ],
+      [
+        [
+          575,
+          142
+        ],
+        [
+          550,
+          110
+        ],
+        [
+          530,
+          98
+        ]
+      ]
+    ]
+  },
+  "remaining": [
+    "Complete remaining front hair and crown selections",
+    "Final brow positioning, thickness and opacity review in task 5",
+    "Actual head motion and mesh binding",
+    "Full front/side/back hair separation remains pending"
+  ],
+  "neutral_fringe_rgb_mean_abs_error": 0.8628766621934855,
+  "brow_completion_registration": [
+    {
+      "generated_box": [
+        91,
+        414,
+        703,
+        750
+      ],
+      "source_box": [
+        474,
+        227,
+        535,
+        261
+      ]
+    },
+    {
+      "generated_box": [
+        1199,
+        130,
+        1886,
+        282
+      ],
+      "source_box": [
+        583,
+        196,
+        648,
+        216
+      ]
+    }
+  ],
+  "brow_original_core_pixels_retained": 26,
+  "warp_validation": {
+    "method": "premultiplied RGB interpolation, straight alpha export",
+    "tested_shifts": [
+      -6,
+      -2,
+      0,
+      2,
+      6
+    ],
+    "max_premultiplied_rgb_rounding_error": 0.9816133985332556,
+    "skin_shadow_triangle_removed_from_hair": true
+  },
+  "exported_ora": {
+    "file": "MewNook-v4-fringe-repair.ora",
+    "layers": 37,
+    "default_visible_rgba_source_exact": true
+  }
+}
