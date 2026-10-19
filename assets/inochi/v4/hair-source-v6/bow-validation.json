@@ -1,0 +1,41 @@
+{
+  "stage": "right_bow_source_matte_candidate_foreground_occlusion_pending",
+  "registration": {
+    "method": "validated two-stage source-to-parent and parent-to-local-edit",
+    "source_parent": {
+      "inliers": 30,
+      "matches": 85,
+      "median_native_error": 0.2590128183364868,
+      "p95_native_error": 0.3796539902687073
+    },
+    "parent_local_edit": {
+      "inliers": 133,
+      "matches": 172,
+      "median_native_error": 0.10375777631998062,
+      "p95_native_error": 0.2730809152126312
+    },
+    "matrix": [
+      [
+        1.0191275221984404,
+        -0.000961579868283996,
+        -2.3762099671626693
+      ],
+      [
+        0.000961579868283996,
+        1.0191275221984404,
+        0.16829107305140428
+      ]
+    ]
+  },
+  "source_navy_core_rgb_exact_pixels": 6675,
+  "offset": [
+    696,
+    140
+  ],
+  "remaining": [
+    "Separate original fine white strand and preserve foreground occlusion",
+    "Joint bow and flick motion",
+    "Side/back hair repaint and grouping",
+    "Rig binding"
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "stage": "original_right_bow_flick_and_fine_strand_joint_static_review",
+  "head_bow_flick_cases": [
+    [
+      -6,
+      -4,
+      -4
+    ],
+    [
+      -6,
+      -4,
+      0
+    ],
+    [
+      -6,
+      -4,
+      4
+    ],
+    [
+      -6,
+      0,
+      -4
+    ],
+    [
+      -6,
+      0,
+      0
+    ],
+    [
+      -6,
+      0,
+      4
+    ],
+    [
+      -6,
+      4,
+      -4
+    ],
+    [
+      -6,
+      4,
+      0
+    ],
+    [
+      -6,
+      4,
+      4
+    ],
+    [
+      0,
+      -4,
+      -4
+    ],
+    [
+      0,
+      -4,
+      0
+    ],
+    [
+      0,
+      -4,
+      4
+    ],
+    [
+      0,
+      0,
+      -4
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      4
+    ],
+    [
+      0,
+      4,
+      -4
+    ],
+    [
+      0,
+      4,
+      0
+    ],
+    [
+      0,
+      4,
+      4
+    ],
+    [
+      6,
+      -4,
+      -4
+    ],
+    [
+      6,
+      -4,
+      0
+    ],
+    [
+      6,
+      -4,
+      4
+    ],
+    [
+      6,
+      0,
+      -4
+    ],
+    [
+      6,
+      0,
+      0
+    ],
+    [
+      6,
+      0,
+      4
+    ],
+    [
+      6,
+      4,
+      -4
+    ],
+    [
+      6,
+      4,
+      0
+    ],
+    [
+      6,
+      4,
+      4
+    ]
+  ],
+  "original_iris_and_eye_corner_core_rgb_exact": true,
+  "original_fine_strand_core_rgb_exact_pixels": 142,
+  "protected_visible_fine_strand_core_pixels": 114,
+  "fine_strand_root_may_be_occluded_by_moving_flick": true,
+  "unrelated_visible_source_rgba_exact": true,
+  "flick_opaque_navy_contamination_pixels": 0,
+  "bow_opaque_white_contamination_pixels": 0,
+  "editable_source_validated": "MewNook-v4-ribbon-joint-source.ora",
+  "fine_strand_offset": [
+    735,
+    215
+  ],
+  "remaining": [
+    "Final side/back hair silhouettes and repaint",
+    "Left bow decomposition",
+    "Full hair occlusion review",
+    "Upright pose, face work and actual rig binding"
+  ]
+}

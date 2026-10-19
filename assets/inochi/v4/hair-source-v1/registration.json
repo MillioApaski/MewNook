@@ -1,0 +1,26 @@
+{
+  "method": "ECC euclidean after resizing to source crop",
+  "correlation_outside_clip": 0.9665935790241578,
+  "matrix_reference_to_generated_resized": [
+    [
+      0.9999998807907104,
+      -0.0004805535718332976,
+      1.1781821250915527
+    ],
+    [
+      0.0004805535718332976,
+      0.9999998807907104,
+      0.7440593838691711
+    ]
+  ],
+  "native_crop_box": [
+    605,
+    120,
+    680,
+    195
+  ],
+  "crop_scale": 12,
+  "source_edge_samples": 14350,
+  "source_to_generated_edge_native_median": 0.0833333358168602,
+  "source_to_generated_edge_native_p95": 0.44876372814178467
+}

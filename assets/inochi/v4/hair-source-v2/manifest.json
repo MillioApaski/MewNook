@@ -1,0 +1,113 @@
+{
+  "stage": "inner_right_fringe_working_selection",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "parts": [
+    {
+      "file": "front-right-inner.png",
+      "offset": [
+        528,
+        95
+      ]
+    },
+    {
+      "file": "right-fringe-hidden-surface.png",
+      "offset": [
+        575,
+        155
+      ]
+    }
+  ],
+  "contour": [
+    [
+      530,
+      98
+    ],
+    [
+      [
+        552,
+        96
+      ],
+      [
+        584,
+        109
+      ],
+      [
+        606,
+        134
+      ]
+    ],
+    [
+      [
+        631,
+        157
+      ],
+      [
+        646,
+        191
+      ],
+      [
+        650,
+        225
+      ]
+    ],
+    [
+      [
+        630,
+        213
+      ],
+      [
+        604,
+        187
+      ],
+      [
+        586,
+        164
+      ]
+    ],
+    [
+      [
+        570,
+        137
+      ],
+      [
+        550,
+        109
+      ],
+      [
+        530,
+        98
+      ]
+    ]
+  ],
+  "validation": {
+    "unrepainted_core_source_rgb_exact_pixels": 3528,
+    "no_gold_clip_pixels_in_hair_layer": true,
+    "transparent_underpaint_not_read_as_black": true,
+    "unrelated_source_rgba_exact": true,
+    "tested_horizontal_shifts": [
+      -4,
+      0,
+      4
+    ]
+  },
+  "scope": "Inner forehead lock only; crown and broad outer right lock remain separate pending work. Clip is a separate original raster layer.",
+  "remaining": [
+    "Inspect traced outline and exposed surface under movement",
+    "Separate crown and outer right lock",
+    "Full side/back hair and hidden painting",
+    "Mesh binding"
+  ],
+  "edge_selection": "Manual guide snapped to the original lavender line, not a generated hair silhouette.",
+  "hidden_surface_sources": [
+    "face-source-v4/forehead-no-brows.png where alpha is nonzero",
+    "face-source-v4/registered-brows-completed.png exposed-forehead paint for uncovered hidden pixels only"
+  ],
+  "exported_ora": {
+    "file": "MewNook-v4-hair-source-v2.ora",
+    "layers": 41,
+    "default_visible_rgba_source_exact": true
+  }
+}

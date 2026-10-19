@@ -38,6 +38,8 @@ jobs:
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
       - name: AI protocol unit tests
         run: npm run test:ai
+      - name: Companion activity regression tests
+        run: npm run test:companion
       - name: Typecheck and build PWA
         run: npm run build
       - name: Inochi2D real-browser WebGL2 smoke test
@@ -85,6 +87,8 @@ jobs:
           if-no-files-found: ignore
       - name: Verify v4 upright animation in real Chromium (candidate only)
         run: node scripts/diagnose-inochi-v4.mjs
+      - name: Verify companion chat activity in real Chromium
+        run: node scripts/check-companion-chat.mjs
       - name: Upload v4 candidate screenshots and model
         if: always()
         uses: actions/upload-artifact@v4

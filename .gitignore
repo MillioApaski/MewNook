@@ -8,3 +8,6 @@ dist
 *.tsbuildinfo
 .DS_Store
 .vscode
+
+# Intermediate source-art archives are never deliverables.
+assets/inochi/v4/**/*.building.ora

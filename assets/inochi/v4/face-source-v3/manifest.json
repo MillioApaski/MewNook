@@ -1,0 +1,114 @@
+{
+  "stage": "static_assembly_diagnostics_not_approved_rig",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "layer_count": 33,
+  "working_parts": [
+    {
+      "file": "fringe-over-face-matte.png",
+      "offset": [
+        466,
+        129
+      ],
+      "size": [
+        162,
+        149
+      ],
+      "kind": "source_core_rgb_with_derived_edge_alpha",
+      "notes": "Forehead-crossing source strands only. Crown, clip, side hair and eye-overlap pixels are excluded; not a complete front-hair layer."
+    },
+    {
+      "file": "fringe-hidden-skin-patch.png",
+      "offset": [
+        466,
+        129
+      ],
+      "size": [
+        162,
+        149
+      ],
+      "kind": "registered_image_edit_under_source_strands",
+      "notes": "Only the hidden skin field needed for this selected fringe fragment."
+    },
+    {
+      "file": "fringe-original-selection.png",
+      "offset": [
+        466,
+        129
+      ],
+      "size": [
+        162,
+        149
+      ],
+      "kind": "unmodified_source_pixels",
+      "notes": "Reference partition, not antialiased working matte."
+    },
+    {
+      "file": "fringe-original-remainder.png",
+      "offset": [
+        51,
+        0
+      ],
+      "size": [
+        1071,
+        1402
+      ],
+      "kind": "unmodified_source_pixels",
+      "notes": "Reference complement: together reconstruct original source exactly."
+    },
+    {
+      "file": "left-aperture-mask.png",
+      "offset": [
+        498,
+        268
+      ],
+      "size": [
+        48,
+        31
+      ],
+      "kind": "painted_sclera_segmentation_mask",
+      "notes": "Binary inspection gate; final antialias/eyelid matte remains to be polished."
+    },
+    {
+      "file": "right-aperture-mask.png",
+      "offset": [
+        604,
+        234
+      ],
+      "size": [
+        46,
+        33
+      ],
+      "kind": "painted_sclera_segmentation_mask",
+      "notes": "Binary inspection gate; final antialias/eyelid matte remains to be polished."
+    }
+  ],
+  "eye_metrics": {
+    "left": {
+      "aperture_pixels": 1025
+    },
+    "right": {
+      "aperture_pixels": 1128
+    }
+  },
+  "validation": {
+    "source_fringe_partition_exact": true,
+    "gaze_iris_spill_outside_aperture": 0,
+    "gaze_exterior_rgba_exact": true,
+    "fringe_neutral_rgb_mean_abs_error": 1.103819816311297
+  },
+  "exported_ora_default_visible_rgba_exact": true,
+  "fringe_motion_artistic_status": "NOT PASSED: discontinuous outline / residual source at brow and strand intersections",
+  "gaze_status": "Three static horizontal positions only; clipping verified, artistic acceptance pending",
+  "fringe_scope": "Forehead-crossing strands only, not the entire front-hair/crown/clip layer.",
+  "remaining": [
+    "Artistic assessment of static gaze frames",
+    "Final eye aperture alpha and iris edge cleanup",
+    "Hair strand extraction at brow/eye intersections",
+    "Complete front/side/back hair split and hidden paint",
+    "Actual mesh and motion curves",
+    "Full-character source separation"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "stage": "left_bow_and_stationary_white_curl_source_materials",
+  "registration": {
+    "bow-hidden": {
+      "method": "preserved-region similarity SIFT",
+      "inliers": 12,
+      "matches": 28,
+      "median_native_error": 0.21330903470516205,
+      "p95_native_error": 0.3250856101512909,
+      "matrix": [
+        [
+          1.0145142460730547,
+          -0.003528382762006746,
+          -0.3966780666330171
+        ],
+        [
+          0.003528382762006746,
+          1.0145142460730547,
+          -1.4682189195850166
+        ]
+      ]
+    },
+    "curl-hidden": {
+      "method": "preserved-region similarity SIFT",
+      "inliers": 13,
+      "matches": 71,
+      "median_native_error": 0.22343461215496063,
+      "p95_native_error": 0.31146448850631714,
+      "matrix": [
+        [
+          1.0039642114587817,
+          -0.005000659994082903,
+          5.5111698953042385
+        ],
+        [
+          0.005000659994082903,
+          1.0039642114587817,
+          -2.1179328223890503
+        ]
+      ]
+    }
+  },
+  "old_visible_navy_pixels_remaining_in_original_bow_footprint": 0,
+  "original_navy_core_rgb_exact_pixels": 5654,
+  "original_white_curl_core_rgb_exact_pixels": 104,
+  "working_parts": [
+    {
+      "file": "left-bow-working.png",
+      "offset": [
+        333,
+        200
+      ]
+    },
+    {
+      "file": "white-curl-working.png",
+      "offset": [
+        397,
+        211
+      ]
+    }
+  ],
+  "remaining": [
+    "Joint movement and source export verification",
+    "Long side/back hair and complete hair occlusion",
+    "Face, upright pose and actual rig"
+  ]
+}

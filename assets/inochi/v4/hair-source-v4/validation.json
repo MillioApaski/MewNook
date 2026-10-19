@@ -1,0 +1,42 @@
+{
+  "stage": "source_ahoge_and_crown_root_static_candidate",
+  "registration": {
+    "inliers": 15,
+    "matches": 127,
+    "median_native_error": 0.2076610028743744,
+    "p95_native_error": 0.28968605399131775,
+    "matrix": [
+      [
+        1.0019445964329912,
+        0.0001262483071151813,
+        -3.493193919894833
+      ],
+      [
+        -0.0001262483071151813,
+        1.0019445964329912,
+        0.13556120046269773
+      ]
+    ]
+  },
+  "source_part_offset": [
+    420,
+    6
+  ],
+  "tested_parameters": [
+    -6,
+    -3,
+    0,
+    3,
+    6
+  ],
+  "unrelated_visible_source_rgba_exact": true,
+  "remaining": [
+    "Final crown outline review with full crown separation",
+    "Full crown and ear boundary",
+    "Joint assembly with four front locks",
+    "Side and back hair",
+    "Actual rig binding"
+  ],
+  "original_ahoge_core_rgb_exact_pixels": 705,
+  "root_seam_fix": "Preserve originally visible crown edge to right of stem; feather hidden root paint in premultiplied alpha"
+}

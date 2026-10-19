@@ -1,4 +1,5 @@
 import {useEffect, useRef} from 'react'
+import type {CompanionActivity} from './companionActivity'
 
 /**
  * Inochi2D WebGL2 runtime. The browser JS/WASM is third-party licensed;
@@ -25,7 +26,7 @@ interface Props {
   model: 'v3' | 'v4'
   active: boolean
   scale: number
-  activity: 'focus'|'rest'|'idle'|'chat'|'sleepy'
+  activity: CompanionActivity
   touches: number
   onStatus: (status:InochiTestStatus,error?:string)=>void
 }
@@ -205,5 +206,5 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" aria-label={model==='v4'?'MewNook Inochi2D v4 正坐姿实验角色':'MewNook Inochi2D v3 角色'} />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'MewNook Inochi2D v4 正坐姿实验角色':'MewNook Inochi2D v3 角色'} />
 }

@@ -1,0 +1,227 @@
+{
+  "stage": "source_refinement_no_runtime_integration",
+  "source_sha256": "5c47238062e6b7f99e95c14658d3af87f1a147ada44173375c90a1cf0f479231",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "working_parts": [
+    {
+      "file": "left-iris-visible.png",
+      "offset": [
+        509,
+        268
+      ],
+      "size": [
+        35,
+        31
+      ],
+      "kind": "original_rgb_corrected_selection",
+      "notes": "Manual source-boundary selection restores pale lower iris sectors. Upper occluded iris is still NOT invented or completed."
+    },
+    {
+      "file": "left-iris-underpaint.png",
+      "offset": [
+        508,
+        262
+      ],
+      "size": [
+        38,
+        39
+      ],
+      "kind": "original_visible_rgb_plus_painted_hidden_region",
+      "notes": "Hidden arc supplied by an isolated image-edit iris, scaled to source iris bounds; original visible selection copied unchanged. Art alignment is still subject to review."
+    },
+    {
+      "file": "left-upper-lashes-matte.png",
+      "offset": [
+        484,
+        259
+      ],
+      "size": [
+        60,
+        32
+      ],
+      "kind": "derived_alpha_unmix_from_original",
+      "notes": "RGB at alpha edges is unblended against painted skin estimate. Compare on dark/light backgrounds; not raw-source RGB at those edges."
+    },
+    {
+      "file": "left-lower-lid-matte.png",
+      "offset": [
+        487,
+        276
+      ],
+      "size": [
+        57,
+        24
+      ],
+      "kind": "derived_alpha_unmix_from_original",
+      "notes": "RGB at alpha edges is unblended against painted skin estimate. Compare on dark/light backgrounds; not raw-source RGB at those edges."
+    },
+    {
+      "file": "left-sclera-underpaint.png",
+      "offset": [
+        478,
+        256
+      ],
+      "size": [
+        75,
+        48
+      ],
+      "kind": "registered_image_edit",
+      "notes": "Painted eye-white under-surface; includes surrounding skin/eyelid at its edge, still needs final mask refinement."
+    },
+    {
+      "file": "right-iris-visible.png",
+      "offset": [
+        608,
+        235
+      ],
+      "size": [
+        34,
+        32
+      ],
+      "kind": "original_rgb_corrected_selection",
+      "notes": "Manual source-boundary selection restores pale lower iris sectors. Upper occluded iris is still NOT invented or completed."
+    },
+    {
+      "file": "right-iris-underpaint.png",
+      "offset": [
+        606,
+        229
+      ],
+      "size": [
+        39,
+        41
+      ],
+      "kind": "original_visible_rgb_plus_painted_hidden_region",
+      "notes": "Hidden arc supplied by an isolated image-edit iris, scaled to source iris bounds; original visible selection copied unchanged. Art alignment is still subject to review."
+    },
+    {
+      "file": "right-upper-lashes-matte.png",
+      "offset": [
+        600,
+        220
+      ],
+      "size": [
+        66,
+        32
+      ],
+      "kind": "derived_alpha_unmix_from_original",
+      "notes": "RGB at alpha edges is unblended against painted skin estimate. Compare on dark/light backgrounds; not raw-source RGB at those edges."
+    },
+    {
+      "file": "right-lower-lid-matte.png",
+      "offset": [
+        618,
+        239
+      ],
+      "size": [
+        41,
+        29
+      ],
+      "kind": "derived_alpha_unmix_from_original",
+      "notes": "RGB at alpha edges is unblended against painted skin estimate. Compare on dark/light backgrounds; not raw-source RGB at those edges."
+    },
+    {
+      "file": "right-sclera-underpaint.png",
+      "offset": [
+        586,
+        216
+      ],
+      "size": [
+        81,
+        56
+      ],
+      "kind": "registered_image_edit",
+      "notes": "Painted eye-white under-surface; includes surrounding skin/eyelid at its edge, still needs final mask refinement."
+    },
+    {
+      "file": "forehead-underpaint.png",
+      "offset": [
+        449,
+        109
+      ],
+      "size": [
+        210,
+        202
+      ],
+      "kind": "registered_image_edit",
+      "notes": "Hidden forehead and brow/eye completion, patch only; not yet composited beneath a finished extracted original fringe."
+    }
+  ],
+  "registration": {
+    "sclera": {
+      "correlation": 0.9981730864698685,
+      "affine": [
+        [
+          1.0008063316345215,
+          0.0004021292261313647,
+          -0.7453321814537048
+        ],
+        [
+          0.00013082785881124437,
+          1.0000054836273193,
+          0.0458163321018219
+        ]
+      ]
+    },
+    "forehead": {
+      "correlation": 0.9980572437646151,
+      "affine": [
+        [
+          1.0006113052368164,
+          5.730910925194621e-05,
+          -0.6607691049575806
+        ],
+        [
+          -6.595825834665447e-05,
+          1.0001016855239868,
+          0.01954580843448639
+        ]
+      ]
+    }
+  },
+  "matte_stats": {
+    "left-iris": {
+      "v1_pixels": 562,
+      "v2_pixels": 773,
+      "restored_light_pixels": 235
+    },
+    "left-upper-lashes": {
+      "core_pixels": 445,
+      "soft_alpha_pixels": 136
+    },
+    "left-lower-lid": {
+      "core_pixels": 40,
+      "soft_alpha_pixels": 67
+    },
+    "right-iris": {
+      "v1_pixels": 681,
+      "v2_pixels": 810,
+      "restored_light_pixels": 169
+    },
+    "right-upper-lashes": {
+      "core_pixels": 426,
+      "soft_alpha_pixels": 194
+    },
+    "right-lower-lid": {
+      "core_pixels": 5,
+      "soft_alpha_pixels": 50
+    }
+  },
+  "validation": {
+    "reference_visible_rgba_exact": true,
+    "reference_layer_count": 16,
+    "working_layer_count": 11,
+    "preview_exterior_rgba_exact": true,
+    "iris_visible_rgba_preserved": true
+  },
+  "remaining": [
+    "Painted iris underpaint needs final eyelid/overlap acceptance; it is not automatically a finished moving eye.",
+    "Sclera and forehead are painted candidate surfaces, not final production mattes.",
+    "Original fringe/occlusion still needs precise alpha extraction.",
+    "Matte unmix uses an estimated skin background and needs visual approval.",
+    "Working group is a material collection, not an assembled replacement face or rig."
+  ]
+}

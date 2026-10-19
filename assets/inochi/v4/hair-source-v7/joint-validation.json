@@ -1,0 +1,117 @@
+{
+  "stage": "original_both_bows_and_static_foreground_hair_source_review",
+  "left_right_bow_parameter_cases": [
+    [
+      -5,
+      -4
+    ],
+    [
+      -5,
+      -2
+    ],
+    [
+      -5,
+      0
+    ],
+    [
+      -5,
+      2
+    ],
+    [
+      -5,
+      4
+    ],
+    [
+      -2,
+      -4
+    ],
+    [
+      -2,
+      -2
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -2,
+      2
+    ],
+    [
+      -2,
+      4
+    ],
+    [
+      0,
+      -4
+    ],
+    [
+      0,
+      -2
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      0,
+      4
+    ],
+    [
+      2,
+      -4
+    ],
+    [
+      2,
+      -2
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      5,
+      -4
+    ],
+    [
+      5,
+      -2
+    ],
+    [
+      5,
+      0
+    ],
+    [
+      5,
+      2
+    ],
+    [
+      5,
+      4
+    ]
+  ],
+  "left_white_curl_core_rgb_exact_pixels": 104,
+  "iris_rgb_exact": true,
+  "right_fine_strand_visible_core_rgb_exact": true,
+  "unrelated_prior_working_visible_rgba_exact": true,
+  "opaque_white_contamination_on_left_bow": 0,
+  "opaque_navy_contamination_on_white_curl": 0,
+  "ora_crc_and_default_source_and_serialized_joint_validated": true,
+  "remaining": [
+    "Long side/back hair silhouettes and hidden repaint",
+    "Final full-hair root and ear overlap",
+    "Face, upright pose and actual rig binding"
+  ]
+}

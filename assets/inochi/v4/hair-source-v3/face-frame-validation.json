@@ -1,0 +1,44 @@
+{
+  "stage": "outer_face_frame_painted_occlusion_static_review",
+  "source_core_rgb_exact_pixels": 3668,
+  "lash_occlusion_painted_pixels": 276,
+  "tested_parameters": [
+    -6,
+    -3,
+    0,
+    3,
+    6
+  ],
+  "original_iris_rgb_unchanged": true,
+  "parts": [
+    {
+      "file": "right-face-frame-working.png",
+      "offset": [
+        528,
+        79
+      ]
+    },
+    {
+      "file": "right-face-frame-hidden-surface.png",
+      "offset": [
+        610,
+        145
+      ]
+    }
+  ],
+  "remaining": [
+    "Crown hidden roots and ear/ahoge boundary",
+    "Outer ribbon-side flick",
+    "Side and back hair",
+    "Actual model binding"
+  ],
+  "stationary_eye_corner_core_rgb_exact": true,
+  "unrelated_visible_source_rgba_exact": true,
+  "isolated_hair_paint_used_only_for_stain_pixels": 155,
+  "exported_ora": {
+    "file": "MewNook-v4-hair-source-v3.ora",
+    "layers": 58,
+    "default_source_visible_rgba_exact": true,
+    "joint_assembly_visible_rgba_matches_checked_neutral": true
+  }
+}

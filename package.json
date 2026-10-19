@@ -10,6 +10,7 @@
     "deploy": "npm run build && wrangler deploy",
     "typecheck": "tsc -b",
     "test:ai": "node --test tests/aiChat.test.mjs",
+    "test:companion": "node --test tests/companionActivity.test.mjs",
     "prepare:inochi": "node scripts/prepare-inochi-test.mjs"
   },
   "dependencies": {
