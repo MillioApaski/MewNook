@@ -77,11 +77,11 @@ body{overflow:hidden}
 .room-stage.has-scene-art:before,.room-stage.has-scene-art:after{display:none}
 .room-stage.has-scene-art > :not(.art-stage){display:none}
 .art-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:max(100vw,177.68vh);height:max(100vh,56.28vw);overflow:hidden;z-index:3;isolation:isolate}
-.art-background{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.art-background{z-index:0;display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
 .art-character{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;border:0;padding:0;z-index:2;background:transparent;cursor:pointer;filter:brightness(.87) saturate(.88);transition:transform .35s}
 .art-character:hover{transform:translateY(-.5%)}
 .art-character img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
-.art-foreground{position:absolute;left:0;top:16.5%;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
+.art-foreground{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
 @media(max-width:680px){.art-stage{width:max(100vw,177.68dvh);height:max(100dvh,56.28vw)}}
 @media(prefers-reduced-motion:reduce){.art-character{transition:none!important}}
 
@@ -94,7 +94,7 @@ body{overflow:hidden}
    Both assets already contain their desired lighting. */
 .art-sunset .art-character,.art-rain .art-character{filter:none}
 .art-sunset .art-foreground,.art-rain .art-foreground{filter:none}
-.art-sunset .art-foreground,.art-rain .art-foreground{top:16.5%}
+
 
 /* Focus illustrations share a normalized transparent portrait canvas. */
 .art-character.focus-art{filter:none}
@@ -163,9 +163,8 @@ body{overflow:hidden}
 .source-character-poster{position:absolute;left:50%;transform:translateX(-50%);max-width:none;pointer-events:none;user-select:none}
 .inochi-demo-layer.ready .source-character-poster{visibility:hidden}
 
-/* The day foreground contains a strip of carpet above the actual desk.
-   Keep that strip behind the source character; preserve the raised desk props
-   outside the portrait area. Coordinates follow the 1672 x 941 room artwork. */
-.source-character.art-day .art-foreground{
-  clip-path:polygon(0 0,16% 0,16% 73.9%,66% 77%,66% 0,100% 0,100% 100%,0 100%);
-}
+/* Explicit paint order: room background < complete character < desk image.
+   The character is never bottom-masked or feathered into the room. */
+.art-character-layer{position:absolute;inset:0;z-index:2;opacity:1;mask:none;-webkit-mask:none;clip-path:none}
+.art-character-layer .inochi-demo-layer,.art-character-layer .inochi-demo-canvas,.art-character-layer .source-character-poster{mask:none;-webkit-mask:none;clip-path:none}
+.art-desk-layer{opacity:1;mask:none;-webkit-mask:none;clip-path:none;transition:none}

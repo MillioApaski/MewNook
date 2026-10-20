@@ -56,6 +56,16 @@ try{
  await fresh.locator('canvas[data-model-revision="source-art-20261020"]').waitFor({timeout:60000})
  await fresh.locator('.art-character.inochi-ready').waitFor();await fresh.waitForTimeout(350);await fresh.screenshot({path:out+'/fresh-install.png'})
  assert.equal(await fresh.locator('canvas').getAttribute('data-model-version'),'v4')
+ const layers=await fresh.locator('.art-stage').evaluate(stage=>[...stage.children].map(e=>({name:e.dataset.roomLayer,z:Number(getComputedStyle(e).zIndex)})))
+ assert.deepEqual(layers,[{name:'background',z:0},{name:'character',z:2},{name:'desk',z:3}])
+ const opacity=await fresh.evaluate(()=>{
+  const desk=document.querySelector('.art-desk-layer'),poster=document.querySelector('.source-character-poster'),c=document.createElement('canvas');c.width=1672;c.height=941;const ctx=c.getContext('2d');ctx.drawImage(desk,0,0);const pixels=ctx.getImageData(0,0,1672,941).data
+  const partial=[600,900].map(x=>{let count=0;for(let y=0;y<941;y++){const a=pixels[(y*1672+x)*4+3];if(a>0&&a<255)count++}return count})
+  c.width=1122;c.height=1402;ctx.drawImage(poster,0,0);const body=ctx.getImageData(0,0,1122,1402).data
+  return{src:desk.currentSrc,partial,body:[820,900,1050,1250].map(y=>body[(y*1122+560)*4+3]),masks:[...document.querySelectorAll('.art-character-layer,.inochi-demo-layer,.inochi-demo-canvas,.source-character-poster')].map(e=>({mask:getComputedStyle(e).maskImage,clip:getComputedStyle(e).clipPath}))}
+ })
+ assert.ok(opacity.src.endsWith('/desk.svg'));assert.ok(opacity.partial.every(n=>n<=2),'desk cutout must have no feather band');assert.ok(opacity.body.every(a=>a>=250)&&Math.max(...opacity.body)-Math.min(...opacity.body)<=2,'original lower body must not fade with height');assert.ok(opacity.masks.every(v=>v.mask==='none'&&v.clip==='none'))
+
  assert.equal(oldPortraitRequested,false,'loading must not fetch the old portrait')
  assert.equal(await fresh.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'hidden')
  assert.equal(await fresh.locator('canvas').evaluate(c=>getComputedStyle(c).visibility),'visible')
@@ -112,6 +122,9 @@ try{
    const timer=document.querySelector('.scene-focus-chip').getBoundingClientRect()
    return{ear:point(670,10),earRight:point(700,100),hands:point(600,830),seat:point(600,930),faceWidth:346*scale,desk:r.y+edge/probe.height*r.height,timer:{left:timer.left,bottom:timer.bottom},scale}
   })
+  if(scene==='day'&&width===2048&&deviceScaleFactor===1){
+   await framed.locator('.art-desk-layer').evaluate(e=>e.style.visibility='hidden');await framed.screenshot({path:out+'/character-no-desk.png'});await framed.locator('.art-desk-layer').evaluate(e=>e.style.visibility='')
+  }
   if(scene==='day'){geometry.deskSeam=await checkDeskSeam(framed,width,geometry.hands.x);geometry.desk=geometry.deskSeam.at(-1).actual;assert.ok(geometry.desk-geometry.hands.y-33*geometry.scale<26,'lower body must meet the desk without a floating gap')}
   assert.ok(geometry.ear.y>=60&&geometry.ear.y<height*.32,'ears must remain visible below the top bar')
   assert.ok(geometry.faceWidth>(width<=680?width*.4:height*.2),'room portrait must stay close to the desk')
@@ -136,5 +149,5 @@ try{
  assert.equal(legacyFrame.scale,.32);assert.ok(Math.abs(legacyFrame.width-.377)<.001);await legacy.close()
  // Blocking both dynamic fallbacks must expose the original PNG instead of an empty room.
  const fallback=await browser.newPage();await fallback.route('**/*.inx*',route=>route.abort());await fallback.goto('http://127.0.0.1:4173/');await fallback.waitForFunction(()=>document.querySelector('canvas')?.dataset.modelState==='error');assert.equal(await fallback.locator('.art-character.inochi-ready').count(),0);assert.equal(await fallback.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'visible');assert.equal(await fallback.locator('.art-character img').evaluate(p=>getComputedStyle(p).visibility),'hidden');await fallback.close()
- assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',loadingPoster:true,noOldPortraitRequest:!oldPortraitRequested,handover,legacyMigration:true,headPat:true,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,framing,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
+ assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',loadingPoster:true,noOldPortraitRequest:!oldPortraitRequested,handover,legacyMigration:true,headPat:true,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,layers,opacity,framing,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
 }finally{await browser.close()}

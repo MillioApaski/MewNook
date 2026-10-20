@@ -96,6 +96,8 @@ jobs:
         run: node scripts/check-companion-chat.mjs
       - name: Verify approved model in the production room
         run: node scripts/check-room-source.mjs
+      - name: Verify existing tabs reload after PWA updates
+        run: node scripts/check-pwa-update.mjs
       - name: Verify source artwork bindings in real Chromium
         run: CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
       - name: Verify standalone v4 action regions and recovery

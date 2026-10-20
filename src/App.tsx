@@ -497,8 +497,9 @@ export default function App() {
 
   return <div className={'immersive-shell accent-' + settings.accent + ' backdrop-' + roomScene}>
     <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
-      {illustratedScene && <div className={'art-stage art-' + illustratedScene + (settings.inochiTestMode && settings.inochiModel==='v4' ? ' source-character' : '')} key={illustratedScene}>
-        <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
+      {illustratedScene && <div className={'art-stage art-' + illustratedScene + (settings.inochiTestMode && settings.inochiModel==='v4' ? ' source-character' : '')} key={illustratedScene} data-composite-revision="desk-layer-v1">
+        <img data-room-layer="background" className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
+        <div className="art-character-layer" data-room-layer="character">
         <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
             src={settings.inochiTestMode && settings.inochiModel==='v4' ? '/inochi2d/v4/poster.png' : activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
@@ -511,7 +512,8 @@ export default function App() {
             activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
-        <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>
+        </div>
+        <img data-room-layer="desk" className="art-foreground art-desk-layer" src={'/assets/rooms/' + illustratedScene + '/desk.svg'} alt="" draggable={false}/>
       </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
       <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
