@@ -1,6 +1,38 @@
 import assert from'node:assert/strict'
 import{chromium}from'playwright-core'
 import{mkdir,writeFile}from'node:fs/promises'
+import{createRequire}from'node:module'
+const{PNG}=createRequire(import.meta.url)('pngjs')
+// A solid underlay exposes the foreground's true CSS occlusion edge in a
+// browser screenshot. Checking the WebP alpha alone missed the carpet strip.
+async function checkDeskSeam(page,width,handX){
+ const stage=await page.locator('.art-stage').boundingBox()
+ const overlay=await page.addStyleTag({content:'.immersive-shell > :not(.room-stage){visibility:hidden!important}'})
+ await page.locator('.art-stage').evaluate(stage=>{
+  const probe=document.createElement('div');probe.id='desk-seam-probe';probe.style.cssText='position:absolute;inset:0;background:#00ff00;z-index:2;pointer-events:none';stage.append(probe)
+ })
+ try{
+  const pixels=PNG.sync.read(await page.screenshot()),ratio=pixels.width/width,rows=[]
+  for(const x of[.25,.35,.5,.58].map(f=>stage.x+stage.width*f).concat(handX)){
+   if(x<1||x>=width-1)continue
+   const sourceX=(x-stage.x)/stage.width*1672
+   // Back edge traced from the original room, independent of the old mask.
+   const expected=stage.y+(686+.0345*sourceX)/941*stage.height
+   const px=Math.round(x*ratio);let edge=Math.max(0,Math.floor((expected-25)*ratio))
+   while(edge<pixels.height){
+    const i=(edge*pixels.width+px)*4
+    if(pixels.data[i]!==0||pixels.data[i+1]!==255||pixels.data[i+2]!==0)break
+    edge++
+   }
+   const actual=edge/ratio
+   assert.ok(Math.abs(actual-expected)<3,'carpet must stay behind the character: '+JSON.stringify({x,actual,expected}))
+   rows.push({x,actual,expected})
+  }
+  return rows
+ }finally{
+  await page.locator('#desk-seam-probe').evaluate(e=>e.remove());await overlay.evaluate(e=>e.remove())
+ }
+}
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader','--use-angle=swiftshader','--enable-webgl']})
 const out=process.env.ROOM_CHECK_OUT||'/tmp/mewnook-source-room';await mkdir(out,{recursive:true});const report=[]
 try{
@@ -78,8 +110,9 @@ try{
    const column=Math.max(0,Math.min(probe.width-1,Math.round((point(600,1000).x-r.x)/r.width*probe.width)))
    let edge=0;while(edge<probe.height&&pixels[(edge*probe.width+column)*4+3]<240)edge++
    const timer=document.querySelector('.scene-focus-chip').getBoundingClientRect()
-   return{ear:point(670,10),earRight:point(700,100),hands:point(600,830),seat:point(600,1000),faceWidth:346*scale,desk:r.y+edge/probe.height*r.height,timer:{left:timer.left,bottom:timer.bottom},scale}
+   return{ear:point(670,10),earRight:point(700,100),hands:point(600,830),seat:point(600,930),faceWidth:346*scale,desk:r.y+edge/probe.height*r.height,timer:{left:timer.left,bottom:timer.bottom},scale}
   })
+  if(scene==='day'){geometry.deskSeam=await checkDeskSeam(framed,width,geometry.hands.x);geometry.desk=geometry.deskSeam.at(-1).actual;assert.ok(geometry.desk-geometry.hands.y-33*geometry.scale<26,'lower body must meet the desk without a floating gap')}
   assert.ok(geometry.ear.y>=60&&geometry.ear.y<height*.32,'ears must remain visible below the top bar')
   assert.ok(geometry.faceWidth>(width<=680?width*.4:height*.2),'room portrait must stay close to the desk')
   assert.ok(geometry.seat.y>=geometry.desk,'the model stool must be occluded by the desk')

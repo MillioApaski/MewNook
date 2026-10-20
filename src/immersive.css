@@ -162,3 +162,10 @@ body{overflow:hidden}
 .source-character .inochi-demo-layer.ready .inochi-demo-canvas{visibility:visible}
 .source-character-poster{position:absolute;left:50%;transform:translateX(-50%);max-width:none;pointer-events:none;user-select:none}
 .inochi-demo-layer.ready .source-character-poster{visibility:hidden}
+
+/* The day foreground contains a strip of carpet above the actual desk.
+   Keep that strip behind the source character; preserve the raised desk props
+   outside the portrait area. Coordinates follow the 1672 x 941 room artwork. */
+.source-character.art-day .art-foreground{
+  clip-path:polygon(0 0,16% 0,16% 73.9%,66% 77%,66% 0,100% 0,100% 100%,0 100%);
+}
