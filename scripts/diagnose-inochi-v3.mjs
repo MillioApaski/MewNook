@@ -2,7 +2,7 @@ import {chromium} from 'playwright-core'
 import {PNG} from 'pngjs'
 import pixelmatch from 'pixelmatch'
 import {mkdir,writeFile} from 'node:fs/promises'
-const browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',
+const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',
   headless:true,args:['--no-sandbox','--disable-dev-shm-usage',
     '--enable-unsafe-swiftshader','--use-angle=swiftshader','--enable-webgl']})
 const page=await browser.newPage({viewport:{width:1100,height:950},deviceScaleFactor:1})
@@ -85,7 +85,7 @@ try{
  await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3')
  await page.locator('#status[data-state=ready]').waitFor({timeout:60000})
  for(const [button,text] of [
-  ['#tap','猫耳抖动中'],['#idle','上眼皮闭合中'],
+  ['#tap','摸头回应中'],['#idle','上眼皮闭合中'],
   ['#chat','正在说话'],['#sleep','困倦半睁眼']
  ]){
    await page.locator(button).click()
