@@ -1,0 +1,594 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "head_pivot": [
+    588,
+    370
+  ],
+  "ears": {
+    "left": {
+      "polygon": [
+        [
+          354,
+          88
+        ],
+        [
+          410,
+          90
+        ],
+        [
+          451,
+          112
+        ],
+        [
+          427,
+          142
+        ],
+        [
+          404,
+          174
+        ],
+        [
+          394,
+          207
+        ],
+        [
+          374,
+          179
+        ],
+        [
+          360,
+          131
+        ]
+      ],
+      "pivot": [
+        410,
+        185
+      ]
+    },
+    "right": {
+      "polygon": [
+        [
+          577,
+          72
+        ],
+        [
+          624,
+          33
+        ],
+        [
+          670,
+          6
+        ],
+        [
+          686,
+          44
+        ],
+        [
+          701,
+          114
+        ],
+        [
+          701,
+          149
+        ],
+        [
+          684,
+          174
+        ],
+        [
+          661,
+          151
+        ],
+        [
+          622,
+          127
+        ]
+      ],
+      "pivot": [
+        667,
+        151
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "right source brow",
+      "file": "part-0.png",
+      "offset": [
+        583,
+        196
+      ],
+      "size": [
+        65,
+        20
+      ],
+      "role": "brow",
+      "head_child": true,
+      "front_order": 0
+    },
+    {
+      "name": "left source brow",
+      "file": "part-1.png",
+      "offset": [
+        474,
+        227
+      ],
+      "size": [
+        61,
+        34
+      ],
+      "role": "brow",
+      "head_child": true,
+      "front_order": 1
+    },
+    {
+      "name": "right source chest lock",
+      "file": "part-2.png",
+      "offset": [
+        636,
+        324
+      ],
+      "size": [
+        83,
+        343
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 2
+    },
+    {
+      "name": "left source chest lock",
+      "file": "part-3.png",
+      "offset": [
+        487,
+        324
+      ],
+      "size": [
+        95,
+        316
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 3
+    },
+    {
+      "name": "stationary original left white curl",
+      "file": "part-4.png",
+      "offset": [
+        397,
+        211
+      ],
+      "size": [
+        24,
+        96
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 4
+    },
+    {
+      "name": "white source flick",
+      "file": "part-5.png",
+      "offset": [
+        684,
+        177
+      ],
+      "size": [
+        62,
+        48
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 5
+    },
+    {
+      "name": "stationary original fine strand",
+      "file": "part-6.png",
+      "offset": [
+        735,
+        215
+      ],
+      "size": [
+        53,
+        136
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 6
+    },
+    {
+      "name": "original ahoge",
+      "file": "part-7.png",
+      "offset": [
+        420,
+        6
+      ],
+      "size": [
+        130,
+        93
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 7
+    },
+    {
+      "name": "pin",
+      "file": "part-8.png",
+      "offset": [
+        614,
+        137
+      ],
+      "size": [
+        56,
+        53
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 8
+    },
+    {
+      "name": "center",
+      "file": "part-9.png",
+      "offset": [
+        493,
+        95
+      ],
+      "size": [
+        106,
+        177
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 9
+    },
+    {
+      "name": "left",
+      "file": "part-10.png",
+      "offset": [
+        464,
+        95
+      ],
+      "size": [
+        59,
+        191
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 10
+    },
+    {
+      "name": "right-inner",
+      "file": "part-11.png",
+      "offset": [
+        528,
+        95
+      ],
+      "size": [
+        125,
+        133
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 11
+    },
+    {
+      "name": "face-frame",
+      "file": "part-12.png",
+      "offset": [
+        528,
+        79
+      ],
+      "size": [
+        156,
+        224
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 12
+    },
+    {
+      "name": "source crown cap",
+      "file": "part-13.png",
+      "offset": [
+        436,
+        50
+      ],
+      "size": [
+        163,
+        113
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 13
+    },
+    {
+      "name": "bow",
+      "file": "part-14.png",
+      "offset": [
+        696,
+        140
+      ],
+      "size": [
+        119,
+        177
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 14
+    },
+    {
+      "name": "original left bow",
+      "file": "part-15.png",
+      "offset": [
+        333,
+        200
+      ],
+      "size": [
+        79,
+        189
+      ],
+      "role": "front-hair",
+      "head_child": true,
+      "front_order": 15
+    },
+    {
+      "name": "right eye slot",
+      "file": "part-16.png",
+      "offset": [
+        583,
+        213
+      ],
+      "size": [
+        87,
+        62
+      ],
+      "role": "eye",
+      "head_child": true,
+      "front_order": 16
+    },
+    {
+      "name": "left eye slot",
+      "file": "part-17.png",
+      "offset": [
+        475,
+        253
+      ],
+      "size": [
+        81,
+        54
+      ],
+      "role": "eye",
+      "head_child": true,
+      "front_order": 17
+    },
+    {
+      "name": "mouth slot",
+      "file": "part-18.png",
+      "offset": [
+        560,
+        294
+      ],
+      "size": [
+        63,
+        47
+      ],
+      "role": "mouth",
+      "head_child": true,
+      "front_order": 18
+    },
+    {
+      "name": "torso clothing and hands",
+      "file": "part-19.png",
+      "offset": [
+        345,
+        375
+      ],
+      "size": [
+        481,
+        488
+      ],
+      "role": "body",
+      "head_child": false,
+      "front_order": 19
+    },
+    {
+      "name": "left resting leg",
+      "file": "part-20.png",
+      "offset": [
+        477,
+        863
+      ],
+      "size": [
+        118,
+        488
+      ],
+      "role": "leg",
+      "head_child": false,
+      "front_order": 20
+    },
+    {
+      "name": "right resting leg",
+      "file": "part-21.png",
+      "offset": [
+        595,
+        863
+      ],
+      "size": [
+        121,
+        488
+      ],
+      "role": "leg",
+      "head_child": false,
+      "front_order": 21
+    },
+    {
+      "name": "face and neck",
+      "file": "part-22.png",
+      "offset": [
+        472,
+        155
+      ],
+      "size": [
+        195,
+        270
+      ],
+      "role": "face",
+      "head_child": true,
+      "front_order": 22
+    },
+    {
+      "name": "right original outer hair",
+      "file": "part-23.png",
+      "offset": [
+        746,
+        334
+      ],
+      "size": [
+        228,
+        668
+      ],
+      "role": "back-hair",
+      "head_child": false,
+      "front_order": 23
+    },
+    {
+      "name": "left original outer hair",
+      "file": "part-24.png",
+      "offset": [
+        139,
+        374
+      ],
+      "size": [
+        298,
+        621
+      ],
+      "role": "back-hair",
+      "head_child": false,
+      "front_order": 24
+    },
+    {
+      "name": "right source connector",
+      "file": "part-25.png",
+      "offset": [
+        629,
+        177
+      ],
+      "size": [
+        146,
+        227
+      ],
+      "role": "connector",
+      "head_child": true,
+      "front_order": 25
+    },
+    {
+      "name": "left source connector",
+      "file": "part-26.png",
+      "offset": [
+        390,
+        201
+      ],
+      "size": [
+        117,
+        208
+      ],
+      "role": "connector",
+      "head_child": true,
+      "front_order": 26
+    },
+    {
+      "name": "right original ear",
+      "file": "part-27.png",
+      "offset": [
+        577,
+        6
+      ],
+      "size": [
+        125,
+        169
+      ],
+      "role": "ear",
+      "head_child": true,
+      "front_order": 27
+    },
+    {
+      "name": "left original ear",
+      "file": "part-28.png",
+      "offset": [
+        354,
+        88
+      ],
+      "size": [
+        98,
+        120
+      ],
+      "role": "ear",
+      "head_child": true,
+      "front_order": 28
+    },
+    {
+      "name": "rear head scaffold",
+      "file": "part-29.png",
+      "offset": [
+        281,
+        0
+      ],
+      "size": [
+        594,
+        435
+      ],
+      "role": "head-rear",
+      "head_child": true,
+      "front_order": 29
+    },
+    {
+      "name": "neck overlap support",
+      "file": "part-30.png",
+      "offset": [
+        511,
+        385
+      ],
+      "size": [
+        130,
+        45
+      ],
+      "role": "neck-support",
+      "head_child": false,
+      "front_order": 30
+    },
+    {
+      "name": "original cat tail",
+      "file": "part-31.png",
+      "offset": [
+        919,
+        460
+      ],
+      "size": [
+        145,
+        407
+      ],
+      "role": "tail",
+      "head_child": false,
+      "front_order": 31
+    },
+    {
+      "name": "chair and background",
+      "file": "part-32.png",
+      "offset": [
+        136,
+        375
+      ],
+      "size": [
+        932,
+        1025
+      ],
+      "role": "background",
+      "head_child": false,
+      "front_order": 32
+    }
+  ],
+  "status": "source assembly, actual rig validation pending"
+}

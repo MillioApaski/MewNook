@@ -1,0 +1,40 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "parts": [
+    {
+      "file": "ribbon-flick-source.png",
+      "offset": [
+        684,
+        177
+      ],
+      "stage": "source_selection_pending_underpaint"
+    }
+  ],
+  "stage": "source_materials_joint_static_review_not_complete_hair",
+  "working_parts": [
+    {
+      "file": "ribbon-flick-working.png",
+      "offset": [
+        684,
+        177
+      ]
+    },
+    {
+      "file": "right-bow-working.png",
+      "offset": [
+        696,
+        140
+      ]
+    },
+    {
+      "file": "fine-strand-working.png",
+      "offset": [
+        735,
+        215
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "canonicalRoute": "/inochi2d-test/smoke",
+  "report": [
+    {
+      "action": "idle",
+      "changedPixels": 861,
+      "resetChangedPixels": 0
+    },
+    {
+      "action": "chat",
+      "changedPixels": 88,
+      "resetChangedPixels": 0
+    },
+    {
+      "action": "sleep",
+      "changedPixels": 894,
+      "resetChangedPixels": 0
+    },
+    {
+      "action": "tap",
+      "changedPixels": 11672,
+      "resetChangedPixels": 0
+    }
+  ],
+  "errors": []
+}

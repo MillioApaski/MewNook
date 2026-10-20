@@ -1,0 +1,27 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "stage": "outer_hair_source_selections",
+  "parts": [
+    {
+      "file": "left-outer-source.png",
+      "offset": [
+        140,
+        375
+      ],
+      "visible_pixels": 71402,
+      "stage": "source_selection_requires_occlusion_review"
+    },
+    {
+      "file": "right-outer-source.png",
+      "offset": [
+        756,
+        335
+      ],
+      "visible_pixels": 64743,
+      "stage": "source_selection_requires_occlusion_review"
+    }
+  ]
+}

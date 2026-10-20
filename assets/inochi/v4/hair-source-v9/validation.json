@@ -1,0 +1,268 @@
+{
+  "stage": "outer_hair_source_static_review_not_complete_head",
+  "registration": {
+    "inliers": 180,
+    "matches": 302,
+    "median_native_error": 0.6763827800750732,
+    "p95_native_error": 1.4625813961029053,
+    "matrix": [
+      [
+        1.0088607356949992,
+        -0.0016194382993626642,
+        -35.152346988798364
+      ],
+      [
+        0.0016194382993626642,
+        1.0088607356949992,
+        -0.9169477932444836
+      ]
+    ]
+  },
+  "source_core_rgb_exact_pixels": {
+    "left": 63689,
+    "right": 57308
+  },
+  "inner_hidden_hair_paint": {
+    "left": {
+      "candidates": [
+        {
+          "method": "preserved outer alpha affine ECC; edited inner strip excluded",
+          "ecc": 0.9760045403816275,
+          "feature_fit_inliers": 5,
+          "feature_fit_not_accepted": true,
+          "matrix": [
+            [
+              0.956057608127594,
+              -0.015998419374227524,
+              24.2900333404541
+            ],
+            [
+              0.005162402056157589,
+              0.9967209696769714,
+              -1.4437731504440308
+            ]
+          ],
+          "input": "inputs/inner-hair-extra-margin-generated.png"
+        },
+        {
+          "method": "preserved outer alpha affine ECC; edited inner strip excluded",
+          "ecc": 0.9880902803817854,
+          "feature_fit_inliers": 10,
+          "feature_fit_not_accepted": true,
+          "matrix": [
+            [
+              1.0108110904693604,
+              0.002217222936451435,
+              -0.8516581654548645
+            ],
+            [
+              -0.00729296775534749,
+              1.0129218101501465,
+              2.7915401458740234
+            ]
+          ],
+          "input": "inputs/insufficient-inner-hair-hidden.png"
+        },
+        {
+          "input": "inputs/lower-hair-clearance-generated.png",
+          "method": "opaque hidden texture plate at fixed source crop; no silhouette replacement",
+          "source_crop": [
+            270,
+            780,
+            970,
+            1060
+          ],
+          "only_fills_pixels_missing_from_prior_hidden_paints": true
+        }
+      ],
+      "required_hidden_pixels": 1275,
+      "required_hidden_opaque_coverage": 1.0
+    },
+    "right": {
+      "candidates": [
+        {
+          "method": "preserved outer alpha affine ECC; edited inner strip excluded",
+          "ecc": 0.990646657238729,
+          "feature_fit_inliers": 8,
+          "feature_fit_not_accepted": true,
+          "matrix": [
+            [
+              0.9726893305778503,
+              -0.0021349634043872356,
+              34.35010528564453
+            ],
+            [
+              0.016996365040540695,
+              0.9987707138061523,
+              -13.495586395263672
+            ]
+          ],
+          "input": "inputs/inner-hair-hidden-generated.png"
+        },
+        {
+          "method": "preserved-region similarity SIFT",
+          "inliers": 15,
+          "matches": 55,
+          "median_native_error": 0.6168222427368164,
+          "p95_native_error": 0.9806621670722961,
+          "matrix": [
+            [
+              1.0034001206722667,
+              -0.007433313070521195,
+              8.421817841905833
+            ],
+            [
+              0.007433313070521195,
+              1.0034001206722667,
+              -0.6198015484998616
+            ]
+          ],
+          "input": "inputs/insufficient-inner-hair-hidden.png"
+        },
+        {
+          "input": "inputs/lower-hair-clearance-generated.png",
+          "method": "opaque hidden texture plate at fixed source crop; no silhouette replacement",
+          "source_crop": [
+            270,
+            780,
+            970,
+            1060
+          ],
+          "only_fills_pixels_missing_from_prior_hidden_paints": true
+        }
+      ],
+      "required_hidden_pixels": 1832,
+      "required_hidden_opaque_coverage": 1.0
+    }
+  },
+  "hidden_motion_clearance_complete": true,
+  "working_parts": [
+    {
+      "file": "left-outer-working.png",
+      "offset": [
+        139,
+        374
+      ]
+    },
+    {
+      "file": "right-outer-working.png",
+      "offset": [
+        746,
+        334
+      ]
+    }
+  ],
+  "left_right_parameter_cases": [
+    [
+      -8,
+      -8
+    ],
+    [
+      -8,
+      -4
+    ],
+    [
+      -8,
+      0
+    ],
+    [
+      -8,
+      4
+    ],
+    [
+      -8,
+      8
+    ],
+    [
+      -4,
+      -8
+    ],
+    [
+      -4,
+      -4
+    ],
+    [
+      -4,
+      0
+    ],
+    [
+      -4,
+      4
+    ],
+    [
+      -4,
+      8
+    ],
+    [
+      0,
+      -8
+    ],
+    [
+      0,
+      -4
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      4
+    ],
+    [
+      0,
+      8
+    ],
+    [
+      4,
+      -8
+    ],
+    [
+      4,
+      -4
+    ],
+    [
+      4,
+      0
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      4,
+      8
+    ],
+    [
+      8,
+      -8
+    ],
+    [
+      8,
+      -4
+    ],
+    [
+      8,
+      0
+    ],
+    [
+      8,
+      4
+    ],
+    [
+      8,
+      8
+    ]
+  ],
+  "foreground_body_rgb_unchanged_in_all_cases": true,
+  "unrelated_prior_working_visible_rgba_exact": true,
+  "default_reference_and_serialized_ora_joint_validated": true,
+  "remaining": [
+    "Review hidden texture continuity and complete hair matte; coverage is not full art approval",
+    "Separate ear-under/head-side to shoulder connector hair panels",
+    "Inspect matte contours and chair/cat-tail boundaries",
+    "Review full hair root and ear overlaps together",
+    "Consolidate remaining fine curls",
+    "Face, upright pose and actual rig/physics"
+  ]
+}

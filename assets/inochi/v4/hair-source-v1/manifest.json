@@ -1,0 +1,42 @@
+{
+  "stage": "original_hairpin_split_static_review",
+  "canvas": [
+    1122,
+    1402
+  ],
+  "parts": [
+    {
+      "file": "hairpin-x.png",
+      "offset": [
+        605,
+        120
+      ],
+      "kind": "original_gold_rgb_with_edge_unmix"
+    },
+    {
+      "file": "hairpin-hidden-hair.png",
+      "offset": [
+        605,
+        120
+      ],
+      "kind": "registered_AI_hidden_hair_underpaint"
+    }
+  ],
+  "validation": {
+    "original_gold_core_pixels_exact": 412,
+    "neutral_clip_rgb_mean_abs_error": 0.002997002997002997,
+    "unrelated_pixels_exact": true,
+    "exported_ora_default_visible_rgba_exact": true,
+    "neutral_whole_cleared_region_rgb_mean_abs_error": 1.0943396226415094,
+    "cleared_white_rim_radius_source_pixels": 5,
+    "light_and_dark_background_review_completed": true
+  },
+  "remaining": [
+    "Full front/side/back hair separation and hidden painting",
+    "Mesh and motion binding"
+  ],
+  "exported_ora": {
+    "file": "MewNook-v4-hair-source.ora",
+    "layers": 39
+  }
+}

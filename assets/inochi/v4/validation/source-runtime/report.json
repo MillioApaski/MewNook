@@ -1,0 +1,885 @@
+{
+  "browser": "153.0.8010.0",
+  "actions": {
+    "idle": {
+      "count": 935,
+      "box": [
+        284,
+        140,
+        370,
+        185
+      ],
+      "values": {
+        "ParamEyeBlinkLeft": 1,
+        "ParamEyeBlinkRight": 1,
+        "ParamMouthOpen": 0,
+        "ParamHeadRoll": 0,
+        "ParamHeadY": 0,
+        "ParamHeadX": 0,
+        "ParamBrowLeft": 0,
+        "ParamBrowRight": 0,
+        "ParamEarLeft": 0,
+        "ParamEarRight": 0,
+        "ParamHairLeft": 0,
+        "ParamHairRight": 0,
+        "ParamHairFront": 0,
+        "ParamSleepy": 0,
+        "ParamSleepyLeft": 0,
+        "ParamSleepyRight": 0
+      },
+      "resetChangedPixels": 0
+    },
+    "chat": {
+      "count": 93,
+      "box": [
+        330,
+        133,
+        355,
+        195
+      ],
+      "values": {
+        "ParamEyeBlinkLeft": 0,
+        "ParamEyeBlinkRight": 0,
+        "ParamMouthOpen": 0.6900290197368815,
+        "ParamHeadRoll": 0,
+        "ParamHeadY": 0,
+        "ParamHeadX": 0,
+        "ParamBrowLeft": -0.2,
+        "ParamBrowRight": -0.2,
+        "ParamEarLeft": 0,
+        "ParamEarRight": 0,
+        "ParamHairLeft": 0,
+        "ParamHairRight": 0,
+        "ParamHairFront": 0,
+        "ParamSleepy": 0,
+        "ParamSleepyLeft": 0,
+        "ParamSleepyRight": 0
+      },
+      "resetChangedPixels": 0
+    },
+    "sleep": {
+      "count": 979,
+      "box": [
+        284,
+        133,
+        370,
+        185
+      ],
+      "values": {
+        "ParamEyeBlinkLeft": 0.7789999999999999,
+        "ParamEyeBlinkRight": 0.7789999999999999,
+        "ParamMouthOpen": 0,
+        "ParamHeadRoll": 0,
+        "ParamHeadY": 0,
+        "ParamHeadX": 0,
+        "ParamBrowLeft": 0.57,
+        "ParamBrowRight": 0.57,
+        "ParamEarLeft": 0,
+        "ParamEarRight": 0,
+        "ParamHairLeft": 0,
+        "ParamHairRight": 0,
+        "ParamHairFront": 0,
+        "ParamSleepy": 0,
+        "ParamSleepyLeft": 0,
+        "ParamSleepyRight": 0
+      },
+      "resetChangedPixels": 0
+    },
+    "tap": {
+      "count": 14747,
+      "box": [
+        122,
+        43,
+        522,
+        518
+      ],
+      "values": {
+        "ParamEyeBlinkLeft": 0.6894399988070802,
+        "ParamEyeBlinkRight": 0.6894399988070802,
+        "ParamMouthOpen": 0,
+        "ParamHeadRoll": 0.7486875447512072,
+        "ParamHeadY": 0.4979288880273357,
+        "ParamHeadX": 0,
+        "ParamBrowLeft": -0.35,
+        "ParamBrowRight": -0.35,
+        "ParamEarLeft": -0.6627425336596676,
+        "ParamEarRight": 0.622447790094049,
+        "ParamHairLeft": -0.14497383311406484,
+        "ParamHairRight": 0.14497383311406484,
+        "ParamHairFront": -0.10148168317984538,
+        "ParamSleepy": 0,
+        "ParamSleepyLeft": 0,
+        "ParamSleepyRight": 0
+      },
+      "resetChangedPixels": 0
+    }
+  },
+  "parameters": {
+    "ParamHeadRoll": {
+      "positive": {
+        "count": 13557,
+        "box": [
+          216,
+          43,
+          448,
+          359
+        ]
+      },
+      "negative": {
+        "count": 13402,
+        "box": [
+          215,
+          41,
+          446,
+          357
+        ]
+      }
+    },
+    "ParamHairLeft": {
+      "positive": {
+        "count": 6548,
+        "box": [
+          123,
+          157,
+          335,
+          516
+        ]
+      },
+      "negative": {
+        "count": 6602,
+        "box": [
+          119,
+          160,
+          334,
+          515
+        ]
+      }
+    },
+    "ParamHairRight": {
+      "positive": {
+        "count": 5322,
+        "box": [
+          359,
+          158,
+          524,
+          518
+        ]
+      },
+      "negative": {
+        "count": 5198,
+        "box": [
+          359,
+          156,
+          521,
+          519
+        ]
+      }
+    },
+    "ParamHairFront": {
+      "positive": {
+        "count": 1300,
+        "box": [
+          216,
+          93,
+          446,
+          220
+        ]
+      },
+      "negative": {
+        "count": 1294,
+        "box": [
+          215,
+          92,
+          446,
+          220
+        ]
+      }
+    },
+    "ParamEarLeft": {
+      "positive": {
+        "count": 218,
+        "box": [
+          228,
+          80,
+          254,
+          123
+        ]
+      },
+      "negative": {
+        "count": 230,
+        "box": [
+          225,
+          81,
+          257,
+          128
+        ]
+      }
+    },
+    "ParamEarRight": {
+      "positive": {
+        "count": 515,
+        "box": [
+          343,
+          43,
+          393,
+          112
+        ]
+      },
+      "negative": {
+        "count": 516,
+        "box": [
+          341,
+          43,
+          392,
+          111
+        ]
+      }
+    },
+    "ParamTailDeform": {
+      "positive": {
+        "count": 795,
+        "box": [
+          497,
+          259,
+          569,
+          425
+        ]
+      },
+      "negative": {
+        "count": 796,
+        "box": [
+          494,
+          258,
+          566,
+          425
+        ]
+      }
+    },
+    "ParamBreath": {
+      "positive": {
+        "count": 5826,
+        "box": [
+          215,
+          43,
+          446,
+          434
+        ]
+      },
+      "negative": {
+        "count": 5911,
+        "box": [
+          216,
+          43,
+          446,
+          440
+        ]
+      }
+    },
+    "ParamBrowLeft": {
+      "positive": {
+        "count": 43,
+        "box": [
+          285,
+          147,
+          309,
+          161
+        ]
+      },
+      "negative": {
+        "count": 44,
+        "box": [
+          285,
+          146,
+          309,
+          160
+        ]
+      }
+    },
+    "ParamBrowRight": {
+      "positive": {
+        "count": 45,
+        "box": [
+          337,
+          133,
+          364,
+          140
+        ]
+      },
+      "negative": {
+        "count": 45,
+        "box": [
+          337,
+          132,
+          364,
+          139
+        ]
+      }
+    },
+    "ParamEyeBlinkLeft": {
+      "intermediateChangedPixels": [
+        0,
+        98,
+        210,
+        274,
+        316,
+        348,
+        368,
+        388,
+        405,
+        425,
+        434,
+        458,
+        469,
+        485,
+        478,
+        478,
+        482
+      ]
+    },
+    "ParamEyeBlinkRight": {
+      "intermediateChangedPixels": [
+        0,
+        73,
+        149,
+        226,
+        249,
+        291,
+        306,
+        336,
+        349,
+        378,
+        392,
+        426,
+        436,
+        464,
+        460,
+        460,
+        453
+      ]
+    },
+    "ParamMouthOpen": {
+      "intermediateChangedPixels": [
+        0,
+        10,
+        26,
+        36,
+        45,
+        53,
+        58,
+        65,
+        71,
+        79,
+        85,
+        90,
+        96,
+        103,
+        109,
+        117,
+        121
+      ]
+    }
+  },
+  "errors": [],
+  "switchReset": {
+    "count": 0,
+    "box": [
+      650,
+      750,
+      0,
+      0
+    ]
+  },
+  "debug": {
+    "debugEnabled": true,
+    "profilerEnabled": false,
+    "mounted": true,
+    "hasRuntime": true,
+    "canvasSize": {
+      "width": 650,
+      "height": 750,
+      "devicePixelRatio": 1
+    },
+    "activeAnimation": null,
+    "cameraTransform": {
+      "x": 0,
+      "y": 350,
+      "scale": 0.95
+    },
+    "blinkLayer": {
+      "mode": "auto",
+      "valueLeft": 0,
+      "valueRight": 0,
+      "manualUntilMs": 0,
+      "activeParameterIds": []
+    },
+    "gazeLayer": {
+      "mode": "auto",
+      "x": 0,
+      "y": 0,
+      "activeParameterIds": []
+    },
+    "lipSyncLayer": {
+      "targetOpen": 0,
+      "currentOpen": 0,
+      "viseme": "neutral",
+      "active": false,
+      "pose": [
+        1,
+        0
+      ]
+    },
+    "expressionLayer": {
+      "name": null,
+      "weight": 0,
+      "values": {},
+      "active": false,
+      "allowMouth": false,
+      "appliedParameterIds": [],
+      "blockedParameterIds": []
+    },
+    "performanceProfiler": {
+      "enabled": false,
+      "frames": 0,
+      "slowFrames": 0,
+      "lastFrameMs": 0,
+      "avgFrameMs": 0,
+      "maxFrameMs": 0,
+      "lastDeltaMs": 0,
+      "avgDeltaMs": 0,
+      "maxDeltaMs": 0,
+      "lastParameterWrites": 0,
+      "avgParameterWrites": 0,
+      "maxParameterWrites": 0,
+      "lastParameterWriteSkips": 0,
+      "avgParameterWriteSkips": 0,
+      "maxParameterWriteSkips": 0,
+      "targetFrameMs": 16.67,
+      "budgetOverrunFrames": 0,
+      "lastFrameBudgetUsage": 0,
+      "avgFrameBudgetUsage": 0,
+      "maxFrameBudgetUsage": 0,
+      "lastMeasuredSectionMs": 0,
+      "avgMeasuredSectionMs": 0,
+      "maxMeasuredSectionMs": 0,
+      "lastUnmeasuredFrameMs": 0,
+      "avgUnmeasuredFrameMs": 0,
+      "maxUnmeasuredFrameMs": 0,
+      "bottleneckSectionName": null,
+      "topSections": [],
+      "runtimeProfile": null,
+      "runtimeTopSections": [],
+      "runtimeBottleneckSectionName": null,
+      "avgRuntimeTotalMs": 0,
+      "maxRuntimeTotalMs": 0,
+      "sections": {}
+    },
+    "canvasDataset": {
+      "inochi2dLowerBodyMotion": "secondary",
+      "inochi2dRuntime": "inox2d-wasm-webgl2",
+      "inochi2dIdleMode": "procedural-blink-secondary-motion",
+      "inochi2dProfiler": "disabled",
+      "inochi2dFrameCount": "3528",
+      "inochi2dCameraScale": "0.9500",
+      "inochi2dCameraX": "0.00",
+      "inochi2dCameraY": "350.00",
+      "inochi2dDevicePixelRatio": "1.000",
+      "inochi2dExpressionLayer": "none",
+      "inochi2dExpressionMouthOwnership": "none",
+      "inochi2dMouthSafety": "idle-parameter-only",
+      "inochi2dActiveLayers": "2",
+      "inochi2dTouchedParameters": "0",
+      "inochi2dAnimationTouchedParameterIds": "",
+      "inochi2dUnresolvedParameterHandles": "",
+      "inochi2dModelStatus": "loaded",
+      "inochi2dMouthShape": "1.000,0.000",
+      "inochi2dLipSyncLayer": "idle",
+      "inochi2dLastFrameTs": "80518.9"
+    },
+    "activeAnimationParameterIds": [],
+    "scalarParameterValues": {
+      "ParamEyeBlinkLeft": 0.6894399988070802,
+      "ParamEyeBlinkRight": 0.6894399988070802,
+      "ParamMouthOpen": 0,
+      "ParamHeadRoll": 0.7486875447512072,
+      "ParamHeadY": 0.4979288880273357,
+      "ParamHeadX": 0,
+      "ParamBrowLeft": -0.35,
+      "ParamBrowRight": -0.35,
+      "ParamEarLeft": -0.6627425336596676,
+      "ParamEarRight": 0.622447790094049,
+      "ParamHairLeft": -0.14497383311406484,
+      "ParamHairRight": 0.14497383311406484,
+      "ParamHairFront": -0.10148168317984538,
+      "ParamSleepy": 0,
+      "ParamSleepyLeft": 0,
+      "ParamSleepyRight": 0,
+      "ParamBreath": 0,
+      "ParamTailDeform": 0
+    },
+    "vectorParameterValues": {},
+    "cameraMotionOffset": {
+      "x": 0,
+      "y": 0,
+      "scale": 0
+    },
+    "nodeMotionOffsets": {},
+    "secondaryNodeMotionOffsets": {
+      "Leg:: Left": {
+        "x": 0.07337597727814292,
+        "y": 0.022249790304212046,
+        "rz": -0.0012822339462194646
+      },
+      "Leg:: Right": {
+        "x": -0.27477799188715507,
+        "y": -0.014303436624136317,
+        "rz": 0.00018367750289757995
+      },
+      "Leg:: Left:: Shadow": {
+        "x": 0.04031256485071872,
+        "y": 0.006357082944060586,
+        "rz": 0
+      },
+      "Leg:: Right:: Shadow": {
+        "x": -0.04031256485071872,
+        "y": -0.004767812208045439,
+        "rz": 0
+      }
+    },
+    "appliedNodeMotionOffsets": {
+      "Leg:: Left": {
+        "x": 0.07337597727814292,
+        "y": 0.022249790304212046,
+        "rz": -0.0012822339462194646
+      },
+      "Leg:: Right": {
+        "x": -0.27477799188715507,
+        "y": -0.014303436624136317,
+        "rz": 0.00018367750289757995
+      },
+      "Leg:: Left:: Shadow": {
+        "x": 0.04031256485071872,
+        "y": 0.006357082944060586,
+        "rz": 0
+      },
+      "Leg:: Right:: Shadow": {
+        "x": -0.04031256485071872,
+        "y": -0.004767812208045439,
+        "rz": 0
+      }
+    },
+    "partOpacityValues": {
+      "right eye slot 0": 1,
+      "right eye slot 125": 1,
+      "right eye slot 250": 1,
+      "right eye slot 375": 1,
+      "right eye slot 500": 1,
+      "right eye slot 625": 1,
+      "right eye slot 750": 0.5155199904566414,
+      "right eye slot 875": 0,
+      "right eye slot 1000": 0,
+      "left eye slot 0": 1,
+      "left eye slot 125": 1,
+      "left eye slot 250": 1,
+      "left eye slot 375": 1,
+      "left eye slot 500": 1,
+      "left eye slot 625": 1,
+      "left eye slot 750": 0.5155199904566414,
+      "left eye slot 875": 0,
+      "left eye slot 1000": 0,
+      "mouth slot 0": 1,
+      "mouth slot 125": 0,
+      "mouth slot 250": 0,
+      "mouth slot 375": 0,
+      "mouth slot 500": 0,
+      "mouth slot 625": 0,
+      "mouth slot 750": 0,
+      "mouth slot 875": 0,
+      "mouth slot 1000": 0
+    },
+    "speechSecondaryMotionDriver": {
+      "open": 0,
+      "impulseX": 0,
+      "impulseY": 0,
+      "active": false
+    },
+    "motionLayers": {
+      "activeLayers": [
+        {
+          "id": "base:user-parameters",
+          "name": "user-parameters",
+          "type": "base",
+          "owner": "base",
+          "priority": 5,
+          "weight": 1,
+          "targetWeight": 1,
+          "fadeInMs": 0,
+          "fadeOutMs": 0,
+          "transitionMs": 0,
+          "interruptible": false,
+          "ownsParameters": [
+            "ParamEyeBlinkLeft",
+            "ParamEyeBlinkRight",
+            "ParamMouthOpen",
+            "ParamHeadRoll",
+            "ParamHeadY",
+            "ParamHeadX",
+            "ParamBrowLeft",
+            "ParamBrowRight",
+            "ParamEarLeft",
+            "ParamEarRight",
+            "ParamHairLeft",
+            "ParamHairRight",
+            "ParamHairFront",
+            "ParamSleepy",
+            "ParamSleepyLeft",
+            "ParamSleepyRight",
+            "ParamBreath",
+            "ParamTailDeform"
+          ],
+          "parameterCount": 18
+        },
+        {
+          "id": "secondary:procedural",
+          "name": "secondary-motion",
+          "type": "secondary",
+          "owner": "secondary",
+          "priority": 15,
+          "weight": 1,
+          "targetWeight": 1,
+          "fadeInMs": 0,
+          "fadeOutMs": 0,
+          "transitionMs": 0,
+          "interruptible": false,
+          "ownsParameters": [
+            "Front Hair:: Right2:: Physics",
+            "Front Hair:: Left2:: Physics",
+            "Front Hair:: Right1:: Physics",
+            "Front Hair:: Left1:: Physics",
+            "Front Hair:: Center:: Physics",
+            "Side Hair:: Left:: Physics",
+            "Side Hair:: Right:: Physics",
+            "Back Side:: Hair:: Left1:: Physics",
+            "Back Side:: Hair:: Left2:: Physics",
+            "Back Side:: Hair:: Left3:: Physics",
+            "Back Side:: Hair:: Right1:: Physics",
+            "Back Side:: Hair:: Right2:: Physics",
+            "Back Side:: Hair:: Right3:: Physics"
+          ],
+          "parameterCount": 13
+        }
+      ],
+      "touchedParameterIds": [],
+      "parameterSources": {
+        "ParamEyeBlinkLeft": "base",
+        "ParamEyeBlinkRight": "base",
+        "ParamMouthOpen": "base",
+        "ParamHeadRoll": "base",
+        "ParamHeadY": "base",
+        "ParamHeadX": "base",
+        "ParamBrowLeft": "base",
+        "ParamBrowRight": "base",
+        "ParamEarLeft": "base",
+        "ParamEarRight": "base",
+        "ParamHairLeft": "base",
+        "ParamHairRight": "base",
+        "ParamHairFront": "base",
+        "ParamSleepy": "base",
+        "ParamSleepyLeft": "base",
+        "ParamSleepyRight": "base",
+        "ParamBreath": "base",
+        "ParamTailDeform": "base"
+      },
+      "parameterOwners": {
+        "ParamEyeBlinkLeft": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamEyeBlinkRight": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamMouthOpen": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHeadRoll": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHeadY": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHeadX": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamBrowLeft": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamBrowRight": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamEarLeft": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamEarRight": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHairLeft": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHairRight": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamHairFront": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamSleepy": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamSleepyLeft": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamSleepyRight": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamBreath": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamTailDeform": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        }
+      },
+      "transition": null,
+      "lastSwitch": null,
+      "lastReset": null,
+      "lastCompletedAnimation": null,
+      "history": []
+    },
+    "frameSnapshot": {
+      "frameId": 3544,
+      "dt": 0.0333000011742115,
+      "physicsRan": true,
+      "baseParamCount": 18,
+      "physicsInputOffsetCount": 0,
+      "postPhysicsParamOverrideCount": 0,
+      "postPhysicsTransformOffsetCount": 0,
+      "nodeCount": 60,
+      "rootDrawableCount": 57,
+      "drawableCount": 57,
+      "skippedNodeCount": 0
+    },
+    "secondaryMotion": {
+      "physics": {
+        "x": 13.704196238971418,
+        "y": -1.3267014197645917
+      },
+      "hair": {
+        "x": 11.535444588826085,
+        "y": -1.1143191075109065
+      },
+      "hairFront": {
+        "x": 2.369471275895339,
+        "y": -0.41527048676931233
+      },
+      "hairSideLeft": {
+        "x": 6.785320806764315,
+        "y": -0.09119104134252598
+      },
+      "hairSideRight": {
+        "x": 5.175134598265177,
+        "y": 0.12939695199500303
+      },
+      "hairBackLeft": {
+        "x": 6.32062663853237,
+        "y": -0.21283949124650964
+      },
+      "hairBackRight": {
+        "x": 8.047923477699918,
+        "y": 0.3194670265307371
+      },
+      "cloth": {
+        "x": 4.0779734428221515,
+        "y": 0.03580176620519191
+      },
+      "hip": {
+        "x": 3.295669329965653,
+        "y": -0.1490926018878612
+      },
+      "leg": {
+        "x": 2.1988671736755667,
+        "y": -0.13315060163118764
+      },
+      "foot": {
+        "x": 1.3738188123535258,
+        "y": -0.044437798342420745
+      },
+      "accessory": {
+        "x": 9.901075028708776,
+        "y": 0.4265698609837611
+      },
+      "tail": {
+        "x": 3.6581177500734983,
+        "y": 0.07562417881762741
+      },
+      "driver": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "idleAnimationNames": [],
+    "idleAnimationProfiles": {},
+    "lastRareIdleGestureTimestampMs": 0,
+    "reactionAnimationGroups": {},
+    "emotionAnimationGroups": {}
+  }
+}

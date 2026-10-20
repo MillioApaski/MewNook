@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><style>body{margin:0;background:#bec9dd}canvas{width:650px;height:750px;display:block}</style><canvas id="puppet"></canvas><script type="module">
+import{createInochi2DController}from'/public/inochi2d-test/runtime/inochi_source_bridge.js';
+import{sampleAction,sourceArtParameters}from'/public/inochi2d-test/actions.js';
+try{
+ const c=await createInochi2DController({wasmUrl:'/public/inochi2d-test/runtime/inochi2d_bg.wasm',debug:true});const canvas=document.querySelector('canvas');await c.mount(canvas);c.resize(650,750,1);await c.setCameraTransform(0,0,.48);await c.loadModel('/assets/inochi/v4/rig/MewNook-v4-source-rig.inx');
+ window.probe={set:async(values)=>{for(const[n,v]of Object.entries(values))await c.setParameter(n,v)},action:async(name,t)=>{const v=sourceArtParameters(sampleAction(name,t));for(const[n,value]of Object.entries(v))await c.setParameter(n,value);return v},camera:(...args)=>c.setCameraTransform(...args),debug:()=>c.getDebugState()};document.body.dataset.ready='yes';
+}catch(e){document.body.dataset.error=e.message;console.error(e)}
+</script>

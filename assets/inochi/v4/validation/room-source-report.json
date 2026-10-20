@@ -1,0 +1,369 @@
+[
+  {
+    "freshDefault": "v4 source art",
+    "loadingPoster": true,
+    "noOldPortraitRequest": true,
+    "handover": {
+      "posterScale": 0.806442179144385,
+      "liveScale": 0.8065,
+      "posterTop": 72,
+      "liveTop": 71.97431999999998
+    },
+    "legacyMigration": true,
+    "headPat": true,
+    "chatAndReset": true,
+    "nightEyelids": true,
+    "optOutPersists": true,
+    "pngFallback": true,
+    "productionModelRequested": true,
+    "layers": [
+      {
+        "name": "background",
+        "z": 0
+      },
+      {
+        "name": "character",
+        "z": 2
+      },
+      {
+        "name": "desk",
+        "z": 3
+      }
+    ],
+    "opacity": {
+      "src": "http://127.0.0.1:4173/assets/rooms/sunset/desk.svg",
+      "partial": [
+        0,
+        0
+      ],
+      "body": [
+        253,
+        253,
+        253,
+        253
+      ],
+      "masks": [
+        {
+          "mask": "none",
+          "clip": "none"
+        },
+        {
+          "mask": "none",
+          "clip": "none"
+        },
+        {
+          "mask": "none",
+          "clip": "none"
+        },
+        {
+          "mask": "none",
+          "clip": "none"
+        }
+      ]
+    },
+    "framing": [
+      {
+        "scene": "day",
+        "width": 2048,
+        "height": 1074,
+        "deviceScaleFactor": 1,
+        "ear": {
+          "x": 814.2720875,
+          "y": 80.67789299999998
+        },
+        "earRight": {
+          "x": 840.2550875,
+          "y": 158.626893
+        },
+        "hands": {
+          "x": 753.6450875,
+          "y": 790.879893
+        },
+        "seat": {
+          "x": 753.6450875,
+          "y": 877.4898929999999
+        },
+        "faceWidth": 299.6706,
+        "desk": 826,
+        "timer": {
+          "left": 900.578125,
+          "bottom": 139
+        },
+        "scale": 0.8661,
+        "deskSeam": [
+          {
+            "x": 512,
+            "actual": 818,
+            "expected": 818.6249735487513
+          },
+          {
+            "x": 716.8,
+            "actual": 825,
+            "expected": 825.6905547589
+          },
+          {
+            "x": 1024,
+            "actual": 835,
+            "expected": 836.2889265741233
+          },
+          {
+            "x": 1187.84,
+            "actual": 841,
+            "expected": 841.9413915422423
+          },
+          {
+            "x": 753.6450875,
+            "actual": 826,
+            "expected": 826.9617068972121
+          }
+        ]
+      },
+      {
+        "scene": "day",
+        "width": 2048,
+        "height": 1074,
+        "deviceScaleFactor": 1.25,
+        "ear": {
+          "x": 814.2786275,
+          "y": 80.6462808
+        },
+        "earRight": {
+          "x": 840.2634275,
+          "y": 158.60068079999996
+        },
+        "hands": {
+          "x": 753.6474275,
+          "y": 790.8974808
+        },
+        "seat": {
+          "x": 753.6474275,
+          "y": 877.5134808
+        },
+        "faceWidth": 299.69136000000003,
+        "desk": 826.4,
+        "timer": {
+          "left": 900.578125,
+          "bottom": 139
+        },
+        "scale": 0.86616,
+        "deskSeam": [
+          {
+            "x": 512,
+            "actual": 817.6,
+            "expected": 818.6249735487513
+          },
+          {
+            "x": 716.8,
+            "actual": 824.8,
+            "expected": 825.6905547589
+          },
+          {
+            "x": 1024,
+            "actual": 835.2,
+            "expected": 836.2889265741233
+          },
+          {
+            "x": 1187.84,
+            "actual": 840.8,
+            "expected": 841.9413915422423
+          },
+          {
+            "x": 753.6474275,
+            "actual": 826.4,
+            "expected": 826.9617876269972
+          }
+        ]
+      },
+      {
+        "scene": "day",
+        "width": 2560,
+        "height": 1080,
+        "deviceScaleFactor": 2,
+        "ear": {
+          "x": 994.762765,
+          "y": 135.2387592
+        },
+        "earRight": {
+          "x": 1020.891565,
+          "y": 213.62515919999998
+        },
+        "hands": {
+          "x": 933.795565,
+          "y": 849.4259592
+        },
+        "seat": {
+          "x": 933.795565,
+          "y": 936.5219592
+        },
+        "faceWidth": 301.35215999999997,
+        "desk": 902,
+        "timer": {
+          "left": 1156.578125,
+          "bottom": 139
+        },
+        "scale": 0.87096,
+        "deskSeam": [
+          {
+            "x": 640,
+            "actual": 892,
+            "expected": 892.0321713768597
+          },
+          {
+            "x": 896,
+            "actual": 900.5,
+            "expected": 900.8641718351487
+          },
+          {
+            "x": 1280,
+            "actual": 914,
+            "expected": 914.1121725225823
+          },
+          {
+            "x": 1484.8,
+            "actual": 921,
+            "expected": 921.1777728892137
+          },
+          {
+            "x": 933.795565,
+            "actual": 902,
+            "expected": 902.16811889531
+          }
+        ]
+      },
+      {
+        "scene": "day",
+        "width": 390,
+        "height": 844,
+        "deviceScaleFactor": 2,
+        "ear": {
+          "x": 262.1449075,
+          "y": 118.4084875
+        },
+        "earRight": {
+          "x": 280.62730750000003,
+          "y": 173.85568750000002
+        },
+        "hands": {
+          "x": 219.0193075,
+          "y": 623.5940875
+        },
+        "seat": {
+          "x": 219.0193075,
+          "y": 685.2020875000001
+        },
+        "faceWidth": 213.16368,
+        "desk": 641.5,
+        "timer": {
+          "left": 100.5234375,
+          "bottom": 103
+        },
+        "scale": 0.61608,
+        "deskSeam": [
+          {
+            "x": 195,
+            "actual": 641,
+            "expected": 641.1547800212539
+          },
+          {
+            "x": 314.9687499999999,
+            "actual": 645,
+            "expected": 645.2938062486716
+          },
+          {
+            "x": 219.0193075,
+            "actual": 641.5,
+            "expected": 641.9834670227182
+          }
+        ]
+      },
+      {
+        "scene": "rain",
+        "width": 1440,
+        "height": 1000,
+        "deviceScaleFactor": 1,
+        "ear": {
+          "x": 544.049125,
+          "y": 80.03931999999998
+        },
+        "earRight": {
+          "x": 568.2441249999999,
+          "y": 152.62431999999995
+        },
+        "hands": {
+          "x": 487.594125,
+          "y": 741.36932
+        },
+        "seat": {
+          "x": 487.594125,
+          "y": 822.01932
+        },
+        "faceWidth": 279.049,
+        "desk": 768.3315621679064,
+        "timer": {
+          "left": 596.578125,
+          "bottom": 139
+        },
+        "scale": 0.8065
+      },
+      {
+        "scene": "sunset",
+        "width": 1440,
+        "height": 1000,
+        "deviceScaleFactor": 1,
+        "ear": {
+          "x": 544.049125,
+          "y": 80.03931999999998
+        },
+        "earRight": {
+          "x": 568.2441249999999,
+          "y": 152.62431999999995
+        },
+        "hands": {
+          "x": 487.594125,
+          "y": 741.36932
+        },
+        "seat": {
+          "x": 487.594125,
+          "y": 822.01932
+        },
+        "faceWidth": 279.049,
+        "desk": 763.0180658873538,
+        "timer": {
+          "left": 596.578125,
+          "bottom": 139
+        },
+        "scale": 0.8065
+      },
+      {
+        "scene": "night",
+        "width": 1440,
+        "height": 1000,
+        "deviceScaleFactor": 1,
+        "ear": {
+          "x": 544.049125,
+          "y": 80.03931999999998
+        },
+        "earRight": {
+          "x": 568.2441249999999,
+          "y": 152.62431999999995
+        },
+        "hands": {
+          "x": 487.594125,
+          "y": 741.36932
+        },
+        "seat": {
+          "x": 487.594125,
+          "y": 822.01932
+        },
+        "faceWidth": 279.049,
+        "desk": 717.3219978746015,
+        "timer": {
+          "left": 596.578125,
+          "bottom": 139
+        },
+        "scale": 0.8065
+      }
+    ],
+    "errors": []
+  }
+]

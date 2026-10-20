@@ -122,8 +122,10 @@ npm run deploy
 
 现在使用 `scripts/mewnook_eye_art.py` 为歪头的左右眼分别构建收窄的上眼皮遮挡和细眼线，避免旧版本大椭圆肤色块盖住刘海与眉毛。模型动画及网页缓存版本已同步更新；浏览器自动化额外保存睁眼、困倦半闭眼、完全闭眼的独立截图进行回归。素材仍属于程序辅助绘制的工程版本。
 
-### v4 正坐姿模型：主页面可选实验入口
+### 正式房间动态角色
 
-进入「设置 → 虚拟房间 → Inochi2D 实验模式」，可选择 **v3 旧斜头**或 **v4 正坐姿（实验）**。已有用户默认仍为 v3；切换模型会重新初始化渲染器。v4 加载失败依次回退 v3 / v2，所有模型失败则保持 PNG 立绘。
+正式房间默认展示已验收的原画正坐姿模型，支持自然眨眼、聊天口型、夜间困倦、摸头时的头部/头发/猫耳联动，以及呼吸和尾巴动作。新台词短暂驱动口型，查看聊天记录或等待 API 不会持续张嘴。
 
-v4 使用仓库已入库的 `assets/inochi/v4/source/pose_reference.png`，通过 `scripts/build-mewnook-v4.py` 和 `scripts/upgrade-mewnook-v4.py` 生成 `MewNook-v4.inx`。包含独立左右困倦眼皮、左右猫耳与发尾网格、尾巴变形、呼吸和 A/B 口型。**这是程序辅助的工程模型，不是已经手工补画完整遮挡层、具备 Inochi Creator 原生可编辑项目的正式美术模型。**
+已有安装首次升级到此版本时启用新模型；之后保留用户选择。可在「设置 → 动态角色」关闭动画、调整角色大小或选择旧版外观。无法加载时依次回退旧模型和静态立绘。桌面与手机分别按可见区域取景。
+
+正式资源为 `public/inochi2d/v4/MewNook.inx`，与独立动作页 `/inochi2d-test/smoke?model=v4` 的原画版本一致。构建脚本为 `scripts/build-mewnook-v4-source-rig.py`，源 PNG/OpenRaster 位于 `assets/inochi/v4/scene-source-v1`、`face-source-v6` 和 `face-source-v7`。动作范围和源工程说明见 [v4 修复清单](docs/V4_REPAIR_TODO.md)。

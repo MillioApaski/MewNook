@@ -77,11 +77,11 @@ body{overflow:hidden}
 .room-stage.has-scene-art:before,.room-stage.has-scene-art:after{display:none}
 .room-stage.has-scene-art > :not(.art-stage){display:none}
 .art-stage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:max(100vw,177.68vh);height:max(100vh,56.28vw);overflow:hidden;z-index:3;isolation:isolate}
-.art-background{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.art-background{z-index:0;display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
 .art-character{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;border:0;padding:0;z-index:2;background:transparent;cursor:pointer;filter:brightness(.87) saturate(.88);transition:transform .35s}
 .art-character:hover{transform:translateY(-.5%)}
 .art-character img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
-.art-foreground{position:absolute;left:0;top:16.5%;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
+.art-foreground{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;pointer-events:none;user-select:none;filter:brightness(.77) saturate(.76)}
 @media(max-width:680px){.art-stage{width:max(100vw,177.68dvh);height:max(100dvh,56.28vw)}}
 @media(prefers-reduced-motion:reduce){.art-character{transition:none!important}}
 
@@ -94,7 +94,7 @@ body{overflow:hidden}
    Both assets already contain their desired lighting. */
 .art-sunset .art-character,.art-rain .art-character{filter:none}
 .art-sunset .art-foreground,.art-rain .art-foreground{filter:none}
-.art-sunset .art-foreground,.art-rain .art-foreground{top:16.5%}
+
 
 /* Focus illustrations share a normalized transparent portrait canvas. */
 .art-character.focus-art{filter:none}
@@ -128,8 +128,7 @@ body{overflow:hidden}
 .ai-persona-foot .light-button{flex-shrink:0;padding:5px 8px;font-size:10px}
 @media(prefers-reduced-motion:reduce){.vn-stream-cursor{animation:none}}
 
-/* Inochi2D test rig is composited in the exact same character anchor as PNG.
-   Keep the original invisible button to handle tapping and preserve fallback. */
+/* Keep the invisible portrait button for tapping and static fallback. */
 .inochi-demo-layer{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;z-index:2;
   pointer-events:none;opacity:0;transition:opacity .3s ease}
 .inochi-demo-layer.ready{opacity:1}
@@ -140,3 +139,32 @@ body{overflow:hidden}
 .inochi-test-settings input[type="range"]{width:100%;accent-color:#8798c4}
 .inochi-test-settings .footnote{line-height:1.55;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.inochi-demo-layer{transition:none}}
+
+/* The source rig includes a full stool and legs. Its room frame shows the
+   upper body at the original seat, with the desk occluding the lower body.
+   The wider canvas leaves room for hair and tail at this closer camera. */
+.source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .inochi-demo-layer,
+.source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character{
+  left:7.65%;top:0;width:55%;height:100%;
+}
+/* Center the portrait in the visible phone crop of the wider room art. */
+@media(max-width:680px){
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .inochi-demo-layer,
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character{
+    left:50%;top:6%;width:100vw;height:73%;transform:translateX(-50%);
+  }
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character:hover{transform:translateX(-50%)}
+}
+
+.source-character .inochi-demo-layer{opacity:1;transition:none}
+.source-character .art-character img{visibility:hidden}
+.source-character .inochi-demo-canvas{visibility:hidden}
+.source-character .inochi-demo-layer.ready .inochi-demo-canvas{visibility:visible}
+.source-character-poster{position:absolute;left:50%;transform:translateX(-50%);max-width:none;pointer-events:none;user-select:none}
+.inochi-demo-layer.ready .source-character-poster{visibility:hidden}
+
+/* Explicit paint order: room background < complete character < desk image.
+   The character is never bottom-masked or feathered into the room. */
+.art-character-layer{position:absolute;inset:0;z-index:2;opacity:1;mask:none;-webkit-mask:none;clip-path:none}
+.art-character-layer .inochi-demo-layer,.art-character-layer .inochi-demo-canvas,.art-character-layer .source-character-poster{mask:none;-webkit-mask:none;clip-path:none}
+.art-desk-layer{opacity:1;mask:none;-webkit-mask:none;clip-path:none;transition:none}

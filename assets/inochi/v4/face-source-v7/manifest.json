@@ -1,0 +1,29 @@
+{
+  "keys": [
+    0.0,
+    0.125,
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    0.875,
+    1.0
+  ],
+  "mouth_slot_offset": [
+    560,
+    294
+  ],
+  "mouth_slot_size": [
+    63,
+    47
+  ],
+  "neutral_mouth_rgb_exact": true,
+  "painted_mouth_pixels": 486,
+  "editable_material_recomposition_exact": true,
+  "brow_names": [
+    "left",
+    "right"
+  ],
+  "source": "Original visible smile and brows; full registered expression-talking repaint"
+}

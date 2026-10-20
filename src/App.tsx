@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { InochiTestCharacter, type InochiTestStatus } from './inochi/InochiTestCharacter'
+import { SourceCharacterPoster } from './inochi/SourceCharacterPoster'
+import { companionActivity, speechDuration } from './inochi/companionActivity'
 import { boundedOutputTokens, chatContext, requestAI } from './aiChat'
 import { Companion, type Mood } from './Companion'
 import {
@@ -105,6 +107,7 @@ export default function App() {
   const [chatLoading, setChatLoading] = useState(false)
   const [chatError, setChatError] = useState('')
   const [streamingText, setStreamingText] = useState('')
+  const [speechUntil, setSpeechUntil] = useState(0)
   const [memoryLoading, setMemoryLoading] = useState(false)
   const [proactiveState, setProactiveState] = useSavedState<{day:string;count:number;last:number}>('proactiveState',
     {day:localDate(),count:0,last:Date.now()})
@@ -145,6 +148,7 @@ export default function App() {
 
   // The collapsed Galgame line is a temporary notification, not a permanent HUD.
   const showDialogue = (line: string | null = null, durationMs = 6500) => {
+    if (line) setSpeechUntil(Date.now() + speechDuration(line))
     setSceneLine(line)
     setDialogueOffset(0)
     setDialogueTimeoutMs(durationMs)
@@ -160,10 +164,16 @@ export default function App() {
     setUtilityPanel(null)
   }
   const closeChat = () => {
+    setSpeechUntil(0)
     setChatExpanded(false)
     setDialogueVisible(false)
     setMoodOverride(null)
   }
+  useEffect(() => {
+    if (!speechUntil) return
+    const timeout = window.setTimeout(() => setSpeechUntil(0), Math.max(0, speechUntil-Date.now()))
+    return () => window.clearTimeout(timeout)
+  }, [speechUntil])
   useEffect(() => {
     if (!dialogueVisible || chatExpanded) return
     const timeout = window.setTimeout(() => setDialogueVisible(false), dialogueTimeoutMs)
@@ -367,7 +377,7 @@ export default function App() {
       setChat(previous => [...previous,{id:uid(),role:'user' as const,content}].slice(-100))
       setChatDraft('')
     }
-    setChatError('');setStreamingText('');setDialogueOffset(0)
+    setChatError('');setStreamingText('');setSpeechUntil(0);setDialogueOffset(0)
     setMoodOverride('chat')
     setDialogueVisible(true)
     if (!aiReady()) {
@@ -387,13 +397,18 @@ export default function App() {
         url:settings.aiUrl, model:settings.aiModel, key,
         signal:controller.signal, maxTokens:settings.aiMaxTokens, streaming:settings.aiStreaming !== false,
         messages:[{role:'system',content:currentSystemPrompt()},...chatContext(history,settings.aiContextTurns)],
-        onDelta:setStreamingText
+        onDelta:text=>{
+          if (controller.signal.aborted) return
+          setStreamingText(text)
+          if (text.trim()) setSpeechUntil(Date.now()+1200)
+        }
       })
       if (controller.signal.aborted) return
       setChat(previous => [...previous,{id:uid(),role:'assistant' as const,content:answer}].slice(-100))
       failedContent.current = null
       showDialogue(answer)
     } catch (error) {
+      setSpeechUntil(0)
       setChatError(controller.signal.aborted ? '已停止生成，可以重试。' :
         error instanceof TypeError ? '网络请求失败：请检查 API、网络及 CORS 设置。' :
         error instanceof Error ? error.message : '请求失败')
@@ -403,7 +418,10 @@ export default function App() {
       setChatLoading(false);setStreamingText('')
     }
   }
-  const stopGeneration = () => requestController.current?.abort()
+  const stopGeneration = () => {
+    setSpeechUntil(0)
+    requestController.current?.abort()
+  }
 
   async function summarizeMemory() {
     if (!aiReady() || requestBusy.current) return
@@ -479,20 +497,23 @@ export default function App() {
 
   return <div className={'immersive-shell accent-' + settings.accent + ' backdrop-' + roomScene}>
     <div className={'room-stage' + (illustratedScene ? ' has-scene-art' : '')} aria-label="沉浸式猫娘工作空间">
-      {illustratedScene && <div className={'art-stage art-' + illustratedScene} key={illustratedScene}>
-        <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
+      {illustratedScene && <div className={'art-stage art-' + illustratedScene + (settings.inochiTestMode && settings.inochiModel==='v4' ? ' source-character' : '')} key={illustratedScene} data-composite-revision="desk-layer-v1">
+        <img data-room-layer="background" className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
+        <div className="art-character-layer" data-room-layer="character">
         <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
-            src={activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
+            src={settings.inochiTestMode && settings.inochiModel==='v4' ? '/inochi2d/v4/poster.png' : activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
             alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
             draggable={false}/>
         </button>
         {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
+          {settings.inochiModel==='v4' && <SourceCharacterPoster scale={settings.inochiScale||0.32}/>}
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
-            activity={chatExpanded?'chat':timer.phase==='focus' && timer.running?'focus':timer.phase!=='focus'?'rest':roomScene==='night'?'sleepy':'idle'}
+            activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
-        <img className="art-foreground" src={'/assets/rooms/' + illustratedScene + '/foreground.webp'} alt="" draggable={false}/>
+        </div>
+        <img data-room-layer="desk" className="art-foreground art-desk-layer" src={'/assets/rooms/' + illustratedScene + '/desk.svg'} alt="" draggable={false}/>
       </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
       <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
@@ -585,18 +606,18 @@ export default function App() {
             <Field label="场景"><select value={settings.scene} onChange={e=>saveSettings({scene:e.target.value as Scene})}>{(Object.keys(sceneName) as Scene[]).map(scene=><option key={scene} value={scene}>{sceneName[scene]}</option>)}</select></Field>
             <Field label="主题配色"><select value={settings.accent} onChange={e=>saveSettings({accent:e.target.value as Settings['accent']})}><option value="blue">雾蓝</option><option value="pink">樱粉</option><option value="lavender">淡紫</option></select></Field>
           </div><div className="inochi-test-settings">
-            <div className="switch-row"><div><b>Inochi2D 实验模式</b><span>用 WebGL2 验证动态角色。默认关闭；v3 是旧斜头工程版，v4 为新正坐姿工程候选（还未完成手工补画）。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
+            <div className="switch-row"><div><b>动态角色</b><span>使用原画正坐姿角色，支持聊天、困倦和摸头回应。关闭后使用静态立绘。</span></div><input type="checkbox" checked={!!settings.inochiTestMode} onChange={e=>{saveSettings({inochiTestMode:e.target.checked});setInochiStatus('off');setInochiError('')}}/></div>
             {settings.inochiTestMode && <>
-              <Field label="实验模型" hint="v4 使用新正坐姿原画，尚属工程候选；切换时重新加载，失败自动回退旧版。">
+              <Field label="角色模型" hint="选择喜欢的角色外观。">
                 <select value={settings.inochiModel === 'v4' ? 'v4' : 'v3'} onChange={e=>{saveSettings({inochiModel:e.target.value === 'v4' ? 'v4' : 'v3'});setInochiStatus('off');setInochiError('')}}>
-                  <option value="v3">v3 · 旧斜头（稳定）</option>
-                  <option value="v4">v4 · 正坐姿（实验）</option>
+                  <option value="v3">旧版斜头角色</option>
+                  <option value="v4">原画正坐姿角色</option>
                 </select>
               </Field>
-              <Field label="测试模型缩放" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
-              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
+              <Field label="角色大小" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
+              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已显示静态立绘' : '等待启动'}</p>
               {inochiError && <p className="error-text">{inochiError}</p>}
-              <p className="footnote">v3 为旧斜头工程模型；v4 使用新的正坐姿原画，已包含眼睛、嘴、猫耳、发尾和尾巴参数，但仍缺少专业手绘遮挡层。加载失败自动回退，静态 PNG 始终保留。<a href="/inochi2d-test/smoke.html" target="_blank" rel="noreferrer">打开独立渲染测试</a> · <a href="https://github.com/Inochi2D/inochi2d" target="_blank" rel="noreferrer">Inochi2D 技术</a></p>
+              <p className="footnote">无法加载动态角色时会自动使用静态立绘。<a href="/inochi2d-test/smoke?model=v4" target="_blank" rel="noreferrer">打开动作测试页</a></p>
             </>}
           </div><p className="footnote">天气数据：<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · 非商业使用请遵守其许可与署名要求。</p></section>
           <section className="panel full-panel"><div className="panel-heading large"><div><span className="section-icon blue"><KeyRound size={20}/></span><strong>自定义 AI API</strong></div><span className="badge">BYOK · 可选</span></div>

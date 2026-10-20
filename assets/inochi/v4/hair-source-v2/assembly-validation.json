@@ -1,0 +1,26 @@
+{
+  "stage": "joint_source_front_fringe_static_check_not_runtime",
+  "horizontal_shifts": [
+    -6,
+    -3,
+    0,
+    3,
+    6
+  ],
+  "validation": {
+    "source_iris_rgb_exact": true,
+    "unrelated_source_rgb_exact": true,
+    "exported_ora_reference_visible_rgba_exact": true,
+    "exported_joint_assembly_visible_rgba_matches_neutral": true
+  },
+  "exported_ora": {
+    "file": "MewNook-v4-front-assembly.ora",
+    "layers": 47
+  },
+  "remaining": [
+    "Crown and outer right lock",
+    "Side/back hair and all hidden sections",
+    "Final brow review",
+    "Actual rig and actions"
+  ]
+}

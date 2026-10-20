@@ -1,0 +1,42 @@
+{
+  "stage": "source_flick_hidden_paint_static_review",
+  "registration": {
+    "method": "preserved-shading translation ECC; feature fit rejected",
+    "ecc": 0.9823837140542685,
+    "translation_native_pixels": [
+      0.21908171474933624,
+      0.03863796964287758
+    ],
+    "matrix": [
+      [
+        1.0,
+        -0.0,
+        2.19081711769104
+      ],
+      [
+        -0.0,
+        1.0,
+        0.3863796889781952
+      ]
+    ]
+  },
+  "source_core_rgb_exact_pixels": 604,
+  "part_offset": [
+    684,
+    177
+  ],
+  "tested_parameters": [
+    -4,
+    -2,
+    0,
+    2,
+    4
+  ],
+  "unrelated_visible_rgba_exact": true,
+  "remaining": [
+    "Inspect navy contamination and old silhouette at displacement",
+    "Separate bow and diagonal fine strand",
+    "Full side and back hair",
+    "Actual rig binding"
+  ]
+}

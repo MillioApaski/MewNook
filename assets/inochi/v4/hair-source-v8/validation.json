@@ -1,0 +1,154 @@
+{
+  "stage": "two_main_front_long_locks_source_static_review",
+  "registration": {
+    "inliers": 144,
+    "matches": 371,
+    "median_native_error": 0.36843329668045044,
+    "p95_native_error": 0.6338011026382446,
+    "matrix": [
+      [
+        1.0018177141370272,
+        -4.6395260420107556e-05,
+        -0.4672288063846523
+      ],
+      [
+        4.6395260420107556e-05,
+        1.0018177141370272,
+        -0.02294198260578818
+      ]
+    ]
+  },
+  "source_core_rgb_exact_pixels": {
+    "left": 13339,
+    "right": 10756
+  },
+  "opaque_navy_cloth_contamination_pixels": 0,
+  "full_rectangular_opaque_underpaint_verified": true,
+  "working_parts": [
+    {
+      "file": "left-lock-working.png",
+      "offset": [
+        487,
+        324
+      ]
+    },
+    {
+      "file": "right-lock-working.png",
+      "offset": [
+        636,
+        324
+      ]
+    }
+  ],
+  "left_right_parameter_cases": [
+    [
+      -6,
+      -6
+    ],
+    [
+      -6,
+      -3
+    ],
+    [
+      -6,
+      0
+    ],
+    [
+      -6,
+      3
+    ],
+    [
+      -6,
+      6
+    ],
+    [
+      -3,
+      -6
+    ],
+    [
+      -3,
+      -3
+    ],
+    [
+      -3,
+      0
+    ],
+    [
+      -3,
+      3
+    ],
+    [
+      -3,
+      6
+    ],
+    [
+      0,
+      -6
+    ],
+    [
+      0,
+      -3
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      0,
+      6
+    ],
+    [
+      3,
+      -6
+    ],
+    [
+      3,
+      -3
+    ],
+    [
+      3,
+      0
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      3,
+      6
+    ],
+    [
+      6,
+      -6
+    ],
+    [
+      6,
+      -3
+    ],
+    [
+      6,
+      0
+    ],
+    [
+      6,
+      3
+    ],
+    [
+      6,
+      6
+    ]
+  ],
+  "unoccluded_original_navy_cloth_core_rgb_exact": true,
+  "unrelated_prior_working_visible_rgba_exact": true,
+  "ora_default_and_joint_validated": true,
+  "remaining": [
+    "Review edges and all original fine curls",
+    "Outer long side/back hair and shoulder occlusion",
+    "Full hair root/ear review",
+    "Face, upright pose and actual rig binding"
+  ]
+}

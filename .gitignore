@@ -8,3 +8,13 @@ dist
 *.tsbuildinfo
 .DS_Store
 .vscode
+
+# Intermediate source-art archives are never deliverables.
+assets/inochi/v4/**/*.building.ora
+
+# Reproducible local source-art previews and intermediate model.
+__pycache__/
+assets/inochi/v4/face-source-v6/preview-*.png
+assets/inochi/v4/face-source-v7/preview-*.png
+assets/inochi/v4/rig/MewNook-v4-source-rig.inx
+assets/inochi/v4/validation/source-runtime/*.png

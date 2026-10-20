@@ -1,0 +1,18 @@
+{
+  "source_crop": [
+    350,
+    175,
+    815,
+    450
+  ],
+  "sheet_size": [
+    1116,
+    660
+  ],
+  "visible_selected_pixels": {
+    "left": 10635,
+    "right": 12446
+  },
+  "selection": "source colour and traced scope, excluding previous working part footprints",
+  "remaining": "Review selection before consuming hidden paint; source only, not rigged"
+}

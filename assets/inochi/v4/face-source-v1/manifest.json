@@ -1,0 +1,481 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "status": "facial_source_prototype_not_a_finished_full_character_rig",
+  "source_sha256": "5c47238062e6b7f99e95c14658d3af87f1a147ada44173375c90a1cf0f479231",
+  "matte_contours": {
+    "eye-left": [
+      [
+        478,
+        278
+      ],
+      [
+        484,
+        267
+      ],
+      [
+        498,
+        258
+      ],
+      [
+        516,
+        256
+      ],
+      [
+        536,
+        261
+      ],
+      [
+        552,
+        273
+      ],
+      [
+        550,
+        284
+      ],
+      [
+        538,
+        296
+      ],
+      [
+        522,
+        303
+      ],
+      [
+        503,
+        302
+      ],
+      [
+        488,
+        295
+      ],
+      [
+        478,
+        286
+      ]
+    ],
+    "eye-right": [
+      [
+        586,
+        246
+      ],
+      [
+        590,
+        233
+      ],
+      [
+        601,
+        224
+      ],
+      [
+        619,
+        216
+      ],
+      [
+        639,
+        218
+      ],
+      [
+        658,
+        228
+      ],
+      [
+        666,
+        234
+      ],
+      [
+        660,
+        248
+      ],
+      [
+        649,
+        263
+      ],
+      [
+        634,
+        271
+      ],
+      [
+        615,
+        270
+      ],
+      [
+        597,
+        260
+      ]
+    ],
+    "brow-left": [
+      [
+        489,
+        247
+      ],
+      [
+        500,
+        238
+      ],
+      [
+        516,
+        231
+      ],
+      [
+        531,
+        226
+      ],
+      [
+        536,
+        230
+      ],
+      [
+        522,
+        235
+      ],
+      [
+        506,
+        241
+      ],
+      [
+        494,
+        251
+      ]
+    ],
+    "brow-right": [
+      [
+        583,
+        213
+      ],
+      [
+        597,
+        203
+      ],
+      [
+        612,
+        198
+      ],
+      [
+        629,
+        197
+      ],
+      [
+        636,
+        201
+      ],
+      [
+        621,
+        202
+      ],
+      [
+        605,
+        207
+      ],
+      [
+        590,
+        217
+      ]
+    ],
+    "mouth-neutral": [
+      [
+        568,
+        306
+      ],
+      [
+        583,
+        304
+      ],
+      [
+        600,
+        300
+      ],
+      [
+        610,
+        307
+      ],
+      [
+        607,
+        316
+      ],
+      [
+        595,
+        323
+      ],
+      [
+        578,
+        325
+      ],
+      [
+        569,
+        319
+      ]
+    ]
+  },
+  "registration": {
+    "skin-underpaint": {
+      "correlation": 0.9980939192299586,
+      "affine": [
+        [
+          1.001164197921753,
+          0.0004302027518860996,
+          -1.4838688373565674
+        ],
+        [
+          4.177349910605699e-05,
+          1.0000128746032715,
+          -0.005476236343383789
+        ]
+      ]
+    },
+    "closed": {
+      "correlation": 0.9981166876051152,
+      "affine": [
+        [
+          1.0004273653030396,
+          -4.977243224857375e-05,
+          -0.10485391318798065
+        ],
+        [
+          3.0036944735911675e-05,
+          0.9999339580535889,
+          0.09716518968343735
+        ]
+      ]
+    },
+    "talking": {
+      "correlation": 0.9976214976903295,
+      "affine": [
+        [
+          1.0001213550567627,
+          -0.00014399649808183312,
+          -0.2725597620010376
+        ],
+        [
+          -7.788249058648944e-05,
+          0.9995208382606506,
+          0.28666388988494873
+        ]
+      ]
+    },
+    "sleepy": {
+      "correlation": 0.9979256815345666,
+      "affine": [
+        [
+          1.000388741493225,
+          0.0003315380890853703,
+          -0.5627399682998657
+        ],
+        [
+          8.517794049112126e-05,
+          1.000149130821228,
+          -0.07085439562797546
+        ]
+      ]
+    }
+  },
+  "parts": [
+    {
+      "file": "original-remainder.png",
+      "offset": [
+        51,
+        0
+      ],
+      "size": [
+        1071,
+        1402
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "skin-underpaint.png",
+      "offset": [
+        478,
+        197
+      ],
+      "size": [
+        189,
+        129
+      ],
+      "kind": "image_edited_missing_skin"
+    },
+    {
+      "file": "left-eye-surround.png",
+      "offset": [
+        478,
+        256
+      ],
+      "size": [
+        75,
+        48
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "left-iris.png",
+      "offset": [
+        509,
+        267
+      ],
+      "size": [
+        35,
+        26
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "left-upper-lashes.png",
+      "offset": [
+        485,
+        260
+      ],
+      "size": [
+        58,
+        30
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "left-lower-lid.png",
+      "offset": [
+        488,
+        276
+      ],
+      "size": [
+        56,
+        23
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "right-eye-surround.png",
+      "offset": [
+        586,
+        216
+      ],
+      "size": [
+        81,
+        56
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "right-iris.png",
+      "offset": [
+        608,
+        235
+      ],
+      "size": [
+        34,
+        32
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "right-upper-lashes.png",
+      "offset": [
+        601,
+        221
+      ],
+      "size": [
+        64,
+        30
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "right-lower-lid.png",
+      "offset": [
+        613,
+        240
+      ],
+      "size": [
+        45,
+        27
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "brow-left.png",
+      "offset": [
+        489,
+        226
+      ],
+      "size": [
+        48,
+        26
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "brow-right.png",
+      "offset": [
+        583,
+        197
+      ],
+      "size": [
+        54,
+        21
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "mouth-neutral.png",
+      "offset": [
+        568,
+        300
+      ],
+      "size": [
+        43,
+        26
+      ],
+      "kind": "original_pixels"
+    },
+    {
+      "file": "paint-closed.png",
+      "offset": [
+        478,
+        216
+      ],
+      "size": [
+        189,
+        88
+      ],
+      "kind": "registered_image_edit_patch"
+    },
+    {
+      "file": "paint-talking.png",
+      "offset": [
+        568,
+        300
+      ],
+      "size": [
+        43,
+        26
+      ],
+      "kind": "registered_image_edit_patch"
+    },
+    {
+      "file": "paint-sleepy.png",
+      "offset": [
+        478,
+        216
+      ],
+      "size": [
+        189,
+        88
+      ],
+      "kind": "registered_image_edit_patch"
+    }
+  ],
+  "notes": [
+    "Source RGB pixels are copied unchanged; selection alpha partitions the facial regions.",
+    "Eye-surround layers contain original sclera plus skin transition pixels, not a fully repainted independent sclera.",
+    "Occluded iris/eyelash regions and individually separated front hair still need repainting.",
+    "Body, hair, ears, clothes, chair and tail remain together in the original remainder layer.",
+    "Generative variants are sampled only inside specified facial mattes; all exterior pixels stay original."
+  ],
+  "validation": {
+    "neutral_visible_rgba_exact": true,
+    "part_count": 16,
+    "expression_exterior_rgba_exact": true,
+    "visible_source_pixels": 740243
+  }
+}

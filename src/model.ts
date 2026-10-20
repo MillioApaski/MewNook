@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DEFAULT_COMPANION_PROMPT } from './companionPersona'
+import {characterDefaults,migrateCharacterSettings} from './inochi/characterSettings'
 
 export type Phase = 'focus' | 'short' | 'long'
 export type View = 'home' | 'tasks' | 'stats' | 'settings'
@@ -13,7 +14,7 @@ export type Settings = {
   aiUrl: string; aiModel: string; aiPersonaPrompt: string; nickname: string; accent: 'blue' | 'pink' | 'lavender';
   aiStreaming: boolean; aiContextTurns: number; aiMaxTokens: number; aiMemory: string;
   proactiveEnabled: boolean; proactiveAI: boolean; proactiveIntervalMinutes: number; proactiveDailyLimit: number;
-  inochiTestMode: boolean; inochiScale: number; inochiModel: 'v3' | 'v4'
+  inochiTestMode: boolean; inochiScale: number; inochiModel: 'v3' | 'v4'; inochiModelRevision: number
 }
 export type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string }
 export type Weather = { temperature: number; code: number; isDay: boolean; name: string }
@@ -24,7 +25,7 @@ export const initialSettings: Settings = {
   aiUrl: '', aiModel: '', aiPersonaPrompt: DEFAULT_COMPANION_PROMPT, nickname: '你', accent: 'blue',
   aiStreaming: true, aiContextTurns: 12, aiMaxTokens: 600, aiMemory: '',
   proactiveEnabled: false, proactiveAI: false, proactiveIntervalMinutes: 60, proactiveDailyLimit: 2,
-  inochiTestMode: false, inochiScale: 0.32, inochiModel: 'v3'
+  ...characterDefaults
 }
 export const initialTimer: Timer = { phase: 'focus', running: false, endsAt: null, remaining: 25 * 60, focusCount: 0, selectedTaskId: null }
 export const uid = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? crypto.randomUUID() : Math.random().toString(36).slice(2)
@@ -46,7 +47,7 @@ export function useSavedState<T>(key: string, initial: T) {
       if (!saved) return initial
       const parsed: unknown = JSON.parse(saved)
       if (Array.isArray(initial)) return (Array.isArray(parsed) ? parsed : initial) as T
-      if (initial && typeof initial === 'object' && parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return { ...initial, ...parsed } as T
+      if (initial && typeof initial === 'object' && parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return { ...initial, ...(key === 'settings' ? migrateCharacterSettings(parsed as Record<string, unknown>) : parsed) } as T
       return (parsed as T) ?? initial
     } catch { return initial }
   })
