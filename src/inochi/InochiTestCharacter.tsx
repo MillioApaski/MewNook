@@ -1,5 +1,6 @@
 import {useEffect, useRef} from 'react'
 import type {CompanionActivity} from './companionActivity'
+import{sourceArtFrame}from'./sourceArtFrame'
 
 /** Shared room renderer for the approved original-art character and legacy fallback. */
 interface SourceAction {
@@ -79,23 +80,9 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
         const userScale=Math.min(.9,Math.max(.1,scaleRef.current))
         const source=loadedModelRef.current==='v4'
         if(source){
-          // Frame the upper body behind the room's desk, rather than fitting
-          // the source sheet's feet and stool into the old portrait slot.
-          const mobile=window.matchMedia('(max-width:680px)').matches
-          const framedHeight=mobile?1000:1240
-          const zoom=userScale/.32
-          const visibleHeight=Math.min(bounds.height,window.innerHeight)
-          const cameraScale=visibleHeight/framedHeight*zoom
-          // Keep the ears clear of the timer as the size slider changes.
-          const top=Math.max(
-            (bounds.height-visibleHeight)/2+visibleHeight*(mobile?.10:.06),
-            (mobile?112:72)-bounds.top
-          )
-          // Other room illustrations place their foreground desk lower.
-          const foreground=canvas.closest('.art-stage')?.querySelector<HTMLElement>('.art-foreground')
-          const cameraY=701+(top+(foreground?.offsetTop??0)-bounds.height/2)/cameraScale
+          const frame=sourceArtFrame(canvas.parentElement??canvas,userScale)
           // WASM camera units are backing pixels; resize uses this DPR too.
-          void controller.setCameraTransform(0,cameraY,cameraScale*ratio)
+          void controller.setCameraTransform(0,frame.cameraY,frame.scale*ratio)
         }else{
           void controller.setCameraTransform(0,120,userScale)
         }
@@ -140,6 +127,9 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
       // MewNook parameters are owned by the rig, not by Aka preset names.
       controllerReadyRef.current=true
+      // Keep the poster until the loaded rig has reached a browser paint.
+      await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))
+      if(disposed)return
       canvas.dataset.modelState='ready'
       onStatus('ready',loadedModel===model?'':model+' 无法加载，已回退 '+loadedModel)
     })().catch(e=>{

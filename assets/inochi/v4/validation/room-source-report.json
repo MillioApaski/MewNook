@@ -1,6 +1,14 @@
 [
   {
     "freshDefault": "v4 source art",
+    "loadingPoster": true,
+    "noOldPortraitRequest": true,
+    "handover": {
+      "posterScale": 0.806442179144385,
+      "liveScale": 0.8065,
+      "posterTop": 72,
+      "liveTop": 71.97431999999998
+    },
     "legacyMigration": true,
     "headPat": true,
     "chatAndReset": true,

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { InochiTestCharacter, type InochiTestStatus } from './inochi/InochiTestCharacter'
+import { SourceCharacterPoster } from './inochi/SourceCharacterPoster'
 import { companionActivity, speechDuration } from './inochi/companionActivity'
 import { boundedOutputTokens, chatContext, requestAI } from './aiChat'
 import { Companion, type Mood } from './Companion'
@@ -500,11 +501,12 @@ export default function App() {
         <img className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
         <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
-            src={activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
+            src={settings.inochiTestMode && settings.inochiModel==='v4' ? '/inochi2d/v4/poster.png' : activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
             alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
             draggable={false}/>
         </button>
         {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
+          {settings.inochiModel==='v4' && <SourceCharacterPoster scale={settings.inochiScale||0.32}/>}
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
             activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
@@ -611,7 +613,7 @@ export default function App() {
                 </select>
               </Field>
               <Field label="角色大小" hint="如果人物太大或太小，可调整取景。"><input type="range" min="0.1" max="0.9" step="0.01" value={settings.inochiScale||0.32} onChange={e=>saveSettings({inochiScale:Number(e.target.value)})}/></Field>
-              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已回退 PNG' : '等待启动'}</p>
+              <p className="footnote">运行状态：{inochiStatus === 'ready' ? '已加载并渲染' : inochiStatus === 'loading' ? '正在加载 MewNook 角色…' : inochiStatus === 'error' ? '加载失败，已显示静态立绘' : '等待启动'}</p>
               {inochiError && <p className="error-text">{inochiError}</p>}
               <p className="footnote">无法加载动态角色时会自动使用静态立绘。<a href="/inochi2d-test/smoke?model=v4" target="_blank" rel="noreferrer">打开动作测试页</a></p>
             </>}

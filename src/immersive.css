@@ -143,15 +143,22 @@ body{overflow:hidden}
 /* The source rig includes a full stool and legs. Its room frame shows the
    upper body at the original seat, with the desk occluding the lower body.
    The wider canvas leaves room for hair and tail at this closer camera. */
-.source-character:has(canvas[data-model-version="v4"]) .inochi-demo-layer,
-.source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready{
+.source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .inochi-demo-layer,
+.source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character{
   left:7.65%;top:0;width:55%;height:100%;
 }
 /* Center the portrait in the visible phone crop of the wider room art. */
 @media(max-width:680px){
-  .source-character:has(canvas[data-model-version="v4"]) .inochi-demo-layer,
-  .source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready{
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .inochi-demo-layer,
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character{
     left:50%;top:6%;width:100vw;height:73%;transform:translateX(-50%);
   }
-  .source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready:hover{transform:translateX(-50%)}
+  .source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character:hover{transform:translateX(-50%)}
 }
+
+.source-character .inochi-demo-layer{opacity:1;transition:none}
+.source-character .art-character img{visibility:hidden}
+.source-character .inochi-demo-canvas{visibility:hidden}
+.source-character .inochi-demo-layer.ready .inochi-demo-canvas{visibility:visible}
+.source-character-poster{position:absolute;left:50%;transform:translateX(-50%);max-width:none;pointer-events:none;user-select:none}
+.inochi-demo-layer.ready .source-character-poster{visibility:hidden}
