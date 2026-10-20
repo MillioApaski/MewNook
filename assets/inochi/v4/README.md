@@ -1,13 +1,19 @@
-# MewNook v4 角色源工程（目标正坐姿）
+# MewNook v4 原画实验模型
 
-当前原参考图仍为交叉腿坐姿，正坐姿和完整可绑定模型尚未完成。已有面部、前发局部拆分与必要补画的 PNG / OpenRaster 工作工程，不能视为正式 rig。
+当前版本已接入独立测试页 `/inochi2d-test/smoke`，默认显示双腿不交叉、双膝靠拢的新坐姿。支持原画眼睑、连续口型、左右眉毛、摸头时的头部/头发/猫耳联动，以及尾巴和呼吸。主界面仍使用原有模型。
 
-- `face-source-v1` 至 `face-source-v4`：面部素材与前发片段迭代，包含未通过或被弃用的候选，按各自说明使用。
-- `hair-source-v1`：发卡阶段源工程，新增原画发卡及其隐藏头发补画。
-- `hair-source-v2`：新增右内侧刘海与隐藏底面，以及三片前发、发卡、眉毛的联合静态检查工程。右外侧发束和发冠仍待分离。
-- `hair-source-v3`：新增右侧脸颊发束、固定眼尾和四片前发联合检查；发冠仍是明确标注未完成的选区草稿，侧发、后发等继续处理。
-- 修复任务和检查结果见仓库 `docs/V4_REPAIR_TODO.md`。全部任务完成后才接入测试页。
+最新源工程：
 
-请阅读 [v4 结构说明](../../../docs/INOCHI_V4_STRUCTURE.md)。此目录不属于 Vite public，不应由网站直接提供源工程。
+- `face-source-v5`：原虹膜、眼白与注视遮罩修复。
+- `face-source-v6`：原睫毛、闭眼补画、九级眼睑关键帧。
+- `face-source-v7`：完整口腔补画、原微笑、左右眉毛和组合表情。
+- `hair-source-v1` 至 `hair-source-v10`：原画发片与必要隐藏区补画；各目录记录对应阶段。
+- `pose-source-v1`：正坐姿补画候选。
+- `scene-source-v1`：最新整身源工程、33 个部件及绑定位置。
+- `validation/source-runtime`：实际 WebGL2 截图与动作/复位检查结果。
 
-所有 left/right 都按**观察者所见画面左右**命名，不按角色本人的左右命名。单张原画不可自动裁剪后冒充有完整遮挡补画的正式 rig。
+生成运行时模型：`python scripts/build-mewnook-v4-source-rig.py`。输出经验证后复制到 `public/inochi2d-test/models/MewNook-v4-review.inx`。测试步骤和范围见 [修复清单](../../../docs/V4_REPAIR_TODO.md)。旧目录包含弃用候选，不应直接混用旧部件。
+
+所有 left/right 均按画面左右命名。OpenRaster/PNG 为可编辑源素材，并非 Inochi Creator 原生工程；当前模型只实现已验证的小幅动作。源工程不发布到网站 public 目录。
+
+AI 辅助生成与维护：GPT-6 Sol。

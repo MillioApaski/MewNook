@@ -4,7 +4,7 @@ import pixelmatch from 'pixelmatch'
 import {mkdir,writeFile} from 'node:fs/promises'
 
 const browser=await chromium.launch({
- executablePath:'/usr/bin/google-chrome',headless:true,
+ executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',headless:true,
  args:['--no-sandbox','--disable-dev-shm-usage','--enable-unsafe-swiftshader','--use-angle=swiftshader','--enable-webgl']
 })
 const page=await browser.newPage({viewport:{width:1100,height:950},deviceScaleFactor:1})
@@ -13,12 +13,12 @@ const params=[
  ['ParamEyeBlinkLeft',25],['ParamEyeBlinkRight',25],
  ['ParamMouthOpen',10],['ParamEarLeft',10],['ParamEarRight',10],
  ['ParamHairLeft',10],['ParamHairRight',10],['ParamTailDeform',10],
- ['ParamSleepyLeft',10],['ParamSleepyRight',10]
+ ['ParamBrowLeft',3],['ParamBrowRight',3],['ParamHeadRoll',50]
 ]
 const results=[]
 try{
  page.on('pageerror',e=>console.log('V4 PAGE ERROR:',e.message))
- await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v4&probe=1')
+ await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke?model=v4&probe=1')
  await page.locator('#status[data-state="ready"]').waitFor({timeout:60000})
  await page.waitForTimeout(400)
  const figure=page.locator('figure')
@@ -46,10 +46,10 @@ try{
 
  // Test the user-facing buttons. Pixel-only parameter checks missed several
  // no-op reactions in the earlier tilted rig.
- await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v4')
+ await page.goto('http://127.0.0.1:4173/inochi2d-test/smoke?model=v4')
  await page.locator('#status[data-state=ready]').waitFor({timeout:60000})
  for(const [button,label,delay] of [
-   ['tap','猫耳抖动中',300],
+   ['tap','摸头回应中',300],
    ['idle','上眼皮闭合中',160],
    ['chat','正在说话',450],
    ['sleep','困倦半睁眼',450]

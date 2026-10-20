@@ -36,9 +36,10 @@ jobs:
           python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
           python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
-          python scripts/build-mewnook-v4-review.py
+          python scripts/build-mewnook-v4-source-rig.py
+          cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
       - name: Standalone action timeline tests
-        run: node --test tests/inochiActions.test.mjs
+        run: node --test tests/inochiActions.test.mjs tests/parameterOpacity.test.mjs
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Companion activity regression tests
@@ -52,7 +53,7 @@ jobs:
           google-chrome --headless=new --no-sandbox --disable-dev-shm-usage \
             --enable-unsafe-swiftshader --use-angle=swiftshader --enable-webgl \
             --virtual-time-budget=25000 --dump-dom \
-            http://127.0.0.1:4173/inochi2d-test/smoke.html \
+            http://127.0.0.1:4173/inochi2d-test/smoke \
             > /tmp/inochi-rendered.html 2> /tmp/inochi-browser.log || true
           if ! grep -q 'data-state="ready"' /tmp/inochi-rendered.html; then
             echo "::error::Inochi2D WebGL2 smoke test did not render the model"
@@ -71,7 +72,7 @@ jobs:
           google-chrome --headless=new --no-sandbox --disable-dev-shm-usage \
             --enable-unsafe-swiftshader --use-angle=swiftshader --enable-webgl \
             --virtual-time-budget=25000 --dump-dom \
-            'http://127.0.0.1:4173/inochi2d-test/smoke.html?model=v3&diagnose=1' \
+            'http://127.0.0.1:4173/inochi2d-test/smoke?model=v3&diagnose=1' \
             > /tmp/inochi-v3-diagnostic.html 2> /tmp/inochi-v3-browser.log || true
           python -c "import re; s=open('/tmp/inochi-v3-diagnostic.html').read(); m=re.search(r'data-diagnostic=\\\"([^\\\"]+)',s); print('V3 DIAGNOSTIC:',m.group(1) if m else 'Missing!'); print('V3 STATUS:',re.findall(r'<span id=\\\"status\\\"[^>]*>[^<]*',s)[:1])"
       - name: Diagnose v3 with real Chrome frame screenshots
@@ -92,6 +93,8 @@ jobs:
         run: node scripts/diagnose-inochi-v4.mjs
       - name: Verify companion chat activity in real Chromium
         run: node scripts/check-companion-chat.mjs
+      - name: Verify source artwork bindings in real Chromium
+        run: CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
       - name: Verify standalone v4 action regions and recovery
         run: node scripts/check-v4-review.mjs
       - name: Upload v4 candidate screenshots and model
@@ -104,6 +107,7 @@ jobs:
             /tmp/v4-motion-report.json
             public/inochi2d-test/models/MewNook-v4.inx
             /tmp/inochi-v4-review
+            assets/inochi/v4/validation/source-runtime
             public/inochi2d-test/models/MewNook-v4-review.inx
           if-no-files-found: ignore
       - name: Save validated standalone candidate on internal PR branch

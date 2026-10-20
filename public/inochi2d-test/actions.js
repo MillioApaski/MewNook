@@ -1,17 +1,38 @@
 // Timeline values shared by the standalone page and deterministic frame tests.
-export const actionDuration={idle:360,tap:2000,chat:5000,sleep:5000}
+export const actionDuration={idle:360,tap:2400,chat:5000,sleep:5000}
 export function sampleAction(action,elapsed){
  const t=Math.max(0,elapsed),done=t>=(actionDuration[action]||0)
- const result={blink:0,mouth:0,sleepy:0,earLeft:0,earRight:0,done}
+ const result={blink:0,mouth:0,sleepy:0,earLeft:0,earRight:0,headRoll:0,headY:0,hair:0,brow:0,done}
  if(done)return result
  if(action==='idle')result.blink=t<120?t/120:t<180?1:1-(t-180)/180
  if(action==='tap'){
-   const envelope=(.25+.75*Math.exp(-t/1100))*Math.min(1,(2000-t)/300)
+   const fade=Math.min(1,t/180,(2400-t)/450)
+   const envelope=(.25+.75*Math.exp(-t/1100))*fade
    result.earLeft=Math.sin(t/170+.8)*envelope
    result.earRight=-Math.sin(t/170+1.25)*envelope
-   result.blink=t<400?Math.sin(Math.PI*t/400)*.75:0
+   result.headRoll=Math.sin(t/430)*.75*fade
+   result.headY=Math.sin(Math.PI*Math.min(t/900,1))*.65*fade
+   result.hair=Math.sin(t/240+.7)*.55*fade
+   result.brow=-.35*fade
+   result.blink=t<900?Math.sin(Math.PI*t/900)*.9:0
  }
- if(action==='chat')result.mouth=(.5+.5*Math.sin(t/115))*.85
- if(action==='sleep')result.sleepy=Math.min(1,t/450,(5000-t)/450)*.95
+ if(action==='chat'){
+   const envelope=Math.min(1,t/160,(5000-t)/250)
+   result.mouth=(.5+.5*Math.sin(t/115))*.85*envelope
+   result.brow=-.2*envelope
+ }
+ if(action==='sleep'){
+   result.sleepy=Math.min(1,t/450,(5000-t)/450)*.95
+   result.brow=result.sleepy*.6
+ }
  return result
+}
+export function sourceArtParameters(state,blink=0,wind=0){
+ const closure=Math.max(blink,state.blink,state.sleepy*.82)
+ return {ParamEyeBlinkLeft:closure,ParamEyeBlinkRight:closure,
+  ParamMouthOpen:state.mouth,ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
+  ParamHeadX:0,ParamBrowLeft:state.brow,ParamBrowRight:state.brow,
+  ParamEarLeft:state.earLeft,ParamEarRight:state.earRight,
+  ParamHairLeft:wind+state.hair,ParamHairRight:wind*.85-state.hair,
+  ParamHairFront:wind*.65+state.hair*.7,ParamSleepy:0,ParamSleepyLeft:0,ParamSleepyRight:0}
 }

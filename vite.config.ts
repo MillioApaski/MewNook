@@ -1,9 +1,28 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+
+// Keep the canonical experimental route available in dev and production preview.
+const standaloneSmokeRoute: Plugin = {
+  name: 'standalone-inochi-smoke-route',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      if (req.url?.split('?')[0] === '/inochi2d-test/smoke') req.url = req.url.replace('/smoke', '/smoke.html')
+      next()
+    })
+  },
+  configurePreviewServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      if (req.url?.split('?')[0] === '/inochi2d-test/smoke') req.url = req.url.replace('/smoke', '/smoke.html')
+      next()
+    })
+  }
+}
+
 export default defineConfig({
   plugins: [
+    standaloneSmokeRoute,
     react(),
     VitePWA({
       registerType: 'autoUpdate',

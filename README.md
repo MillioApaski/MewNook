@@ -129,3 +129,9 @@ npm run deploy
 进入「设置 → 虚拟房间 → Inochi2D 实验模式」，可选择 **v3 旧斜头**或 **v4 正坐姿（实验）**。已有用户默认仍为 v3；切换模型会重新初始化渲染器。v4 加载失败依次回退 v3 / v2，所有模型失败则保持 PNG 立绘。
 
 v4 使用仓库已入库的 `assets/inochi/v4/source/pose_reference.png`，通过 `scripts/build-mewnook-v4.py` 和 `scripts/upgrade-mewnook-v4.py` 生成 `MewNook-v4.inx`。包含独立左右困倦眼皮、左右猫耳与发尾网格、尾巴变形、呼吸和 A/B 口型。**这是程序辅助的工程模型，不是已经手工补画完整遮挡层、具备 Inochi Creator 原生可编辑项目的正式美术模型。**
+
+### v4 原画拆层独立测试（2026-10-20）
+
+访问 **`/inochi2d-test/smoke`**，默认展示新原画实验模型。眨眼使用原睫毛和闭眼补画，口型使用完整口腔补画；困倦复用同一套眼睑，摸头联动头部、头发和猫耳。双腿不交叉的新坐姿已接入此测试页，主界面的 `MewNook-v4.inx` 保持原版本。
+
+原画部件及 OpenRaster 工程位于 `assets/inochi/v4/scene-source-v1`、`face-source-v6` 和 `face-source-v7`。构建脚本为 `scripts/build-mewnook-v4-source-rig.py`；实际 WebGL2 动作、切换及复位证据和范围见 [v4 修复清单](docs/V4_REPAIR_TODO.md)。
