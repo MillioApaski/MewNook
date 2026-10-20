@@ -38,8 +38,9 @@ jobs:
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
           python scripts/build-mewnook-v4-source-rig.py
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
+          cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d/v4/MewNook.inx
       - name: Standalone action timeline tests
-        run: node --test tests/inochiActions.test.mjs tests/parameterOpacity.test.mjs
+        run: node --test tests/inochiActions.test.mjs tests/parameterOpacity.test.mjs tests/characterSettings.test.mjs
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Companion activity regression tests
@@ -93,6 +94,8 @@ jobs:
         run: node scripts/diagnose-inochi-v4.mjs
       - name: Verify companion chat activity in real Chromium
         run: node scripts/check-companion-chat.mjs
+      - name: Verify approved model in the production room
+        run: node scripts/check-room-source.mjs
       - name: Verify source artwork bindings in real Chromium
         run: CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
       - name: Verify standalone v4 action regions and recovery
@@ -107,6 +110,7 @@ jobs:
             /tmp/v4-motion-report.json
             public/inochi2d-test/models/MewNook-v4.inx
             /tmp/inochi-v4-review
+            /tmp/mewnook-source-room
             assets/inochi/v4/validation/source-runtime
             public/inochi2d-test/models/MewNook-v4-review.inx
           if-no-files-found: ignore

@@ -140,3 +140,13 @@ body{overflow:hidden}
 .inochi-test-settings input[type="range"]{width:100%;accent-color:#8798c4}
 .inochi-test-settings .footnote{line-height:1.55;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.inochi-demo-layer{transition:none}}
+
+/* Center the approved character inside the visible phone viewport rather than
+   the much wider, cropped room illustration. ResizeObserver refits the rig. */
+@media(max-width:680px){
+  .source-character .inochi-demo-layer,
+  .source-character .art-character.inochi-ready{
+    left:50%;top:6%;width:100vw;height:73%;transform:translateX(-50%);
+  }
+  .source-character .art-character.inochi-ready:hover{transform:translateX(-50%)}
+}

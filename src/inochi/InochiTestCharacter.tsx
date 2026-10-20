@@ -1,12 +1,15 @@
 import {useEffect, useRef} from 'react'
 import type {CompanionActivity} from './companionActivity'
 
-/**
- * Inochi2D WebGL2 runtime. The browser JS/WASM is third-party licensed;
- * MewNook-v3.inx is our reproducible experimental puppet with validated
- * native per-vertex hair/tail deformation; the original source is still flat
- * artwork, so this is not a finished hand-rigged Inochi Creator model.
- */
+/** Shared room renderer for the approved original-art character and legacy fallback. */
+interface SourceAction {
+  blink:number; mouth:number; sleepy:number; earLeft:number; earRight:number;
+  headRoll:number; headY:number; hair:number; brow:number; done:boolean
+}
+interface SourceActions {
+  sampleAction(action:string,elapsed:number):SourceAction
+  sourceArtParameters(state:SourceAction,blink?:number,wind?:number):Record<string,number>
+}
 interface Controller {
   mount(canvas: HTMLCanvasElement): Promise<void> | void
   loadModel(url:string): Promise<void>
@@ -37,6 +40,11 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
   const namesRef=useRef<string[]>([])
   const firstTouchRef=useRef(touches)
   const tapUntilRef=useRef(0)
+  const tapStartedRef=useRef(0)
+  const actionsRef=useRef<SourceActions|null>(null)
+  const resizeRef=useRef<(()=>void)|null>(null)
+  const scaleRef=useRef(scale)
+  scaleRef.current=scale
   const controllerReadyRef=useRef(false)
   const loadedModelRef=useRef('')
   const manualBlinkUntil=useRef(0)
@@ -48,10 +56,15 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
     if(!canvas)return
     let disposed=false,controller:Controller|null=null,observer:ResizeObserver|null=null
     let resizeHandler:(()=>void)|null=null
+    canvas.dataset.modelState='loading'
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl='/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261020':'/inochi2d-test/runtime/inochi_bridge.js'
+      if(model==='v4'){
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261020'
+        actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
+      }
       const bridge=await import(/* @vite-ignore */ moduleUrl) as Bridge
       if(disposed)return
       controller=await bridge.createInochi2DController({wasmUrl:'/inochi2d-test/runtime/inochi2d_bg.wasm'})
@@ -60,19 +73,24 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       await controller.mount(canvas)
       const resize=()=>{
         if(!canvas.isConnected||!controller)return
-        const bounds=canvas.getBoundingClientRect()
+        const bounds=(canvas.parentElement??canvas).getBoundingClientRect()
         const ratio=Math.min(window.devicePixelRatio||1,1.25)
         void controller.resize(Math.max(1,bounds.width),Math.max(1,bounds.height),ratio)
+        const userScale=Math.min(.9,Math.max(.1,scaleRef.current))
+        const source=loadedModelRef.current==='v4'
+        const fit=Math.min(bounds.width/1122,bounds.height/1402)*.96
+        void controller.setCameraTransform(0,source?0:120,source?fit*(userScale/.32):userScale)
       }
+      resizeRef.current=resize
       resize()
       if(typeof ResizeObserver!=='undefined'){
         observer=new ResizeObserver(resize)
-        observer.observe(canvas)
+        observer.observe(canvas.parentElement??canvas)
       }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d-test/models/MewNook-v4.inx?rig=upright-motion-20261016'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261020'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -93,15 +111,18 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261020':'legacy'
+      resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
       if(namesRef.current.includes('Energetic Sway'))
         await controller.playAnimation?.('Energetic Sway',{loop:true,kind:'idle'})
       // MewNook parameters are owned by the rig, not by Aka preset names.
       controllerReadyRef.current=true
+      canvas.dataset.modelState='ready'
       onStatus('ready',loadedModel===model?'':model+' 无法加载，已回退 '+loadedModel)
     })().catch(e=>{
-      if(!disposed)onStatus('error',e instanceof Error?e.message:String(e))
+      if(!disposed){canvas.dataset.modelState='error';onStatus('error',e instanceof Error?e.message:String(e))}
     })
     return()=>{
       disposed=true
@@ -109,6 +130,10 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       loadedModelRef.current=''
       delete canvas.dataset.modelVersion
       delete canvas.dataset.requestedModel
+      delete canvas.dataset.modelRevision
+      delete canvas.dataset.headPat
+      resizeRef.current=null
+      actionsRef.current=null
       observer?.disconnect()
       if(resizeHandler)window.removeEventListener('resize',resizeHandler)
       if(controllerRef.current===controller)controllerRef.current=null
@@ -117,11 +142,10 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
     }
     // The renderer mounts only once; scale and activity use separate effects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[active,onStatus])
+  },[active,model,onStatus])
 
   useEffect(()=>{
-    const c=controllerRef.current
-    if(c)void c.setCameraTransform(0,120,Math.min(.9,Math.max(.1,scale)))
+    resizeRef.current?.()
   },[scale])
 
   useEffect(()=>{
@@ -135,8 +159,10 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
     if(touches===firstTouchRef.current)return
     firstTouchRef.current=touches
     const c=controllerRef.current
-    if(!c)return
-    tapUntilRef.current=Date.now()+1400
+    if(!c || !controllerReadyRef.current)return
+    tapStartedRef.current=Date.now()
+    tapUntilRef.current=tapStartedRef.current+(loadedModelRef.current==='v4'?2400:1400)
+    if(loadedModelRef.current==='v4')return
     manualBlinkUntil.current=Date.now()+470
     void c.applyInteractionImpulse?.(5,-3)
     const names=namesRef.current
@@ -163,48 +189,55 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       const state=smoothed.current
       state.smile+=((resting||talking?0.65:focused?0.10:0.22)-state.smile)*0.12
       state.sleepy+=((sleepy?0.95:focused?0.12:0)-state.sleepy)*0.12
-      // A subtle A/B mouth cycle fitted to the original tilted smile. The
-      // sleepy mouth is controlled by ParamSleepy instead.
+      // Smooth new-text speech and release the mouth when the reply finishes.
       state.mouth+=((talking?(0.52+0.38*Math.abs(Math.sin(t*4.8))):0)-state.mouth)*0.25
       const set=(name:string,val:number)=>void c.setParameter?.(name,val)
+      if(v4){
+        if(!actionsRef.current)return
+        const actions=actionsRef.current
+        const response=actions.sampleAction(touched?'tap':'none',current-tapStartedRef.current)
+        response.sleepy=state.sleepy
+        response.mouth=state.mouth
+        if(!touched)response.brow=sleepy?.57:talking?-.2:0
+        const motion=focused?.4:sleepy?.3:1
+        const values=actions.sourceArtParameters(response,blink,Math.sin(t*.82)*.2*motion)
+        values.ParamBreath=Math.sin(t*(sleepy?1.25:2))*(focused?.42:.65)
+        values.ParamTailDeform=Math.sin(t*.94+1.7)*.28*motion
+        for(const [id,value] of Object.entries(values))set(id,value)
+        if(canvasRef.current){
+          canvasRef.current.dataset.headPat=touched?'active':'idle'
+          canvasRef.current.dataset.eyeClosure=values.ParamEyeBlinkLeft.toFixed(3)
+          canvasRef.current.dataset.mouthOpen=values.ParamMouthOpen.toFixed(3)
+          canvasRef.current.dataset.headRoll=values.ParamHeadRoll.toFixed(3)
+        }
+        return
+      }
       set('ParamEyeBlinkLeft',blinkValue)
       set('ParamEyeBlinkRight',blinkValue)
       set('ParamBreath',Math.sin(t*(sleepy?1.25:2.0))*(focused?.42:.65))
-      if(!v4){
-        set('ParamBodyY',Math.sin(t*1.0)*.16)
-        set('ParamBodyZ',Math.sin(t*.7)*.12)
-      }
+      set('ParamBodyY',Math.sin(t*1.0)*.16)
+      set('ParamBodyZ',Math.sin(t*.7)*.12)
       // The character was painted with a tilted head. Never simulate a
       // frontal head turn by sliding only the irises.
-      if(!v4){
-        set('ParamHeadX',focused?-.055:Math.sin(t*.42)*.035)
-        set('ParamHeadY',focused?.055:sleepy?.035:Math.sin(t*.34)*.025)
-        set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
-      }
+      set('ParamHeadX',focused?-.055:Math.sin(t*.42)*.035)
+      set('ParamHeadY',focused?.055:sleepy?.035:Math.sin(t*.34)*.025)
+      set('ParamTailSwing',Math.sin(t*(sleepy?.65:1.3))*(focused?.35:.6))
       // Real native Inochi2D per-vertex deform. No CSS animation or
       // transform-position fallback; amplitudes remain deliberately small.
       const motion=focused?.4:sleepy?.3:1
       set('ParamHairLeft',Math.sin(t*.82)*.33*motion)
       set('ParamHairRight',Math.sin(t*.73+1.1)*.29*motion)
-      if(!v4)set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
+      set('ParamHairFront',Math.sin(t*1.07+.5)*.22*motion)
       set('ParamTailDeform',Math.sin(t*.94+1.7)*.36*motion)
       set('ParamEarLeft',touched?.95:Math.sin(t*1.8)*.17)
       set('ParamEarRight',touched?-.95:Math.sin(t*1.7+.4)*.17)
-      if(!v4){
-        set('ParamSmile',state.smile)
-        set('ParamEmbarrassed',touched && !focused?.6:0)
-      }
-      set('ParamSleepy',v4?(sleepy?0.82:0):state.sleepy)
-      if(v4){
-        set('ParamSleepyLeft',state.sleepy)
-        set('ParamSleepyRight',state.sleepy)
-        set('ParamEarLeftTilt',touched?.75:0)
-        set('ParamEarRightTilt',touched?-.75:0)
-      }
+      set('ParamSmile',state.smile)
+      set('ParamEmbarrassed',touched && !focused?.6:0)
+      set('ParamSleepy',state.sleepy)
       set('ParamMouthOpen',state.mouth)
     },70)
     return()=>window.clearInterval(clock)
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'MewNook Inochi2D v4 正坐姿实验角色':'MewNook Inochi2D v3 角色'} />
+  return <canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'正坐姿动态猫娘':'旧版动态猫娘'} />
 }

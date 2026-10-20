@@ -98,7 +98,7 @@ try{
  // Integration test: same v3 rig must load inside the actual MewNook React scene.
  await page.addInitScript(()=>{
    localStorage.setItem('mewnook:settings',JSON.stringify({
-     inochiTestMode:true,inochiScale:0.32,scene:'day',city:''
+     inochiTestMode:true,inochiModel:'v3',inochiModelRevision:1,inochiScale:0.32,scene:'day',city:''
    }))
  })
  await page.goto('http://127.0.0.1:4173/')

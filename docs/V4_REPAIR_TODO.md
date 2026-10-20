@@ -1,6 +1,6 @@
 # v4 修复清单
 
-本轮修复已接入独立测试页 `/inochi2d-test/smoke`，默认 v4。最新实验模型为 `MewNook-v4-review.inx?rig=source-art-20261020`。主界面的旧 v4 模型未替换。
+本轮修复已接入独立测试页 `/inochi2d-test/smoke`，默认 v4。最新实验模型为 `MewNook-v4-review.inx?rig=source-art-20261020`。同一模型现已接入正式房间，运行资源为 `/inochi2d/v4/MewNook.inx`。
 
 - [x] 1. 修复前发断线、黑边和重复眉毛。
 - [x] 2. 拆分前发、侧发、后发、发卡、呆毛、丝带及细发组，补齐当前动作范围的隐藏搭接，复核耳根、胸前、裙边遮挡。
@@ -33,3 +33,10 @@
 先安装 Pillow、NumPy、OpenCV；若需重建源工程，依次执行 `prepare-v4-blink-source.py`、`prepare-v4-mouth-brows.py`、`prepare-v4-upright-scene.py`。普通构建只需 `python scripts/build-mewnook-v4-source-rig.py`，从入库 PNG/manifest 生成模型，不调用生成服务。
 
 源坐标保持 1122×1402；可见原画部件来自原立绘，补画用于被遮挡区域、表情与新坐姿。当前小幅动作已检查，左右腿为静态坐姿层。本轮不包含大幅转头、手臂新动作或 Inochi Creator 原生工程；OpenRaster 与 PNG 保留可编辑源素材。视觉观感仍以测试页供用户审阅为准。
+
+## 正式页面接入
+
+- 默认使用已验收的新模型，旧安装只迁移一次，随后保留用户选择。
+- 正式房间复用独立测试页的原画动作时间线和透明度适配器。
+- 角色按可见容器适配大小；手机端居中取景。
+- `scripts/check-room-source.mjs` 验证首次默认、旧设置迁移、聊天闭嘴、摸头/复位、夜间眼睑、关闭后刷新、重新启用及静态回退，并保存四种场景和小屏截图。

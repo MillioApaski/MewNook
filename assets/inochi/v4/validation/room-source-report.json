@@ -1,0 +1,13 @@
+[
+  {
+    "freshDefault": "v4 source art",
+    "legacyMigration": true,
+    "headPat": true,
+    "chatAndReset": true,
+    "nightEyelids": true,
+    "optOutPersists": true,
+    "pngFallback": true,
+    "productionModelRequested": true,
+    "errors": []
+  }
+]
