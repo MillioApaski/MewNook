@@ -78,15 +78,36 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
         void controller.resize(Math.max(1,bounds.width),Math.max(1,bounds.height),ratio)
         const userScale=Math.min(.9,Math.max(.1,scaleRef.current))
         const source=loadedModelRef.current==='v4'
-        const fit=Math.min(bounds.width/1122,bounds.height/1402)*.96
-        void controller.setCameraTransform(0,source?0:120,source?fit*(userScale/.32):userScale)
+        if(source){
+          // Frame the upper body behind the room's desk, rather than fitting
+          // the source sheet's feet and stool into the old portrait slot.
+          const mobile=window.matchMedia('(max-width:680px)').matches
+          const framedHeight=mobile?1000:1240
+          const zoom=userScale/.32
+          const visibleHeight=Math.min(bounds.height,window.innerHeight)
+          const cameraScale=visibleHeight/framedHeight*zoom
+          // Keep the ears clear of the timer as the size slider changes.
+          const top=Math.max(
+            (bounds.height-visibleHeight)/2+visibleHeight*(mobile?.10:.06),
+            (mobile?112:72)-bounds.top
+          )
+          // Other room illustrations place their foreground desk lower.
+          const foreground=canvas.closest('.art-stage')?.querySelector<HTMLElement>('.art-foreground')
+          const cameraY=701+(top+(foreground?.offsetTop??0)-bounds.height/2)/cameraScale
+          // WASM camera units are backing pixels; resize uses this DPR too.
+          void controller.setCameraTransform(0,cameraY,cameraScale*ratio)
+        }else{
+          void controller.setCameraTransform(0,120,userScale)
+        }
       }
       resizeRef.current=resize
       resize()
       if(typeof ResizeObserver!=='undefined'){
         observer=new ResizeObserver(resize)
         observer.observe(canvas.parentElement??canvas)
-      }else{resizeHandler=resize;window.addEventListener('resize',resizeHandler)}
+      }
+      // The room art can keep its size while an ultrawide viewport changes height.
+      resizeHandler=resize;window.addEventListener('resize',resizeHandler)
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [

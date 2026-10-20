@@ -128,8 +128,7 @@ body{overflow:hidden}
 .ai-persona-foot .light-button{flex-shrink:0;padding:5px 8px;font-size:10px}
 @media(prefers-reduced-motion:reduce){.vn-stream-cursor{animation:none}}
 
-/* Inochi2D test rig is composited in the exact same character anchor as PNG.
-   Keep the original invisible button to handle tapping and preserve fallback. */
+/* Keep the invisible portrait button for tapping and static fallback. */
 .inochi-demo-layer{position:absolute;left:20.3%;top:0;width:37.7%;height:89.3%;z-index:2;
   pointer-events:none;opacity:0;transition:opacity .3s ease}
 .inochi-demo-layer.ready{opacity:1}
@@ -141,12 +140,18 @@ body{overflow:hidden}
 .inochi-test-settings .footnote{line-height:1.55;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.inochi-demo-layer{transition:none}}
 
-/* Center the approved character inside the visible phone viewport rather than
-   the much wider, cropped room illustration. ResizeObserver refits the rig. */
+/* The source rig includes a full stool and legs. Its room frame shows the
+   upper body at the original seat, with the desk occluding the lower body.
+   The wider canvas leaves room for hair and tail at this closer camera. */
+.source-character:has(canvas[data-model-version="v4"]) .inochi-demo-layer,
+.source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready{
+  left:7.65%;top:0;width:55%;height:100%;
+}
+/* Center the portrait in the visible phone crop of the wider room art. */
 @media(max-width:680px){
-  .source-character .inochi-demo-layer,
-  .source-character .art-character.inochi-ready{
+  .source-character:has(canvas[data-model-version="v4"]) .inochi-demo-layer,
+  .source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready{
     left:50%;top:6%;width:100vw;height:73%;transform:translateX(-50%);
   }
-  .source-character .art-character.inochi-ready:hover{transform:translateX(-50%)}
+  .source-character:has(canvas[data-model-version="v4"]) .art-character.inochi-ready:hover{transform:translateX(-50%)}
 }

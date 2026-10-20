@@ -37,7 +37,46 @@ try{
   await page.waitForTimeout(350);await page.screenshot({path:out+'/'+scene+'.png'})
  }
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);const mobileBounds=await page.locator('canvas').boundingBox();console.log('MOBILE BOUNDS',JSON.stringify(mobileBounds));await page.screenshot({path:out+'/mobile.png'});assert.ok(mobileBounds.x>=-1&&mobileBounds.x+mobileBounds.width<=391,'source character canvas must fit mobile viewport')
+ // Check composition in source coordinates, including the actual foreground
+ // alpha edge. A ready canvas alone missed the former full-body/stool framing.
+ const framing=[]
+ for(const [width,height,deviceScaleFactor,scene]of[[2048,1074,1,'day'],[2048,1074,1.25,'day'],[2560,1080,2,'day'],[390,844,2,'day'],[1440,1000,1,'rain'],[1440,1000,1,'sunset'],[1440,1000,1,'night']]){
+  const framed=await browser.newPage({viewport:{width,height},deviceScaleFactor})
+  await framed.addInitScript(scene=>localStorage.setItem('mewnook:settings',JSON.stringify({scene,city:''})),scene)
+  await framed.goto('http://127.0.0.1:4173/');await framed.locator('.art-character.inochi-ready').waitFor({timeout:60000});await framed.waitForTimeout(350)
+  const geometry=await framed.evaluate(()=>{
+   const canvas=document.querySelector('canvas'),b=canvas.getBoundingClientRect(),d=canvas.dataset
+   const scale=Number(d.inochi2dCameraScale)/Number(d.inochi2dDevicePixelRatio),cy=Number(d.inochi2dCameraY)
+   const point=(x,y)=>({x:b.x+b.width/2+(x-561)*scale,y:b.y+b.height/2+(y-701+cy)*scale})
+   const image=document.querySelector('.art-foreground'),r=image.getBoundingClientRect(),probe=document.createElement('canvas');probe.width=image.naturalWidth;probe.height=image.naturalHeight
+   const ctx=probe.getContext('2d');ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,probe.width,probe.height).data
+   const column=Math.max(0,Math.min(probe.width-1,Math.round((point(600,1000).x-r.x)/r.width*probe.width)))
+   let edge=0;while(edge<probe.height&&pixels[(edge*probe.width+column)*4+3]<240)edge++
+   const timer=document.querySelector('.scene-focus-chip').getBoundingClientRect()
+   return{ear:point(670,10),earRight:point(700,100),hands:point(600,830),seat:point(600,1000),faceWidth:346*scale,desk:r.y+edge/probe.height*r.height,timer:{left:timer.left,bottom:timer.bottom},scale}
+  })
+  assert.ok(geometry.ear.y>=60&&geometry.ear.y<height*.32,'ears must remain visible below the top bar')
+  assert.ok(geometry.faceWidth>(width<=680?width*.4:height*.2),'room portrait must stay close to the desk')
+  assert.ok(geometry.seat.y>=geometry.desk,'the model stool must be occluded by the desk')
+  assert.ok(Math.abs(geometry.hands.y-geometry.desk)<height*.14,'hands must sit near the desk edge')
+  assert.ok(width<=680?geometry.ear.y>geometry.timer.bottom:geometry.earRight.x<geometry.timer.left,'timer must not cover the ears')
+  await framed.screenshot({path:out+`/framing-${scene}-${width}-${deviceScaleFactor}.png`});framing.push({scene,width,height,deviceScaleFactor,...geometry})
+  if(width===2560){
+   const before=await framed.locator('canvas').getAttribute('data-inochi2d-camera-scale')
+   await framed.setViewportSize({width,height:900})
+   await framed.waitForFunction(before=>document.querySelector('canvas').dataset.inochi2dCameraScale!==before,before)
+  }
+  await framed.close()
+ }
+ assert.ok(Math.abs(framing[0].scale-framing[1].scale)<.001,'DPR must not change the CSS size of the model')
+ await writeFile(out+'/framing.json',JSON.stringify(framing,null,2))
+ // A source-model download failure must keep the legacy model's old frame.
+ const legacy=await browser.newPage({viewport:{width:1440,height:1000}})
+ await legacy.route('**/inochi2d/v4/MewNook.inx*',route=>route.abort());await legacy.goto('http://127.0.0.1:4173/')
+ await legacy.locator('canvas[data-model-version="v3"]').waitFor({timeout:60000})
+ const legacyFrame=await legacy.locator('canvas').evaluate(c=>({scale:Number(c.dataset.inochi2dCameraScale),width:c.getBoundingClientRect().width/c.closest('.art-stage').getBoundingClientRect().width}))
+ assert.equal(legacyFrame.scale,.32);assert.ok(Math.abs(legacyFrame.width-.377)<.001);await legacy.close()
  // Blocking both dynamic fallbacks must expose the original PNG instead of an empty room.
  const fallback=await browser.newPage();await fallback.route('**/*.inx*',route=>route.abort());await fallback.goto('http://127.0.0.1:4173/');await fallback.waitForFunction(()=>document.querySelector('canvas')?.dataset.modelState==='error');assert.equal(await fallback.locator('.art-character.inochi-ready').count(),0);await fallback.close()
- assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',legacyMigration:true,headPat:true,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
+ assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',legacyMigration:true,headPat:true,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,framing,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
 }finally{await browser.close()}
