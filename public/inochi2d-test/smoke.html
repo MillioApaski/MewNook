@@ -26,10 +26,11 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
  <button id="chat" disabled>聊天表情</button> <button id="sleep" disabled>困倦表情</button> <button id="reset" disabled>恢复待机</button> <button id="closeup" disabled>脸部近看</button>
  <span id="action-label" aria-live="polite"></span>
  <label>缩放 <input id="scale" type="range" min="0.1" max="1.1" step="0.01" value="0.32"/></label></div>
-<p id="details">默认展示 v4 原画实验模型：原画拆层、隐藏区及正坐姿必要补画，使用原睫毛、眉毛和补画口腔素材。可测试眨眼、聊天、困倦、摸头与复位，并切换脸部近看。独立测试使用 Inox2D（BSD-2-Clause），尚未替换主界面模型；可编辑源工程位于仓库 assets/inochi/v4。</p>
+<p id="details">默认展示 v4 原画实验模型：原画拆层、隐藏区及正坐姿必要补画，使用原睫毛、眉毛和补画口腔素材。可测试眨眼、聊天、困倦、摸头与复位，并切换脸部近看。独立测试使用 Inox2D（BSD-2-Clause），已接入主界面；v4 可直接点击头部测试，身体与空白不触发；可编辑源工程位于仓库 assets/inochi/v4。</p>
 </main>
 <script type="module">
 import {sampleAction,sourceArtParameters} from './actions.js'
+import {isHeadHit} from './headHitArea.js'
 const node=document.querySelector('#status')
 const canvas=document.querySelector('#puppet')
 const setStatus=(status,text)=>{node.dataset.state=status;node.textContent=text}
@@ -171,6 +172,17 @@ try {
    action=name;started=performance.now()-elapsed;return frame(performance.now())
  }
  let closeup=false
+ canvas.addEventListener('click',event=>{
+   if(!isV4)return
+   const bounds=canvas.getBoundingClientRect()
+   // Runtime camera uses backing pixels, while pointer events use CSS pixels.
+   const scale=Number(document.querySelector('#scale').value)/(canvas.width/bounds.width)
+   const cameraY=closeup?350:0
+   const top=bounds.height/2+(cameraY-701)*scale
+   if(isHeadHit(event.clientX-bounds.left,event.clientY-bounds.top,{width:bounds.width,scale,top})){
+     startAction('tap','摸头回应中')
+   }
+ })
  document.querySelector('#closeup').onclick=()=>{closeup=!closeup;const scale=closeup?(isV4?.95:.65):(isV4?.46:.32);document.querySelector('#scale').value=String(scale);document.querySelector('#closeup').textContent=closeup?'全身查看':'脸部近看';void controller.setCameraTransform(0,isV4?(closeup?350:0):120,scale)}
  document.querySelector('#scale').oninput=e=>void controller.setCameraTransform(0,isV4?(closeup?350:0):120,Number(e.target.value))
 } catch(e) {

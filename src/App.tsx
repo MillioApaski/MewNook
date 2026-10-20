@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { AmbientEngine, type AmbientKind } from './audio'
 import { InochiTestCharacter, type InochiTestStatus } from './inochi/InochiTestCharacter'
+import { SourceHeadTarget } from './inochi/SourceHeadTarget'
 import { SourceCharacterPoster } from './inochi/SourceCharacterPoster'
 import { companionActivity, speechDuration } from './inochi/companionActivity'
 import { boundedOutputTokens, chatContext, requestAI } from './aiChat'
@@ -500,14 +501,14 @@ export default function App() {
       {illustratedScene && <div className={'art-stage art-' + illustratedScene + (settings.inochiTestMode && settings.inochiModel==='v4' ? ' source-character' : '')} key={illustratedScene} data-composite-revision="desk-layer-v1">
         <img data-room-layer="background" className="art-background" src={'/assets/rooms/' + illustratedScene + '/background.webp'} alt="" draggable={false}/>
         <div className="art-character-layer" data-room-layer="character">
-        <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" onClick={handleCompanionClick}>
+        <button className={'art-character' + (activeArtPose ? ' focus-art' : '') + (settings.inochiTestMode && inochiStatus === 'ready' ? ' inochi-ready' : '')} aria-label="摸摸猫娘的头" tabIndex={settings.inochiTestMode && settings.inochiModel==='v4' ? -1 : 0} onClick={handleCompanionClick}>
           <img key={activeArtPose || illustratedScene}
             src={settings.inochiTestMode && settings.inochiModel==='v4' ? '/inochi2d/v4/poster.png' : activeArtPose ? '/assets/companion/' + activeArtPose + '.webp' : '/assets/rooms/' + illustratedScene + '/character.webp'}
             alt={activeArtPose === 'reading' ? '专注阅读书本的白发蓝瞳猫娘' : activeArtPose === 'typing' ? '专注打字的白发蓝瞳猫娘' : illustratedScene === 'night' ? '夜间在书桌旁打哈欠的白发蓝瞳猫娘' : illustratedScene === 'rain' ? '雨天陪伴工作的白发蓝瞳猫娘' : illustratedScene === 'sunset' ? '黄昏书桌前的白发蓝瞳猫娘' : '白天坐在书桌前微笑的白发蓝瞳猫娘'}
             draggable={false}/>
         </button>
         {settings.inochiTestMode && <div className={'inochi-demo-layer' + (inochiStatus==='ready' ? ' ready' : '')}>
-          {settings.inochiModel==='v4' && <SourceCharacterPoster scale={settings.inochiScale||0.32}/>}
+          {settings.inochiModel==='v4' && <><SourceCharacterPoster scale={settings.inochiScale||0.32}/><SourceHeadTarget scale={settings.inochiScale||0.32} onPat={handleCompanionClick}/></>}
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
             activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
             touches={inochiTouches} onStatus={reportInochiStatus}/>
