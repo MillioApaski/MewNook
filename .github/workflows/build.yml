@@ -40,7 +40,7 @@ jobs:
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d/v4/MewNook.inx
       - name: Standalone action timeline tests
-        run: node --test tests/inochiActions.test.mjs tests/parameterOpacity.test.mjs tests/characterSettings.test.mjs
+        run: node --test tests/*.test.mjs
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Companion activity regression tests
@@ -96,6 +96,8 @@ jobs:
         run: node scripts/check-companion-chat.mjs
       - name: Verify approved model in the production room
         run: node scripts/check-room-source.mjs
+      - name: Verify chat expressions, mobile budget and offline cache
+        run: node scripts/check-chat-performance.mjs
       - name: Verify existing tabs reload after PWA updates
         run: node scripts/check-pwa-update.mjs
       - name: Verify source artwork bindings in real Chromium

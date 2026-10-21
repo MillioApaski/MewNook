@@ -26,10 +26,12 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
  <button id="chat" disabled>聊天表情</button> <button id="sleep" disabled>困倦表情</button> <button id="reset" disabled>恢复待机</button> <button id="closeup" disabled>脸部近看</button>
  <span id="action-label" aria-live="polite"></span>
  <label>缩放 <input id="scale" type="range" min="0.1" max="1.1" step="0.01" value="0.32"/></label></div>
+<p><label>聊天台词 <input id="expression-text" value="太好了，今天的任务完成了！"/></label> <span id="expression-kind"></span></p>
 <p id="details">默认展示 v4 原画实验模型：原画拆层、隐藏区及正坐姿必要补画，使用原睫毛、眉毛和补画口腔素材。可测试眨眼、聊天、困倦、摸头与复位，并切换脸部近看。独立测试使用 Inox2D（BSD-2-Clause），已接入主界面；v4 可直接点击头部测试，身体与空白不触发；可编辑源工程位于仓库 assets/inochi/v4。</p>
 </main>
 <script type="module">
 import {sampleAction,sourceArtParameters,createActionMixer} from './actions.js'
+import {chatExpression,expressionPose} from './chatExpression.js'
 import {isHeadHit} from './headHitArea.js'
 const node=document.querySelector('#status')
 const canvas=document.querySelector('#puppet')
@@ -140,6 +142,9 @@ try {
  const apply=(name,value)=>controller.setParameter?.(name,value)
  function frame(now){
    const t=probe?0:now/1000,state=sampleAction(action,now-started)
+   const expression=chatExpression(document.querySelector('#expression-text').value)
+   if(action==='chat'&&!probe)Object.assign(state,expressionPose(expression))
+   document.querySelector('#expression-kind').textContent=action==='chat'?expression.kind:'neutral'
    if(action!=='none'&&state.done){action='none';announce('已恢复待机')}
    const naturalBlink=!probe&&(t%4.2)<.27?Math.sin(Math.PI*(t%4.2)/.27):0
    const blink=action==='idle'||action==='tap'?state.blink:naturalBlink

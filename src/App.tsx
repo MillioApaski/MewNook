@@ -109,6 +109,7 @@ export default function App() {
   const [chatError, setChatError] = useState('')
   const [streamingText, setStreamingText] = useState('')
   const [speechUntil, setSpeechUntil] = useState(0)
+  const [speechText,setSpeechText]=useState('')
   const [memoryLoading, setMemoryLoading] = useState(false)
   const [proactiveState, setProactiveState] = useSavedState<{day:string;count:number;last:number}>('proactiveState',
     {day:localDate(),count:0,last:Date.now()})
@@ -149,7 +150,7 @@ export default function App() {
 
   // The collapsed Galgame line is a temporary notification, not a permanent HUD.
   const showDialogue = (line: string | null = null, durationMs = 6500) => {
-    if (line) setSpeechUntil(Date.now() + speechDuration(line))
+    if (line) {setSpeechText(line);setSpeechUntil(Date.now() + speechDuration(line))}
     setSceneLine(line)
     setDialogueOffset(0)
     setDialogueTimeoutMs(durationMs)
@@ -401,7 +402,7 @@ export default function App() {
         onDelta:text=>{
           if (controller.signal.aborted) return
           setStreamingText(text)
-          if (text.trim()) setSpeechUntil(Date.now()+1200)
+          if (text.trim()) {setSpeechText(text);setSpeechUntil(Date.now()+1200)}
         }
       })
       if (controller.signal.aborted) return
@@ -511,7 +512,7 @@ export default function App() {
           {settings.inochiModel==='v4' && <><SourceCharacterPoster scale={settings.inochiScale||0.32}/><SourceHeadTarget scale={settings.inochiScale||0.32} onPat={handleCompanionClick}/></>}
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
             activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
-            touches={inochiTouches} onStatus={reportInochiStatus}/>
+            speechText={speechUntil>0?speechText:''} touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
         </div>
         <img data-room-layer="desk" className="art-foreground art-desk-layer" src={'/assets/rooms/' + illustratedScene + '/desk.svg'} alt="" draggable={false}/>

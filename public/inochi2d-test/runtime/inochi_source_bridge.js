@@ -1,5 +1,5 @@
 // MewNook source-art adapter, derived from the pinned BSD-2-Clause bridge.
-// Adds only opt-in scalar parameter opacity evaluation; upstream file stays pinned.
+// Adds opt-in source opacity and an explicit render budget; upstream stays pinned.
 import {compileParameterOpacities,evaluateParameterOpacities} from './parameter_opacity.js';
 import initInochi2d, { Inochi2dRuntime } from './inochi2d.js';
 import { createSecondaryMotionEngine } from './secondary_motion.js';
@@ -999,6 +999,9 @@ export const createInochi2DController = async ({ wasmUrl, debug }) => {
   let runtime = null;
   let mounted = false;
   let rafId = 0;
+  let renderPaused = false;
+  let renderMaxFps = 60;
+  let renderedFrames = 0;
   let width = 1;
   let height = 1;
   let devicePixelRatio = 1;
@@ -3363,12 +3366,12 @@ export const createInochi2DController = async ({ wasmUrl, debug }) => {
 
   const tick = (timestamp) => {
     rafId = 0;
-    if (!mounted || !runtime) {
+    if (!mounted || !runtime || renderPaused) {
       return;
     }
     if (
       typeof lastTickTimestamp === 'number' &&
-      timestamp - lastTickTimestamp < RUNTIME_TICK_MIN_INTERVAL_MS
+      timestamp - lastTickTimestamp < Math.max(RUNTIME_TICK_MIN_INTERVAL_MS,1000/renderMaxFps-1)
     ) {
       rafId = requestAnimationFrame(tick);
       return;
@@ -3387,6 +3390,7 @@ export const createInochi2DController = async ({ wasmUrl, debug }) => {
           : 16.67;
       const deltaTimeSeconds = Math.min(0.05, deltaTimeMs / 1000);
       lastTickTimestamp = timestamp;
+      if(canvas)canvas.dataset.renderedFrames=String(++renderedFrames);
       measurePerformanceSection('activeAnimation', () =>
         applyActiveAnimation(timestamp),
       );
@@ -3474,7 +3478,7 @@ export const createInochi2DController = async ({ wasmUrl, debug }) => {
   };
 
   const ensureLoop = () => {
-    if (!mounted || !runtime || rafId) {
+    if (!mounted || !runtime || rafId || renderPaused) {
       return;
     }
     rafId = requestAnimationFrame(tick);
@@ -3580,6 +3584,14 @@ export const createInochi2DController = async ({ wasmUrl, debug }) => {
   };
 
   return {
+    setRenderPolicy({paused=renderPaused,maxFps=renderMaxFps}={}) {
+      if(Boolean(paused)===renderPaused&&maxFps===renderMaxFps&&canvas?.dataset.renderMaxFps)return;
+      renderMaxFps=Number.isFinite(maxFps)?Math.max(15,Math.min(60,maxFps)):60;
+      renderPaused=Boolean(paused);
+      if(canvas){canvas.dataset.renderPaused=String(renderPaused);canvas.dataset.renderMaxFps=String(renderMaxFps)}
+      if(renderPaused)cancelLoop();
+      else {lastTickTimestamp=null;ensureLoop()}
+    },
     async mount(nextCanvas) {
       canvas = nextCanvas;
       mounted = true;
