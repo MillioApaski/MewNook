@@ -116,7 +116,7 @@ try{
  await page.getByRole('button',{name:'关闭面板',exact:true}).click()
  for(const scene of['rain','sunset','night']){
   await page.evaluate(scene=>{const s=JSON.parse(localStorage.getItem('mewnook:settings'));localStorage.setItem('mewnook:settings',JSON.stringify({...s,scene}))},scene)
-  await page.reload();await page.locator('.art-character.inochi-ready').waitFor({timeout:60000});if(scene==='night'){await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.eyeClosure)>.65);assert.ok(Number(await page.locator('canvas').getAttribute('data-mouth-open'))<.015)}
+  await page.reload();await page.locator('.art-character.inochi-ready').waitFor({timeout:60000});if(scene==='night'){await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.eyeClosure)>.49&&Number(document.querySelector('canvas').dataset.eyeClosure)<.56);assert.ok(Number(await page.locator('canvas').getAttribute('data-mouth-open'))>.09&&Number(await page.locator('canvas').getAttribute('data-mouth-open'))<.13)}
   await page.waitForTimeout(350);await page.screenshot({path:out+'/'+scene+'.png'})
  }
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);const mobileBounds=await page.locator('canvas').boundingBox();console.log('MOBILE BOUNDS',JSON.stringify(mobileBounds));await page.screenshot({path:out+'/mobile.png'});assert.ok(mobileBounds.x>=-1&&mobileBounds.x+mobileBounds.width<=391,'source character canvas must fit mobile viewport')

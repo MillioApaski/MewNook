@@ -23,14 +23,14 @@ export function sampleAction(action,elapsed){
  }
  if(action==='sleep'){
    result.sleepy=Math.min(1,t/450,(5000-t)/450)*.95
-   result.brow=result.sleepy*.6
+   result.brow=result.sleepy*.32
  }
  return result
 }
 export function sourceArtParameters(state,blink=0,wind=0){
- const closure=Math.max(blink,state.blink,state.sleepy*.82)
+ const closure=Math.max(blink,state.blink,state.sleepy*.55)
  return {ParamEyeBlinkLeft:closure,ParamEyeBlinkRight:closure,
-  ParamMouthOpen:state.mouth,ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
+  ParamMouthOpen:Math.max(state.mouth,state.sleepy*.12),ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
   ParamHeadX:0,ParamBrowLeft:state.brow,ParamBrowRight:state.brow,
   ParamEarLeft:state.earLeft,ParamEarRight:state.earRight,
   ParamHairLeft:wind+state.hair,ParamHairRight:wind*.85-state.hair,

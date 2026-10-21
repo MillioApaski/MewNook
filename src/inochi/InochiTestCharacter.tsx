@@ -226,7 +226,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
         response.sleepy=state.sleepy
         response.mouth=state.mouth
         if(!touched){
-          response.brow=sleepy?.57:talking?-.2:0
+          response.brow=sleepy?.304:talking?-.2:0
           if(talking)Object.assign(response,expressionPose(chatExpression(speechRef.current)))
         }
         const motion=focused?.4:sleepy?.3:1
