@@ -8,6 +8,7 @@ interface SourceAction {
   headRoll:number; headY:number; hair:number; brow:number; done:boolean
 }
 interface SourceActions {
+  createActionMixer(): (state:SourceAction,now:number)=>SourceAction
   sampleAction(action:string,elapsed:number):SourceAction
   sourceArtParameters(state:SourceAction,blink?:number,wind?:number):Record<string,number>
 }
@@ -43,6 +44,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
   const tapUntilRef=useRef(0)
   const tapStartedRef=useRef(0)
   const actionsRef=useRef<SourceActions|null>(null)
+  const actionMixerRef=useRef<ReturnType<SourceActions['createActionMixer']>|null>(null)
   const resizeRef=useRef<(()=>void)|null>(null)
   const scaleRef=useRef(scale)
   scaleRef.current=scale
@@ -65,6 +67,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       if(model==='v4'){
         const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261020'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
+        actionMixerRef.current=actionsRef.current.createActionMixer()
       }
       const bridge=await import(/* @vite-ignore */ moduleUrl) as Bridge
       if(disposed)return
@@ -211,7 +214,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
         response.mouth=state.mouth
         if(!touched)response.brow=sleepy?.57:talking?-.2:0
         const motion=focused?.4:sleepy?.3:1
-        const values=actions.sourceArtParameters(response,blink,Math.sin(t*.82)*.2*motion)
+        const values=actions.sourceArtParameters(actionMixerRef.current?.(response,current)??response,blink,Math.sin(t*.82)*.2*motion)
         values.ParamBreath=Math.sin(t*(sleepy?1.25:2))*(focused?.42:.65)
         values.ParamTailDeform=Math.sin(t*.94+1.7)*.28*motion
         for(const [id,value] of Object.entries(values))set(id,value)

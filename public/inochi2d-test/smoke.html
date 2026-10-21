@@ -29,7 +29,7 @@ button:disabled{opacity:.45}input{accent-color:#a0bde5}
 <p id="details">默认展示 v4 原画实验模型：原画拆层、隐藏区及正坐姿必要补画，使用原睫毛、眉毛和补画口腔素材。可测试眨眼、聊天、困倦、摸头与复位，并切换脸部近看。独立测试使用 Inox2D（BSD-2-Clause），已接入主界面；v4 可直接点击头部测试，身体与空白不触发；可编辑源工程位于仓库 assets/inochi/v4。</p>
 </main>
 <script type="module">
-import {sampleAction,sourceArtParameters} from './actions.js'
+import {sampleAction,sourceArtParameters,createActionMixer} from './actions.js'
 import {isHeadHit} from './headHitArea.js'
 const node=document.querySelector('#status')
 const canvas=document.querySelector('#puppet')
@@ -135,6 +135,7 @@ try {
  document.querySelector('#chat').disabled=false
  document.querySelector('#sleep').disabled=false
  let action='none',started=0
+ const mixAction=createActionMixer()
  const announce=text=>{document.querySelector('#action-label').textContent=text}
  const apply=(name,value)=>controller.setParameter?.(name,value)
  function frame(now){
@@ -154,7 +155,7 @@ try {
      ParamSleepyLeft:state.sleepy*(1-blink),ParamSleepyRight:state.sleepy*(1-blink),
      ParamMouthOpen:state.mouth,ParamEmbarrassed:action==='tap'?.4:0
    }
-   if(isV4)Object.assign(values,sourceArtParameters(state,blink,probe?0:Math.sin(t*.82)*.2),{ParamBreath:probe?0:values.ParamBreath,ParamTailDeform:probe?0:values.ParamTailDeform})
+   if(isV4)Object.assign(values,sourceArtParameters(probe?state:mixAction(state,now),blink,probe?0:Math.sin(t*.82)*.2),{ParamBreath:probe?0:values.ParamBreath,ParamTailDeform:probe?0:values.ParamTailDeform})
    for(const [id,value] of Object.entries(values))void apply(id,value)
    canvas.dataset.action=action
    return values

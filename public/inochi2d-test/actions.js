@@ -36,3 +36,21 @@ export function sourceArtParameters(state,blink=0,wind=0){
   ParamHairLeft:wind+state.hair,ParamHairRight:wind*.85-state.hair,
   ParamHairFront:wind*.65+state.hair*.7,ParamSleepy:0,ParamSleepyLeft:0,ParamSleepyRight:0}
 }
+
+// Retain the displayed pose across interruptions and activity changes.
+// Blink stays direct so a quick closure does not turn into a slow squint.
+export function createActionMixer(){
+ let pose=null,last=null
+ const keys=['mouth','sleepy','earLeft','earRight','headRoll','headY','hair','brow']
+ return (target,now)=>{
+   if(!pose){pose={...target};last=now;return {...pose}}
+   const dt=Math.min(100,Math.max(0,now-last));last=now
+   const weight=1-Math.exp(-dt/85)
+   for(const key of keys){
+     const next=pose[key]+(target[key]-pose[key])*weight
+     pose[key]=Math.abs(next-target[key])<.001?target[key]:next
+   }
+   pose.blink=target.blink;pose.done=target.done
+   return {...pose}
+ }
+}
