@@ -22,15 +22,16 @@ export function sampleAction(action,elapsed){
    result.brow=-.2*envelope
  }
  if(action==='sleep'){
-   result.sleepy=Math.min(1,t/450,(5000-t)/450)*.95
-   result.brow=result.sleepy*.32
+   const phase=Math.min(1,t/1000,(5000-t)/800)
+   result.sleepy=phase*phase*(3-2*phase)*.95
  }
  return result
 }
 export function sourceArtParameters(state,blink=0,wind=0){
- const closure=Math.max(blink,state.blink,state.sleepy*.55)
+ const drowsy=Math.max(0,Math.min(1,(state.sleepy-.2)/.75))
+ const closure=Math.max(blink,state.blink,drowsy)
  return {ParamEyeBlinkLeft:closure,ParamEyeBlinkRight:closure,
-  ParamMouthOpen:Math.max(state.mouth,state.sleepy*.12),ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
+  ParamMouthOpen:state.mouth,ParamDrowsyMouth:drowsy*(1-Math.min(1,state.mouth/.2)),ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
   ParamHeadX:0,ParamBrowLeft:state.brow,ParamBrowRight:state.brow,
   ParamEarLeft:state.earLeft,ParamEarRight:state.earRight,
   ParamHairLeft:wind+state.hair,ParamHairRight:wind*.85-state.hair,

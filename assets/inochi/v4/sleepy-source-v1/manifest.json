@@ -1,0 +1,24 @@
+{
+  "slot_offset": [
+    560,
+    294
+  ],
+  "slot_size": [
+    63,
+    47
+  ],
+  "source": "face-source-v7/mouth-open-full.png",
+  "source_sha256": "eddd1ad439c2ebb7f8f3d997dcc01c57af77e7aaac32348700809a83868db3c9",
+  "axis_angle_degrees": -20,
+  "scale": [
+    0.36,
+    0.22
+  ],
+  "visible_mouth_bounds": [
+    583,
+    313,
+    595,
+    320
+  ],
+  "design": "2026-10-22 user-approved closed eyes and tiny relaxed mouth"
+}

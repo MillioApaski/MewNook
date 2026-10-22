@@ -27,7 +27,7 @@ try{
   await clear();await set({[name]:1});const pos=diff(baseline,await snapshot(name+'-positive'));await set({[name]:-1});const neg=diff(baseline,await snapshot(name+'-negative'));assert.ok(pos.count>2&&neg.count>2,name+' binding has no visible effect');report.parameters[name]={positive:pos,negative:neg}
  }
  // Every pair of adjacent slots gets exercised by the actual WASM renderer.
- for(const name of['ParamEyeBlinkLeft','ParamEyeBlinkRight','ParamMouthOpen']){
+ for(const name of['ParamEyeBlinkLeft','ParamEyeBlinkRight','ParamMouthOpen','ParamDrowsyMouth']){
   await clear();const counts=[];for(let k=0;k<=16;k++){await set({[name]:k/16});counts.push(diff(baseline,await snapshot()).count)}assert.equal(counts[0],0);assert.ok(Math.max(...counts)>8);report.parameters[name]={intermediateChangedPixels:counts}
  }
  // Cross-expression switching must clear every previous action's owned parameter.

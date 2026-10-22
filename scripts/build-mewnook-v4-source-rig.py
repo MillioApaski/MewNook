@@ -35,6 +35,10 @@ for e in m['parts']:
    # Progressive opaque covers: preceding key stays opaque under the next key's ramp.
    values=[1. if k==0 or j>=k else 0. for j in range(len(keys))];bindings.append(bind(p,'opacity',values))
   param(parameter,bindings,0,1,len(keys))
+  if e['role']=='mouth':
+   sleepy=part('Original painted tiny sleepy mouth',Image.open(V/'sleepy-source-v1/mouth-sleepy.png'),offset,z-len(keys),parent,'mouth',s)
+   sleepy['opacity']=0
+   param('ParamDrowsyMouth',[bind(sleepy,'opacity',[0.,1.])],0,1,2)
  else:part(e['name'],Image.open(S/e['file']),e['offset'],z,parent,e['role'],s)
 param('ParamHeadRoll',[bind(head,'transform.r.z',[-.055,0,.055])]);param('ParamHeadX',[bind(head,'transform.t.x',[-3.,0.,3.])]);param('ParamHeadY',[bind(head,'transform.t.y',[-3.,0.,3.])])
 hair={'left':[],'right':[],'front':[]};ear={'left':[],'right':[]};brow={'left':[],'right':[]};breathing=[bind(breath,'transform.t.y',[1.5,0.,-1.5])];tail=[]
