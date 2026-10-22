@@ -1,0 +1,14 @@
+{
+  "stage": "continuous fixed face backing; whole-face silhouette registration; no blur",
+  "original_face_uncovered_pixels_before": 2141,
+  "original_face_uncovered_pixels_after": 0,
+  "jaw_and_neck_unchanged_from_y": 350,
+  "hidden_underlap_pixels": 16196,
+  "old_cheek_spill_removed_from_hair_pixels": 35,
+  "canvas": [
+    1122,
+    1402
+  ],
+  "source": "face-layer-rebuild-v1/face-skin-fixed.png",
+  "face_sha256": "a23f13ad6c4390527384b6edd0ba11a960d923c54fcaebc5fd9d55ec90d127db"
+}

@@ -37,6 +37,7 @@ jobs:
           python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
           python scripts/prepare-v4-sleepy-source.py
+          python scripts/register-v4-fixed-face.py
           python scripts/build-mewnook-v4-source-rig.py
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d/v4/MewNook.inx

@@ -26,5 +26,10 @@ try{
  }
  await p.evaluate(()=>window.probe.set({ParamDrowsyMouth:1}));const sleepy=await capture('sleepy');assert.ok(difference(original,sleepy,[310,310,410,360])>2,'Tiny sleepy mouth missing')
  await p.evaluate(()=>window.probe.action('none',0));const reset=await capture('reset');report.resetChangedPixels=difference(original,reset,[0,0,650,750]);assert.ok(report.resetChangedPixels<12);assert.deepEqual(errors,[])
+ for(const direction of [-1,1]){
+  await p.evaluate(direction=>window.probe.set({ParamHairFront:direction,ParamHairLeft:direction,ParamEyeBlinkLeft:1,ParamEyeBlinkRight:1}),direction)
+  await capture('hair-wind-'+(direction>0?'positive':'negative'))
+ }
+ await p.evaluate(()=>window.probe.action('none',0));const finalReset=await capture('reset');report.hairWindResetChangedPixels=difference(original,finalReset,[0,0,650,750]);assert.equal(report.hairWindResetChangedPixels,0)
  report.modelSha256=createHash('sha256').update(await readFile(path.join(root,'assets/inochi/v4/rig/MewNook-v4-source-rig.inx'))).digest('hex');report.browser=await b.version();report.fixedFace='single static texture; separate eyeball, moving upper/lower lid meshes and hair';await writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report))
 }finally{await b?.close();server.close()}

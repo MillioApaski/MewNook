@@ -3,27 +3,28 @@
     {
       "closure": 0.25,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 4898
+      "eyeChangedPixels": 4771
     },
     {
       "closure": 0.5,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 6792
+      "eyeChangedPixels": 6627
     },
     {
       "closure": 0.75,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 8558
+      "eyeChangedPixels": 8391
     },
     {
       "closure": 1,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 9531
+      "eyeChangedPixels": 9386
     }
   ],
   "errors": [],
   "resetChangedPixels": 0,
+  "hairWindResetChangedPixels": 0,
+  "modelSha256": "ff9939b5c6ffda5e72354a2dc91680abb59588023930c2595245aa0e37c8d79d",
   "browser": "153.0.8010.0",
-  "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair",
-  "modelSha256": "1ccd0e8655ce27e348592d320091807c4309b5247f450f5ad78b5d59acbac653"
+  "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair"
 }
