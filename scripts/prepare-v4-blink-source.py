@@ -6,9 +6,20 @@ import cv2,numpy as np
 from PIL import Image,ImageDraw
 from v4_image_io import atomic_png
 from v4_source_io import load_group,composite,export_ora
-R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';O=V/'face-source-v9';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';O=V/'face-source-v10';O.mkdir(exist_ok=True)
 src=np.array(Image.open(V/'source/pose_reference.png').convert('RGBA'));H,W=src.shape[:2];yy,xx=np.indices((H,W),dtype=np.float32);keys=np.linspace(0,1,9)
 meta=json.loads((V/'face-source-v1/manifest.json').read_text())
+# Use the authored hair mattes, including antialiased strands. Never infer hair
+# from brightness: white/pink hair overlaps the eye-repair polygons.
+scene=json.loads((V/'scene-source-v1/manifest.json').read_text())
+hair_alpha=np.zeros((H,W),np.uint8)
+for entry in scene['parts']:
+ if entry['role']!='front-hair':continue
+ tile=np.array(Image.open(V/'scene-source-v1'/entry['file']).convert('RGBA'))[:,:,3]
+ x,y=entry['offset'];h,w=tile.shape
+ hair_alpha[y:y+h,x:x+w]=np.maximum(hair_alpha[y:y+h,x:x+w],tile)
+hair_guard=cv2.dilate((hair_alpha>0).astype('uint8'),np.ones((3,3),np.uint8)).astype(bool)
+
 def warp(a,mx,my):
  a=a.astype(np.float32);alpha=a[:,:,3]/255;wa=cv2.remap(alpha,mx,my,cv2.INTER_LINEAR,borderMode=cv2.BORDER_CONSTANT);rgb=cv2.remap(a[:,:,:3]*alpha[:,:,None],mx,my,cv2.INTER_LINEAR,borderMode=cv2.BORDER_CONSTANT);rgb=np.divide(rgb,wa[:,:,None],out=np.zeros_like(rgb),where=wa[:,:,None]>1e-6);return np.dstack((np.clip(np.round(rgb),0,255).astype('uint8'),np.round(wa*255).astype('uint8')))
 def registered(file,key):
@@ -41,14 +52,14 @@ for s in ('left','right'):
  neutral[region&~(sup[:,:,3]>0)]=src[region&~(sup[:,:,3]>0)];neutral[region,3]=255
  # Reconstruct all original eye paint, including the light upper contour.
  surface=src[:,:,:3].astype('float32')
- repair=cv2.dilate(footprint,np.ones((3,3),np.uint8)).astype(bool)
+ repair=cv2.dilate(footprint,np.ones((3,3),np.uint8)).astype(bool)&~hair_guard
  rx0,ry0,rx1,ry1=Image.fromarray(repair).getbbox();pad=12
  ax0,ay0=max(0,rx0-pad),max(0,ry0-pad);ax1,ay1=min(W,rx1+pad),min(H,ry1+pad)
  active=repair[ay0:ay1,ax0:ax1]
  difference=surface[ay0:ay1,ax0:ax1].copy()
  face=surface[ay0:ay1,ax0:ax1]
  # Hair, lash and eye-white colours must never become skin boundary colours.
- valid=(face[:,:,0]>195)&(face[:,:,0]-face[:,:,2]>10)&(face.mean(2)>185)&~active
+ valid=(~hair_guard[ay0:ay1,ax0:ax1])&(face[:,:,0]>195)&(face[:,:,0]-face[:,:,2]>10)&(face.mean(2)>185)&~active
  assert valid.any()
  _,nearest=cv2.distanceTransformWithLabels((~valid).astype('uint8'),cv2.DIST_L2,5,labelType=cv2.DIST_LABEL_PIXEL)
  field=difference[valid][np.maximum(nearest-1,0)].copy()
@@ -77,13 +88,17 @@ for s in ('left','right'):
   uu=warp(u,xx,yy-t*(curve-top)[None,:]);ll=warp(l,xx,yy-t*(curve-bot)[None,:]);ll[:,:,3]=np.round(ll[:,:,3]*(1-t)).astype('uint8')
   painted=warp(lash,xx,yy+(1-t)*(curve-top+2)[None,:]);uu=np.array(Image.blend(Image.fromarray(uu),Image.fromarray(painted),t));result=Image.fromarray(skinpart);result.alpha_composite(Image.fromarray(white));result.alpha_composite(Image.fromarray(ir));result.alpha_composite(Image.fromarray(ll));result.alpha_composite(Image.fromarray(uu));a=np.array(result)
   if t<.15:a=np.array(Image.blend(Image.fromarray(neutral),Image.fromarray(a),t/.15))
+  a[hair_guard&region]=neutral[hair_guard&region]
   a[~region]=0;return a
  frames=[]
  for t in keys:
   a=frame(float(t));frames.append(a);atomic_png(Image.fromarray(a).crop(bbox),O/(s+'-blink-'+str(round(t*1000))+'.png'))
  assert np.array_equal(frames[0],neutral);assert np.array_equal(frames[-1][:,:,3],frames[0][:,:,3]);bad=(frames[-1][:,:,:3].mean(2)<140)&(frames[-1][:,:,3]>16)&opening&~closed_domain;assert not bad.any()
+ assert all(np.array_equal(a[hair_guard&region],neutral[hair_guard&region]) for a in frames),'Blink modified protected hair pixels'
+ assert not (repair&hair_guard).any(),'Skin repair overlaps hair'
+ atomic_png(Image.fromarray((hair_guard&region).astype('uint8')*255),O/(s+'-protected-hair-mask.png'))
  for name,a in [('skin-support',skinpart),('upper-lid',u),('lower-lid',l),('closed-lash',lash)]:atomic_png(Image.fromarray(a),O/(s+'-'+name+'-full.png'))
- parts[s]=frames;report['eyes'][s]={'slot_offset':[x0,y0],'slot_size':[x1-x0,y1-y0],'closed_lash_source_pixels':int(ink.sum()),'skin_repair':'complete original eye footprint including pale crease; harmonic skin fill','repair_bbox':[rx0,ry0,rx1,ry1],'solver_iterations':iteration+1}
+ parts[s]=frames;report['eyes'][s]={'slot_offset':[x0,y0],'slot_size':[x1-x0,y1-y0],'closed_lash_source_pixels':int(ink.sum()),'skin_repair':'complete original eye footprint including pale crease; harmonic skin fill','repair_bbox':[rx0,ry0,rx1,ry1],'solver_iterations':iteration+1,'protected_hair_pixels':int((hair_guard&region).sum()),'hair_pixels_unchanged_in_all_frames':True,'repair_hair_overlap_pixels':0}
 fixed=[(n,a) for n,a in old if 'source iris' not in n and 'eye support' not in n];baseidx=next(i for i,(n,a) in enumerate(fixed) if n=='hidden paint and original remainder')
 def layers(k):return fixed[:baseidx]+[(s+' eye slot',parts[s][k]) for s in ('right','left')]+fixed[baseidx:]
 board=Image.new('RGB',(1050,450),(235,236,242));d=ImageDraw.Draw(board)
