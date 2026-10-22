@@ -52,7 +52,7 @@ try{
    ['tap','摸头回应中',300],
    ['idle','上眼皮闭合中',160],
    ['chat','正在说话',450],
-   ['sleep','困倦半睁眼',450]
+   ['sleep','闭眼轻憩',1400]
  ]){
    await page.locator('#'+button).click()
    await page.getByText(label,{exact:true}).waitFor()
