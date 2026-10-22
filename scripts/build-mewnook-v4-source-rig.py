@@ -27,7 +27,7 @@ def param(name,bindings,lo=-1,hi=1,n=3,default=0):
 for e in m['parts']:
  parent=head if e['head_child'] else root;z=100*(e['front_order']-len(m['parts']));s='left' if 'left' in e['name'].lower() else 'right' if 'right' in e['name'].lower() else None
  if e['role'] in ['eye','mouth']:
-  if e['role']=='eye':m2=json.loads((V/'face-source-v8/manifest.json').read_text());folder=V/'face-source-v8';offset=m2['eyes'][s]['slot_offset'];prefix=s+'-blink-';parameter='ParamEyeBlink'+s.title()
+  if e['role']=='eye':m2=json.loads((V/'face-source-v9/manifest.json').read_text());folder=V/'face-source-v9';offset=m2['eyes'][s]['slot_offset'];prefix=s+'-blink-';parameter='ParamEyeBlink'+s.title()
   else:m2=json.loads((V/'face-source-v7/manifest.json').read_text());folder=V/'face-source-v7';offset=m2['mouth_slot_offset'];prefix='mouth-';parameter='ParamMouthOpen'
   bindings=[];keys=m2['keys']
   for k,t in enumerate(keys):

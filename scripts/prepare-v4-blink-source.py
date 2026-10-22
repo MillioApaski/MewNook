@@ -6,7 +6,7 @@ import cv2,numpy as np
 from PIL import Image,ImageDraw
 from v4_image_io import atomic_png
 from v4_source_io import load_group,composite,export_ora
-R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';O=V/'face-source-v8';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';O=V/'face-source-v9';O.mkdir(exist_ok=True)
 src=np.array(Image.open(V/'source/pose_reference.png').convert('RGBA'));H,W=src.shape[:2];yy,xx=np.indices((H,W),dtype=np.float32);keys=np.linspace(0,1,9)
 meta=json.loads((V/'face-source-v1/manifest.json').read_text())
 def warp(a,mx,my):
@@ -18,6 +18,12 @@ old=load_group(V/'face-source-v5/MewNook-v4-eye-source.ora',src.shape)
 for s in ('left','right'):
  p=V/'face-source-v5';region=np.array(Image.open(p/(s+'-eye-region-mask.png')))>0;opening=np.array(Image.open(p/(s+'-opening-mask.png')))>0;clip=np.array(Image.open(p/(s+'-aperture-mask.png')))>0
  sup=np.array(Image.open(p/(s+'-eye-support-full.png')).convert('RGBA'));iris=np.array(Image.open(p/(s+'-iris-full.png')).convert('RGBA'));upper=np.array(Image.open(p/(s+'-upper-lid-domain-mask.png')))>0;lower=np.array(Image.open(p/(s+'-lower-lid-domain-mask.png')))>0
+ # Cover the complete source eye, including pale crease/highlight pixels.
+ footprints={
+ 'left':[(479,278),(489,266),(496,257),(505,251),(517,248),(528,249),(535,254),(547,263),(556,273),(556,286),(546,300),(526,307),(506,307),(489,300),(478,287)],
+ 'right':[(589,243),(593,230),(602,220),(612,214),(625,211),(637,211),(645,214),(654,216),(665,219),(674,229),(671,247),(660,260),(638,269),(617,269),(599,260),(590,251)]}
+ footprint=np.zeros((H,W),np.uint8);cv2.fillPoly(footprint,[np.array(footprints[s],np.int32)],1)
+ region|=cv2.dilate(footprint,np.ones((5,5),np.uint8)).astype(bool)
  # Matte follows the real painted lash; the black pixels outside paint alpha are excluded.
  domain=cv2.dilate(region.astype('uint8'),np.ones((9,9),np.uint8)).astype(bool);dark=(closed[:,:,:3].mean(2)<150)&(closed[:,:,3]>16)&domain
  n,labels,stats,cent=cv2.connectedComponentsWithStats(dark.astype('uint8'));assert n>1;label=1+np.argmax(stats[1:,cv2.CC_STAT_AREA]);ink=labels==label;closed_domain=cv2.dilate(ink.astype('uint8'),np.ones((5,5),np.uint8)).astype(bool);region|=closed_domain
@@ -33,14 +39,10 @@ for s in ('left','right'):
  top=profile(opening,'top');bot=profile(opening,'bottom');curve=profile(ink,'mean');base=Image.fromarray(sup);ir=iris.copy();ir[~clip,3]=0;base.alpha_composite(Image.fromarray(ir));neutral=np.array(base);neutral[~region]=0
  # Original non-eye pixels in the slot are kept exact at rest.
  neutral[region&~(sup[:,:,3]>0)]=src[region&~(sup[:,:,3]>0)];neutral[region,3]=255
- # Keep the original surrounding skin/hair pixels exactly. Reconstruct only
- # the former eye opening/lash area, interpolating original surrounding skin.
- # A global RGB offset leaves a visible patch; hair/lash colours are excluded.
- eye_paint=(opening|upper|lower).astype('uint8')
- surface=neutral[:,:,:3].astype('float32')
- warm=(surface[:,:,0]-surface[:,:,2]>8)&(surface.mean(2)>150)
- repair=(cv2.dilate(eye_paint,np.ones((7,7),np.uint8)).astype(bool)|(cv2.dilate(eye_paint,np.ones((19,19),np.uint8)).astype(bool)&warm))&region
- rx0,ry0,rx1,ry1=Image.fromarray(repair).getbbox();pad=3
+ # Reconstruct all original eye paint, including the light upper contour.
+ surface=src[:,:,:3].astype('float32')
+ repair=cv2.dilate(footprint,np.ones((3,3),np.uint8)).astype(bool)
+ rx0,ry0,rx1,ry1=Image.fromarray(repair).getbbox();pad=12
  ax0,ay0=max(0,rx0-pad),max(0,ry0-pad);ax1,ay1=min(W,rx1+pad),min(H,ry1+pad)
  active=repair[ay0:ay1,ax0:ax1]
  difference=surface[ay0:ay1,ax0:ax1].copy()
@@ -62,10 +64,11 @@ for s in ('left','right'):
  repaired=neutral.copy();patch=repaired[ay0:ay1,ax0:ax1];patch[active,:3]=fixed[active]
  repaired[:,:,3]=np.where(region,255,0);repaired[~region,:3]=0
  skinpart=repaired
- edge_distance=cv2.distanceTransform(region.astype('uint8'),cv2.DIST_L2,5)
- edge_weight=np.clip((edge_distance-1)/5,0,1)
- protected=cv2.dilate((opening|upper|lower|ink).astype('uint8'),np.ones((5,5),np.uint8)).astype(bool)
- skin_rim=region&~protected&(surface[:,:,0]-surface[:,:,2]>10)&(surface.mean(2)>185)&(edge_distance<6)
+ # Feather only at the outside boundary of the complete repair footprint.
+ distance=cv2.distanceTransform(repair.astype('uint8'),cv2.DIST_L2,5)
+ weight=np.clip(distance/3,0,1)
+ repaired[repair,:3]=np.round(fixed[active]*weight[repair,None]+neutral[repair,:3]*(1-weight[repair,None])).astype('uint8')
+ skinpart=repaired
  def frame(t):
   if t==0:return neutral.copy()
   nt=(1-t)*top+t*curve;nb=(1-t)*bot+t*curve;ap=(yy>=nt[None,:])&(yy<=nb[None,:])&clip
@@ -74,23 +77,13 @@ for s in ('left','right'):
   uu=warp(u,xx,yy-t*(curve-top)[None,:]);ll=warp(l,xx,yy-t*(curve-bot)[None,:]);ll[:,:,3]=np.round(ll[:,:,3]*(1-t)).astype('uint8')
   painted=warp(lash,xx,yy+(1-t)*(curve-top+2)[None,:]);uu=np.array(Image.blend(Image.fromarray(uu),Image.fromarray(painted),t));result=Image.fromarray(skinpart);result.alpha_composite(Image.fromarray(white));result.alpha_composite(Image.fromarray(ir));result.alpha_composite(Image.fromarray(ll));result.alpha_composite(Image.fromarray(uu));a=np.array(result)
   if t<.15:a=np.array(Image.blend(Image.fromarray(neutral),Image.fromarray(a),t/.15))
-  weight=edge_weight[skin_rim,None]
-  a[skin_rim,:3]=np.round(a[skin_rim,:3]*weight+neutral[skin_rim,:3]*(1-weight)).astype('uint8')
   a[~region]=0;return a
  frames=[]
  for t in keys:
   a=frame(float(t));frames.append(a);atomic_png(Image.fromarray(a).crop(bbox),O/(s+'-blink-'+str(round(t*1000))+'.png'))
  assert np.array_equal(frames[0],neutral);assert np.array_equal(frames[-1][:,:,3],frames[0][:,:,3]);bad=(frames[-1][:,:,:3].mean(2)<140)&(frames[-1][:,:,3]>16)&opening&~closed_domain;assert not bad.any()
- rim=skin_rim&(edge_distance<=1.01)
- assert rim.any()
- assert all(np.array_equal(a[rim],neutral[rim]) for a in frames)
- old_slot=np.array(Image.open(V/'face-source-v6'/(s+'-blink-1000.png')).convert('RGBA'))
- local_rim=rim[y0:y1,x0:x1];rest=neutral[y0:y1,x0:x1]
- before=float(np.abs(old_slot[:,:,:3].astype(float)-rest[:,:,:3])[local_rim].mean())
- neutral_old=np.array(Image.open(V/'face-source-v6'/(s+'-blink-0.png')).convert('RGBA'))
- assert np.array_equal(frames[0][y0:y1,x0:x1],neutral_old)
  for name,a in [('skin-support',skinpart),('upper-lid',u),('lower-lid',l),('closed-lash',lash)]:atomic_png(Image.fromarray(a),O/(s+'-'+name+'-full.png'))
- parts[s]=frames;report['eyes'][s]={'slot_offset':[x0,y0],'slot_size':[x1-x0,y1-y0],'skin_rgb_offset':delta.tolist(),'closed_lash_source_pixels':int(ink.sum()),'outside_painted_lash_dark_residue':0,'skin_repair':'harmonic original-skin fill; original skin and hair outside eye paint preserved','repair_bbox':[rx0,ry0,rx1,ry1],'solver_iterations':iteration+1,'edge_skin_pixels':int(rim.sum()),'previous_skin_edge_mean_difference':before,'skin_edge_mean_difference':0,'neutral_matches_previous':True}
+ parts[s]=frames;report['eyes'][s]={'slot_offset':[x0,y0],'slot_size':[x1-x0,y1-y0],'closed_lash_source_pixels':int(ink.sum()),'skin_repair':'complete original eye footprint including pale crease; harmonic skin fill','repair_bbox':[rx0,ry0,rx1,ry1],'solver_iterations':iteration+1}
 fixed=[(n,a) for n,a in old if 'source iris' not in n and 'eye support' not in n];baseidx=next(i for i,(n,a) in enumerate(fixed) if n=='hidden paint and original remainder')
 def layers(k):return fixed[:baseidx]+[(s+' eye slot',parts[s][k]) for s in ('right','left')]+fixed[baseidx:]
 board=Image.new('RGB',(1050,450),(235,236,242));d=ImageDraw.Draw(board)
@@ -103,4 +96,4 @@ reference=np.zeros_like(src);reference[180:365,440:705]=src[180:365,440:705]
 closed_reference=Image.fromarray(reference)
 for side in ('right','left'):closed_reference.alpha_composite(Image.fromarray(parts[side][-1]))
 editable=[(side+' closed eye slot',parts[side][-1]) for side in ('right','left')]+[('original surrounding face',reference)]
-export_ora(O/'MewNook-v4-blink-source.ora',np.array(closed_reference),editable,'Seam-corrected original-art closed eyes');(O/'manifest.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
+export_ora(O/'MewNook-v4-blink-source.ora',np.array(closed_reference),editable,'Full-footprint original-art closed eyes');(O/'manifest.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))

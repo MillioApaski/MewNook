@@ -70,9 +70,9 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261022-skinfix':'/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261022-eyecontour':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261022-skinfix'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261022-eyecontour'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
         actionMixerRef.current=actionsRef.current.createActionMixer()
       }
@@ -112,7 +112,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261022-skinfix'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261022-eyecontour'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -133,7 +133,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
-      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261022-skinfix':'legacy'
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261022-eyecontour':'legacy'
       resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
