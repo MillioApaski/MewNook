@@ -172,7 +172,7 @@ try {
  document.querySelector('#tap').onclick=()=>startAction('tap','摸头回应中')
  document.querySelector('#idle').onclick=()=>startAction('idle','上眼皮闭合中')
  document.querySelector('#chat').onclick=()=>startAction('chat','正在说话')
- document.querySelector('#sleep').onclick=()=>startAction('sleep','闭眼轻憩')
+ document.querySelector('#sleep').onclick=()=>startAction('sleep',isV4?'闭眼轻憩':'困倦半睁眼')
  document.querySelector('#reset').onclick=()=>startAction('none','已恢复待机')
  if(probe)window.__inochiProbe.actionFrame=async(name,elapsed)=>{
    action=name;started=performance.now()-elapsed;return frame(performance.now())
