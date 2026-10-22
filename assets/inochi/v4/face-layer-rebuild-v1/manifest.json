@@ -1,0 +1,352 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "review_crop": [
+    440,
+    180,
+    704,
+    356
+  ],
+  "stage": "materials only; production rig unchanged",
+  "skin_policy": "one immutable painted base across all poses; no skin baked in eye textures",
+  "generated_inputs": [
+    "inputs/eyeless-painted.png",
+    "inputs/skin-only-painted.png"
+  ],
+  "materials": {
+    "hair-foreground": {
+      "file": "hair-foreground.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "d6b0ae25fe4aa6cb31e6d43530fc2968ae74f0092381cad5daa5b6caa45ea0d9"
+    },
+    "brows": {
+      "file": "brows.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "6e3ef5fdeb63d4a4f038d737ccc97555b703a85d8470e3e668d988b3455985fa"
+    },
+    "left-upper-lid-skin": {
+      "file": "left-upper-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "de2e5a185f7421e74792fef0bda3f6a568205df13ba83d9ed231a186ddb2a058"
+    },
+    "left-lower-lid-skin": {
+      "file": "left-lower-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "78ae2eac173e50493ad811c82c988841f2d8f19a44f14da708d31ff0f7ca3211"
+    },
+    "left-sclera": {
+      "file": "left-sclera.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "85f068ebdee71a80da1f6e45d8e4009dedd865dacfc70cae593e4487331a0de8"
+    },
+    "left-iris": {
+      "file": "left-iris.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "f8776e3628f1460b056ed0845a7cb9188ce71b4f39a79c238921921e57e3394b"
+    },
+    "left-upper-lash": {
+      "file": "left-upper-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "1af79ade6757eb07d994e2ae04a93e95da8e92bcd2c921f7568647503131687e"
+    },
+    "left-lower-lash": {
+      "file": "left-lower-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "1fc0dcc428f7d9d1f613a99dadb07c02db4441eea6237bddc5735d17e5ff8bef"
+    },
+    "left-closed-lash": {
+      "file": "left-closed-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "6c3e75c31704e62ffdeebd28dbffec66cfac57090ad0879190d27d8f8b72c676"
+    },
+    "left-lid-skin": {
+      "file": "left-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "d86f6f109e82f5fdb4519374ab1bf3370c7a0d471fd3a98a74683814ab32280d"
+    },
+    "right-upper-lid-skin": {
+      "file": "right-upper-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "525db8f0a404cdc78215c5e4aa61a73d095c30ff5d37c98096209fef49c77da7"
+    },
+    "right-lower-lid-skin": {
+      "file": "right-lower-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "47fb4e84e19bfee2ddc32e7ecfea329bc9767fe170aed36b70d3071c5530c0e4"
+    },
+    "right-sclera": {
+      "file": "right-sclera.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "00822bc1e51c4e61e24d922ec57fb1b69ccc963427eb070f5d3f4d17f2d83a8a"
+    },
+    "right-iris": {
+      "file": "right-iris.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "2eab92dea65a4c0f53ca1f223c21604298fe9b11088b9fc914767249b0bc1e14"
+    },
+    "right-upper-lash": {
+      "file": "right-upper-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "8ba30b6d2c85c47e0990ab1d42961ac886d6e05a7e40264aead84fd94805474b"
+    },
+    "right-lower-lash": {
+      "file": "right-lower-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "bbe10349c1a95e800c436bee5ed3df75dc6360772de1da2f8ddfc66064b6b677"
+    },
+    "right-closed-lash": {
+      "file": "right-closed-lash.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "73e6728beb952b69ff7571c3719af9d5b6f3b1ba1c4d51bed3dbeb02d85db3d7"
+    },
+    "right-lid-skin": {
+      "file": "right-lid-skin.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "cd4c74d3934441dd749813ce9275aaaf6e5b9e6e6e8c90dec029c0fced5241bd"
+    },
+    "face-skin-fixed": {
+      "file": "face-skin-fixed.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "06751387b03feedfcdd968b49de751be72c4de54a2a5575542d3350a30d769ad"
+    },
+    "hair-part-0": {
+      "file": "hair-part-0.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "5cd9fcd035495270bf0797f4efb73b0b213fca72159e9b2046ca53d6053ec3c3"
+    },
+    "hair-part-1": {
+      "file": "hair-part-1.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "99be7c2eac5e1af9854cbc565e900319808a108cd447842f36b151fedd182542"
+    },
+    "hair-part-3": {
+      "file": "hair-part-3.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "414325d12a941afafddf16bcea694fa5650f9a39aa053dfe2502a2e9ff5af0c5"
+    },
+    "hair-part-6": {
+      "file": "hair-part-6.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "5c9e7e030621c351e5f58a7d0c3fa913d7932d9edb2082b732476c44405f1fdd"
+    },
+    "hair-part-7": {
+      "file": "hair-part-7.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "eb0b1aaf5a8d0d5db8d89da9cf3c4f17639a1a3838dca0918dd8c4c077ae03c9"
+    },
+    "hair-part-8": {
+      "file": "hair-part-8.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "2a7f6c7dd4693b15978a5a715785b9a01b563e21fcad6ec8d9c7541f84751e0b"
+    },
+    "hair-part-9": {
+      "file": "hair-part-9.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "a2bbbbf737d66a0a5986368928cfcf5d846997ddacc598843c26456bf89e6e34"
+    },
+    "hair-part-10": {
+      "file": "hair-part-10.png",
+      "offset": [
+        0,
+        0
+      ],
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "9975f85bbcc5605317aaec88d15d07476dd44a7b16068b3e4b4f96e4034367c3"
+    }
+  },
+  "validation": {
+    "fixed_skin_identical_all_five_poses": true,
+    "hair_material_identical_all_five_poses": true,
+    "closed_eye_white_and_iris_hidden": true,
+    "ora_integrity": true,
+    "visual_acceptance": "pending",
+    "production_model_modified": false
+  }
+}
