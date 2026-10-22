@@ -2,17 +2,18 @@
   "browser": "153.0.8010.0",
   "actions": {
     "idle": {
-      "count": 935,
+      "count": 874,
       "box": [
-        284,
-        140,
+        288,
+        144,
         370,
-        185
+        190
       ],
       "values": {
         "ParamEyeBlinkLeft": 1,
         "ParamEyeBlinkRight": 1,
         "ParamMouthOpen": 0,
+        "ParamDrowsyMouth": 0,
         "ParamHeadRoll": 0,
         "ParamHeadY": 0,
         "ParamHeadX": 0,
@@ -41,6 +42,7 @@
         "ParamEyeBlinkLeft": 0,
         "ParamEyeBlinkRight": 0,
         "ParamMouthOpen": 0.6900290197368815,
+        "ParamDrowsyMouth": 0,
         "ParamHeadRoll": 0,
         "ParamHeadY": 0,
         "ParamHeadX": 0,
@@ -58,22 +60,23 @@
       "resetChangedPixels": 0
     },
     "sleep": {
-      "count": 979,
+      "count": 904,
       "box": [
-        284,
-        133,
+        288,
+        144,
         370,
-        185
+        192
       ],
       "values": {
-        "ParamEyeBlinkLeft": 0.7789999999999999,
-        "ParamEyeBlinkRight": 0.7789999999999999,
+        "ParamEyeBlinkLeft": 0.9645333333333331,
+        "ParamEyeBlinkRight": 0.9645333333333331,
         "ParamMouthOpen": 0,
+        "ParamDrowsyMouth": 0.9645333333333331,
         "ParamHeadRoll": 0,
         "ParamHeadY": 0,
         "ParamHeadX": 0,
-        "ParamBrowLeft": 0.57,
-        "ParamBrowRight": 0.57,
+        "ParamBrowLeft": 0,
+        "ParamBrowRight": 0,
         "ParamEarLeft": 0,
         "ParamEarRight": 0,
         "ParamHairLeft": 0,
@@ -86,7 +89,7 @@
       "resetChangedPixels": 0
     },
     "tap": {
-      "count": 14747,
+      "count": 14546,
       "box": [
         122,
         43,
@@ -97,6 +100,7 @@
         "ParamEyeBlinkLeft": 0.6894399988070802,
         "ParamEyeBlinkRight": 0.6894399988070802,
         "ParamMouthOpen": 0,
+        "ParamDrowsyMouth": 0,
         "ParamHeadRoll": 0.7486875447512072,
         "ParamHeadY": 0.4979288880273357,
         "ParamHeadX": 0,
@@ -117,7 +121,7 @@
   "parameters": {
     "ParamHeadRoll": {
       "positive": {
-        "count": 13557,
+        "count": 13379,
         "box": [
           216,
           43,
@@ -126,7 +130,7 @@
         ]
       },
       "negative": {
-        "count": 13402,
+        "count": 13204,
         "box": [
           215,
           41,
@@ -137,7 +141,7 @@
     },
     "ParamHairLeft": {
       "positive": {
-        "count": 6548,
+        "count": 6547,
         "box": [
           123,
           157,
@@ -146,7 +150,7 @@
         ]
       },
       "negative": {
-        "count": 6602,
+        "count": 6603,
         "box": [
           119,
           160,
@@ -177,7 +181,7 @@
     },
     "ParamHairFront": {
       "positive": {
-        "count": 1300,
+        "count": 1316,
         "box": [
           216,
           93,
@@ -186,7 +190,7 @@
         ]
       },
       "negative": {
-        "count": 1294,
+        "count": 1299,
         "box": [
           215,
           92,
@@ -257,7 +261,7 @@
     },
     "ParamBreath": {
       "positive": {
-        "count": 5826,
+        "count": 5759,
         "box": [
           215,
           43,
@@ -266,7 +270,7 @@
         ]
       },
       "negative": {
-        "count": 5911,
+        "count": 5814,
         "box": [
           216,
           43,
@@ -277,7 +281,7 @@
     },
     "ParamBrowLeft": {
       "positive": {
-        "count": 43,
+        "count": 42,
         "box": [
           285,
           147,
@@ -286,7 +290,7 @@
         ]
       },
       "negative": {
-        "count": 44,
+        "count": 42,
         "box": [
           285,
           146,
@@ -297,7 +301,7 @@
     },
     "ParamBrowRight": {
       "positive": {
-        "count": 45,
+        "count": 43,
         "box": [
           337,
           133,
@@ -306,7 +310,7 @@
         ]
       },
       "negative": {
-        "count": 45,
+        "count": 48,
         "box": [
           337,
           132,
@@ -318,43 +322,43 @@
     "ParamEyeBlinkLeft": {
       "intermediateChangedPixels": [
         0,
-        98,
-        210,
-        274,
-        316,
-        348,
-        368,
-        388,
-        405,
-        425,
-        434,
-        458,
-        469,
-        485,
-        478,
-        478,
-        482
+        105,
+        147,
+        205,
+        218,
+        244,
+        271,
+        300,
+        323,
+        342,
+        371,
+        393,
+        410,
+        424,
+        440,
+        464,
+        458
       ]
     },
     "ParamEyeBlinkRight": {
       "intermediateChangedPixels": [
         0,
-        73,
-        149,
-        226,
-        249,
-        291,
-        306,
-        336,
-        349,
-        378,
-        392,
-        426,
-        436,
-        464,
-        460,
-        460,
-        453
+        85,
+        115,
+        143,
+        184,
+        213,
+        235,
+        256,
+        288,
+        311,
+        335,
+        359,
+        385,
+        396,
+        408,
+        429,
+        416
       ]
     },
     "ParamMouthOpen": {
@@ -376,6 +380,27 @@
         109,
         117,
         121
+      ]
+    },
+    "ParamDrowsyMouth": {
+      "intermediateChangedPixels": [
+        0,
+        0,
+        0,
+        2,
+        6,
+        8,
+        8,
+        9,
+        10,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        14,
+        14
       ]
     }
   },
@@ -478,11 +503,12 @@
       "inochi2dRuntime": "inox2d-wasm-webgl2",
       "inochi2dIdleMode": "procedural-blink-secondary-motion",
       "inochi2dProfiler": "disabled",
-      "inochi2dFrameCount": "3528",
+      "inochi2dFrameCount": "3537",
       "inochi2dCameraScale": "0.9500",
       "inochi2dCameraX": "0.00",
       "inochi2dCameraY": "350.00",
       "inochi2dDevicePixelRatio": "1.000",
+      "renderedFrames": "3542",
       "inochi2dExpressionLayer": "none",
       "inochi2dExpressionMouthOwnership": "none",
       "inochi2dMouthSafety": "idle-parameter-only",
@@ -493,13 +519,14 @@
       "inochi2dModelStatus": "loaded",
       "inochi2dMouthShape": "1.000,0.000",
       "inochi2dLipSyncLayer": "idle",
-      "inochi2dLastFrameTs": "80518.9"
+      "inochi2dLastFrameTs": "196205.3"
     },
     "activeAnimationParameterIds": [],
     "scalarParameterValues": {
       "ParamEyeBlinkLeft": 0.6894399988070802,
       "ParamEyeBlinkRight": 0.6894399988070802,
       "ParamMouthOpen": 0,
+      "ParamDrowsyMouth": 0,
       "ParamHeadRoll": 0.7486875447512072,
       "ParamHeadY": 0.4979288880273357,
       "ParamHeadX": 0,
@@ -525,67 +552,55 @@
     "nodeMotionOffsets": {},
     "secondaryNodeMotionOffsets": {
       "Leg:: Left": {
-        "x": 0.07337597727814292,
-        "y": 0.022249790304212046,
-        "rz": -0.0012822339462194646
+        "x": 0.011329286327494782,
+        "y": 0.02550924160369053,
+        "rz": -0.00029220877022401767
       },
       "Leg:: Right": {
-        "x": -0.27477799188715507,
-        "y": -0.014303436624136317,
-        "rz": 0.00018367750289757995
+        "x": -0.06192518831623169,
+        "y": -0.016398798173801056,
+        "rz": 0.000016231123012725454
       },
       "Leg:: Left:: Shadow": {
-        "x": 0.04031256485071872,
-        "y": 0.006357082944060586,
+        "x": 0.008482097064010435,
+        "y": 0.007288354743911581,
         "rz": 0
       },
       "Leg:: Right:: Shadow": {
-        "x": -0.04031256485071872,
-        "y": -0.004767812208045439,
+        "x": -0.008482097064010435,
+        "y": -0.005466266057933686,
         "rz": 0
       }
     },
     "appliedNodeMotionOffsets": {
       "Leg:: Left": {
-        "x": 0.07337597727814292,
-        "y": 0.022249790304212046,
-        "rz": -0.0012822339462194646
+        "x": 0.011329286327494782,
+        "y": 0.02550924160369053,
+        "rz": -0.00029220877022401767
       },
       "Leg:: Right": {
-        "x": -0.27477799188715507,
-        "y": -0.014303436624136317,
-        "rz": 0.00018367750289757995
+        "x": -0.06192518831623169,
+        "y": -0.016398798173801056,
+        "rz": 0.000016231123012725454
       },
       "Leg:: Left:: Shadow": {
-        "x": 0.04031256485071872,
-        "y": 0.006357082944060586,
+        "x": 0.008482097064010435,
+        "y": 0.007288354743911581,
         "rz": 0
       },
       "Leg:: Right:: Shadow": {
-        "x": -0.04031256485071872,
-        "y": -0.004767812208045439,
+        "x": -0.008482097064010435,
+        "y": -0.005466266057933686,
         "rz": 0
       }
     },
     "partOpacityValues": {
-      "right eye slot 0": 1,
-      "right eye slot 125": 1,
-      "right eye slot 250": 1,
-      "right eye slot 375": 1,
-      "right eye slot 500": 1,
-      "right eye slot 625": 1,
-      "right eye slot 750": 0.5155199904566414,
-      "right eye slot 875": 0,
-      "right eye slot 1000": 0,
-      "left eye slot 0": 1,
-      "left eye slot 125": 1,
-      "left eye slot 250": 1,
-      "left eye slot 375": 1,
-      "left eye slot 500": 1,
-      "left eye slot 625": 1,
-      "left eye slot 750": 0.5155199904566414,
-      "left eye slot 875": 0,
-      "left eye slot 1000": 0,
+      "right independent upper-lash": 1,
+      "right independent lower-lash": 1,
+      "right approved closed lash": 0,
+      "left independent upper-lash": 1,
+      "left independent lower-lash": 1,
+      "left approved closed lash": 0,
       "mouth slot 0": 1,
       "mouth slot 125": 0,
       "mouth slot 250": 0,
@@ -594,7 +609,8 @@
       "mouth slot 625": 0,
       "mouth slot 750": 0,
       "mouth slot 875": 0,
-      "mouth slot 1000": 0
+      "mouth slot 1000": 0,
+      "Original painted tiny sleepy mouth": 0
     },
     "speechSecondaryMotionDriver": {
       "open": 0,
@@ -620,6 +636,7 @@
             "ParamEyeBlinkLeft",
             "ParamEyeBlinkRight",
             "ParamMouthOpen",
+            "ParamDrowsyMouth",
             "ParamHeadRoll",
             "ParamHeadY",
             "ParamHeadX",
@@ -636,7 +653,7 @@
             "ParamBreath",
             "ParamTailDeform"
           ],
-          "parameterCount": 18
+          "parameterCount": 19
         },
         {
           "id": "secondary:procedural",
@@ -673,6 +690,7 @@
         "ParamEyeBlinkLeft": "base",
         "ParamEyeBlinkRight": "base",
         "ParamMouthOpen": "base",
+        "ParamDrowsyMouth": "base",
         "ParamHeadRoll": "base",
         "ParamHeadY": "base",
         "ParamHeadX": "base",
@@ -703,6 +721,12 @@
           "priority": 5
         },
         "ParamMouthOpen": {
+          "source": "base",
+          "layerId": "base:user-parameters",
+          "layerType": "base",
+          "priority": 5
+        },
+        "ParamDrowsyMouth": {
           "source": "base",
           "layerId": "base:user-parameters",
           "layerType": "base",
@@ -806,70 +830,70 @@
       "history": []
     },
     "frameSnapshot": {
-      "frameId": 3544,
-      "dt": 0.0333000011742115,
+      "frameId": 3541,
+      "dt": 0.08330000191926956,
       "physicsRan": true,
-      "baseParamCount": 18,
+      "baseParamCount": 19,
       "physicsInputOffsetCount": 0,
       "postPhysicsParamOverrideCount": 0,
       "postPhysicsTransformOffsetCount": 0,
-      "nodeCount": 60,
-      "rootDrawableCount": 57,
-      "drawableCount": 57,
+      "nodeCount": 57,
+      "rootDrawableCount": 54,
+      "drawableCount": 54,
       "skippedNodeCount": 0
     },
     "secondaryMotion": {
       "physics": {
-        "x": 13.704196238971418,
-        "y": -1.3267014197645917
+        "x": 4.48491641724082,
+        "y": 2.245892037967756
       },
       "hair": {
-        "x": 11.535444588826085,
-        "y": -1.1143191075109065
+        "x": 2.907522205178916,
+        "y": 1.7758716945312032
       },
       "hairFront": {
-        "x": 2.369471275895339,
-        "y": -0.41527048676931233
+        "x": 0.59504170343912,
+        "y": 1.1089419778574936
       },
       "hairSideLeft": {
-        "x": 6.785320806764315,
-        "y": -0.09119104134252598
+        "x": 1.8951143467611913,
+        "y": 1.4856301786054515
       },
       "hairSideRight": {
-        "x": 5.175134598265177,
-        "y": 0.12939695199500303
+        "x": 2.9928983889483924,
+        "y": 1.4312541914218744
       },
       "hairBackLeft": {
-        "x": 6.32062663853237,
-        "y": -0.21283949124650964
+        "x": 3.9526374483953957,
+        "y": 1.6447913774621667
       },
       "hairBackRight": {
-        "x": 8.047923477699918,
-        "y": 0.3194670265307371
+        "x": 1.1769750213634156,
+        "y": 1.4175845440502244
       },
       "cloth": {
-        "x": 4.0779734428221515,
-        "y": 0.03580176620519191
+        "x": 2.15542700413279,
+        "y": 2.937144037910853
       },
       "hip": {
-        "x": 3.295669329965653,
-        "y": -0.1490926018878612
+        "x": 0.8279329416338767,
+        "y": 0.6124143003846413
       },
       "leg": {
-        "x": 2.1988671736755667,
-        "y": -0.13315060163118764
+        "x": 0.4626598398551146,
+        "y": 0.18692746893908005
       },
       "foot": {
-        "x": 1.3738188123535258,
-        "y": -0.044437798342420745
+        "x": 0.17973795149209634,
+        "y": 0.14335953237948298
       },
       "accessory": {
-        "x": 9.901075028708776,
-        "y": 0.4265698609837611
+        "x": 1.6436766790467223,
+        "y": 1.3044809933083457
       },
       "tail": {
-        "x": 3.6581177500734983,
-        "y": 0.07562417881762741
+        "x": 3.8835358057042892,
+        "y": 0.42969996660754545
       },
       "driver": {
         "x": 0,

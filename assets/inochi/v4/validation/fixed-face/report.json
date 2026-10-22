@@ -1,0 +1,29 @@
+{
+  "eyes": [
+    {
+      "closure": 0.25,
+      "protectedHairChanges": 0,
+      "eyeChangedPixels": 4898
+    },
+    {
+      "closure": 0.5,
+      "protectedHairChanges": 0,
+      "eyeChangedPixels": 6792
+    },
+    {
+      "closure": 0.75,
+      "protectedHairChanges": 0,
+      "eyeChangedPixels": 8558
+    },
+    {
+      "closure": 1,
+      "protectedHairChanges": 0,
+      "eyeChangedPixels": 9531
+    }
+  ],
+  "errors": [],
+  "resetChangedPixels": 0,
+  "browser": "153.0.8010.0",
+  "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair",
+  "modelSha256": "1ccd0e8655ce27e348592d320091807c4309b5247f450f5ad78b5d59acbac653"
+}

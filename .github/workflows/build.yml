@@ -36,7 +36,6 @@ jobs:
           python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
           python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
-          python scripts/prepare-v4-blink-source.py
           python scripts/prepare-v4-sleepy-source.py
           python scripts/build-mewnook-v4-source-rig.py
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
@@ -103,7 +102,9 @@ jobs:
       - name: Verify existing tabs reload after PWA updates
         run: node scripts/check-pwa-update.mjs
       - name: Verify source artwork bindings in real Chromium
-        run: CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
+        run: |
+          CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
+          CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-fixed-face.mjs
       - name: Verify standalone v4 action regions and recovery
         run: node scripts/check-v4-review.mjs
       - name: Upload v4 candidate screenshots and model

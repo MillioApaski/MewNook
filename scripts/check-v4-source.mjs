@@ -1,13 +1,14 @@
 import assert from'node:assert/strict'
-import{spawn}from'node:child_process'
-import{mkdir,writeFile}from'node:fs/promises'
+import http from'node:http'
+import{mkdir,writeFile,readFile}from'node:fs/promises'
 import{fileURLToPath}from'node:url'
 import path from'node:path'
 import{createRequire}from'node:module'
 const require=createRequire(import.meta.url),{chromium}=require('playwright-core'),{PNG}=require('pngjs')
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),out=process.env.V4_CHECK_OUT||path.join(root,'assets/inochi/v4/validation/source-runtime')
 await mkdir(out,{recursive:true})
-const server=spawn('python3',['-m','http.server','4181','--bind','127.0.0.1'],{cwd:root,stdio:'ignore'})
+const server=http.createServer(async(req,res)=>{try{const file=path.join(root,decodeURIComponent(req.url.split('?')[0]));res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.wasm')?'application/wasm':file.endsWith('.html')?'text/html':'application/octet-stream');res.end(await readFile(file))}catch{res.statusCode=404;res.end('Not found')}})
+await new Promise(resolve=>server.listen(4181,'127.0.0.1',resolve))
 let browser
 try{
  await new Promise(r=>setTimeout(r,350))
@@ -26,7 +27,7 @@ try{
  for(const name of['ParamHeadRoll','ParamHairLeft','ParamHairRight','ParamHairFront','ParamEarLeft','ParamEarRight','ParamTailDeform','ParamBreath','ParamBrowLeft','ParamBrowRight']){
   await clear();await set({[name]:1});const pos=diff(baseline,await snapshot(name+'-positive'));await set({[name]:-1});const neg=diff(baseline,await snapshot(name+'-negative'));assert.ok(pos.count>2&&neg.count>2,name+' binding has no visible effect');report.parameters[name]={positive:pos,negative:neg}
  }
- // Every pair of adjacent slots gets exercised by the actual WASM renderer.
+ // Exercise continuous eyelid meshes and every mouth opacity interval in WASM.
  for(const name of['ParamEyeBlinkLeft','ParamEyeBlinkRight','ParamMouthOpen','ParamDrowsyMouth']){
   await clear();const counts=[];for(let k=0;k<=16;k++){await set({[name]:k/16});counts.push(diff(baseline,await snapshot()).count)}assert.equal(counts[0],0);assert.ok(Math.max(...counts)>8);report.parameters[name]={intermediateChangedPixels:counts}
  }
@@ -35,4 +36,4 @@ try{
  await clear();report.switchReset=diff(baseline,await snapshot('reset'));assert.ok(report.switchReset.count<12)
  await p.evaluate(()=>window.probe.camera(0,350,.95));await clear();await snapshot('face-neutral');for(const[n,t]of[['idle',140],['chat',800],['sleep',900],['tap',650]]){await p.evaluate(([n,t])=>window.probe.action(n,t),[n,t]);await p.waitForTimeout(150);await snapshot('face-'+n)}
  report.debug=await p.evaluate(()=>window.probe.debug());assert.deepEqual(errors,[]);assert.equal(report.debug.canvasDataset.inochi2dTickError,undefined);await writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({actions:report.actions,parameters:Object.keys(report.parameters),switchReset:report.switchReset,errors},null,2))
-}finally{await browser?.close();server.kill()}
+}finally{await browser?.close();server.close()}
