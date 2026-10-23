@@ -23,13 +23,28 @@ try{
  await page.goto(origin);await page.locator('canvas[data-model-state=ready]').waitFor({timeout:60000})
  report.cold=await page.locator('canvas').evaluate(c=>({readyMs:Number(c.dataset.modelReadyMs),frames:Number(c.dataset.renderedFrames),maxFps:c.dataset.renderMaxFps,resources:performance.getEntriesByType('resource').filter(r=>/inochi/.test(r.name)).map(r=>({path:new URL(r.name).pathname,duration:r.duration,bytes:r.encodedBodySize}))}))
  await page.getByRole('button',{name:'与猫娘聊天',exact:true}).click()
- for(const [text,kind,sign] of [['太好了，任务完成了！','happy',-1],['别担心，慢慢来。','caring',1],['要不要喝点水？','curious',-1]]){
+ for(const [text,kind,sign] of [['太好了，今天的任务终于完成了！可以放松一下，喝口水，再一起整理接下来的安排。','happy',-1],['别担心，慢慢来。','caring',1],['要不要喝点水？','curious',-1]]){
   answer=text
   await page.getByRole('textbox',{name:'和猫娘说话',exact:true}).fill('测试')
   await page.getByRole('button',{name:'发送消息',exact:true}).click()
   await page.waitForFunction(kind=>document.querySelector('canvas')?.dataset.chatExpression===kind,kind)
   await page.waitForFunction(sign=>sign*Number(document.querySelector('canvas').dataset.brow)>.04,sign)
   report.expressions.push({kind,brow:Number(await page.locator('canvas').getAttribute('data-brow'))})
+  if(kind==='happy'){
+   await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.mouthOpen)>.3)
+   // Pointer hit testing is covered by the room suite. Dispatch this click
+   // while the reply is active, without an actionability wait using its time.
+   const before=await page.locator('.source-head-target').evaluate(button=>{
+    const d=document.querySelector('canvas').dataset,state={activity:d.activity,kind:d.chatExpression,mouth:Number(d.mouthOpen)}
+    button.click();return state
+   })
+   assert.equal(before.activity,'chat');assert.equal(before.kind,'happy');assert.ok(before.mouth>.3)
+   await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.headPatWeight)>.6,{},{timeout:5000})
+   assert.ok(Number(await page.locator('canvas').getAttribute('data-mouth-open'))>.3)
+   assert.equal(await page.locator('canvas').getAttribute('data-activity'),'chat')
+   assert.equal(await page.locator('canvas').getAttribute('data-chat-expression'),'happy')
+   report.headPatDuringSpeech=true
+  }
   await page.waitForFunction(()=>document.querySelector('canvas').dataset.chatExpression==='neutral'&&Number(document.querySelector('canvas').dataset.mouthOpen)<.015&&Math.abs(Number(document.querySelector('canvas').dataset.brow))<.002)
  }
  // Reopening history must not replay the last expression.

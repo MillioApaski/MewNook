@@ -1,0 +1,83 @@
+{
+  "modelSha256": "8a04c1397fec4c1f9f55663c998d4a0334ae26b12cc9fd53ad979a5b8a992d53",
+  "sameRoomAndReviewModel": true,
+  "unitTestsPassed": 30,
+  "productionBuild": "passed",
+  "nativeBow": {
+    "positive": {
+      "count": 11326,
+      "box": [
+        216,
+        43,
+        447,
+        362
+      ]
+    },
+    "resetChangedPixels": 0
+  },
+  "nativeTap": {
+    "count": 14579,
+    "box": [
+      123,
+      43,
+      518,
+      516
+    ],
+    "values": {
+      "ParamEyeBlinkLeft": 0.8196795428240741,
+      "ParamEyeBlinkRight": 0.8196795428240741,
+      "ParamMouthOpen": 0,
+      "ParamDrowsyMouth": 0,
+      "ParamHeadRoll": 0.7486875447512072,
+      "ParamHeadY": 0.4979288880273357,
+      "ParamHeadX": 0,
+      "ParamHeadPat": 0.995928219572884,
+      "ParamBrowLeft": -0.35,
+      "ParamBrowRight": -0.35,
+      "ParamEarLeft": -0.6627425336596676,
+      "ParamEarRight": 0.622447790094049,
+      "ParamHairLeft": 0.05421181080051199,
+      "ParamHairRight": -0.05421181080051199,
+      "ParamHairFront": 0.03794826756035839,
+      "ParamSleepy": 0,
+      "ParamSleepyLeft": 0,
+      "ParamSleepyRight": 0
+    },
+    "resetChangedPixels": 0
+  },
+  "switchReset": {
+    "count": 0,
+    "box": [
+      650,
+      750,
+      0,
+      0
+    ]
+  },
+  "errors": [],
+  "roomIntegration": {
+    "modelSha256": "8a04c1397fec4c1f9f55663c998d4a0334ae26b12cc9fd53ad979a5b8a992d53",
+    "headPat": true,
+    "repeatedPatEyelids": true,
+    "nightPatReturnsToSleep": true,
+    "chatAndReset": true,
+    "nightEyelids": true,
+    "optOutPersists": true,
+    "pngFallback": true,
+    "errors": []
+  },
+  "chatIntegration": {
+    "headPatDuringSpeech": true,
+    "streamingCancel": true,
+    "offlineRepeat": true,
+    "backgroundPauseResume": true,
+    "mobile": {
+      "dpr": 1,
+      "maxFps": 30,
+      "width": 390,
+      "height": 616,
+      "framesInSecond": 19
+    },
+    "errors": []
+  }
+}

@@ -111,6 +111,8 @@ for e in m['parts']:
  elif e['role']=='face':
   imagepart('Fixed clean face and original neck',V/'face-layer-rebuild-v3/face-and-neck.png',z,parent,'face',None)
  else:part(e['name'],Image.open(S/e['file']),e['offset'],z,parent,e['role'],s)
+# Separate touch-only weight makes the bow visible without amplifying idle/chat.
+param('ParamHeadPat',[bind(head,'transform.t.y',[0.,7.]),bind(head,'transform.r.z',[0.,.025])],0,1,2)
 param('ParamHeadRoll',[bind(head,'transform.r.z',[-.055,0,.055])]);param('ParamHeadX',[bind(head,'transform.t.x',[-3.,0.,3.])]);param('ParamHeadY',[bind(head,'transform.t.y',[-3.,0.,3.])])
 hair={'left':[],'right':[],'front':[]};ear={'left':[],'right':[]};brow={'left':[],'right':[]};breathing=[bind(breath,'transform.t.y',[1.5,0.,-1.5])];tail=[]
 for p,role,xy,s in sourceparts:

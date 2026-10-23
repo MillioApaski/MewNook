@@ -6,10 +6,11 @@ import{chatExpression,expressionPose}from'../../public/inochi2d-test/chatExpress
 /** Shared room renderer for the approved original-art character and legacy fallback. */
 interface SourceAction {
   blink:number; mouth:number; sleepy:number; earLeft:number; earRight:number;
-  headRoll:number; headY:number; hair:number; brow:number; done:boolean
+  headRoll:number; headY:number; pat:number; hair:number; brow:number; done:boolean
 }
 interface SourceActions {
-  createActionMixer(): (state:SourceAction,now:number)=>SourceAction
+  actionDuration:Record<string,number>
+  createActionMixer(): (state:SourceAction,now:number,touchRevision?:number)=>SourceAction
   sampleAction(action:string,elapsed:number):SourceAction
   sourceArtParameters(state:SourceAction,blink?:number,wind?:number):Record<string,number>
 }
@@ -70,9 +71,9 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261022-hairguard':'/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261024-headpat':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261022-hairguard'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261024-headpat'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
         actionMixerRef.current=actionsRef.current.createActionMixer()
       }
@@ -112,7 +113,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261022-hairguard'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261024-headpat'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -133,7 +134,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
-      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261022-hairguard':'legacy'
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261024-headpat':'legacy'
       resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
@@ -158,6 +159,8 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       delete canvas.dataset.requestedModel
       delete canvas.dataset.modelRevision
       delete canvas.dataset.headPat
+      delete canvas.dataset.headPatWeight
+      delete canvas.dataset.headPatClosure
       resizeRef.current=null
       actionsRef.current=null
       observer?.disconnect()
@@ -188,7 +191,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
     const c=controllerRef.current
     if(!c || !controllerReadyRef.current)return
     tapStartedRef.current=Date.now()
-    tapUntilRef.current=tapStartedRef.current+(loadedModelRef.current==='v4'?2400:1400)
+    tapUntilRef.current=tapStartedRef.current+(loadedModelRef.current==='v4'?(actionsRef.current?.actionDuration.tap??2400):1400)
     if(loadedModelRef.current==='v4')return
     manualBlinkUntil.current=Date.now()+470
     void c.applyInteractionImpulse?.(5,-3)
@@ -230,7 +233,8 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
           if(talking)Object.assign(response,expressionPose(chatExpression(speechRef.current)))
         }
         const motion=focused?.4:sleepy?.3:1
-        const values=actions.sourceArtParameters(actionMixerRef.current?.(response,current)??response,blink,Math.sin(t*.82)*.2*motion)
+        const pose=actionMixerRef.current?.(response,current,touched?tapStartedRef.current:0)??response
+        const values=actions.sourceArtParameters(pose,blink,Math.sin(t*.82)*.2*motion)
         values.ParamBreath=Math.sin(t*(sleepy?1.25:2))*(focused?.42:.65)
         values.ParamTailDeform=Math.sin(t*.94+1.7)*.28*motion
         for(const [id,value] of Object.entries(values))set(id,value)
@@ -238,6 +242,8 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
           canvasRef.current.dataset.chatExpression=talking?chatExpression(speechRef.current).kind:'neutral'
           canvasRef.current.dataset.brow=values.ParamBrowLeft.toFixed(3)
           canvasRef.current.dataset.headPat=touched?'active':'idle'
+          canvasRef.current.dataset.headPatWeight=values.ParamHeadPat.toFixed(3)
+          canvasRef.current.dataset.headPatClosure=pose.blink.toFixed(3)
           canvasRef.current.dataset.eyeClosure=values.ParamEyeBlinkLeft.toFixed(3)
           canvasRef.current.dataset.mouthOpen=values.ParamMouthOpen.toFixed(3)
           canvasRef.current.dataset.drowsyMouth=values.ParamDrowsyMouth.toFixed(3)

@@ -3,75 +3,76 @@
   "expressions": [
     {
       "kind": "happy",
-      "brow": -0.157
+      "brow": -0.059
     },
     {
       "kind": "caring",
-      "brow": 0.169
+      "brow": 0.119
     },
     {
       "kind": "curious",
-      "brow": -0.15
+      "brow": -0.157
     }
   ],
   "errors": [],
   "cold": {
-    "readyMs": 555.2,
-    "frames": 17,
+    "readyMs": 488.1,
+    "frames": 11,
     "maxFps": "60",
     "resources": [
       {
         "path": "/inochi2d/v4/poster.png",
-        "duration": 18,
+        "duration": 18.100000000093132,
         "bytes": 1201610
       },
       {
         "path": "/inochi2d-test/actions.js",
-        "duration": 7.599999999976717,
-        "bytes": 1073
+        "duration": 9.200000000186265,
+        "bytes": 3589
       },
       {
         "path": "/inochi2d-test/runtime/inochi_source_bridge.js",
-        "duration": 14.700000000011642,
-        "bytes": 23007
+        "duration": 9.400000000372529,
+        "bytes": 120296
       },
       {
         "path": "/inochi2d-test/runtime/parameter_opacity.js",
-        "duration": 12.5,
-        "bytes": 631
-      },
-      {
-        "path": "/inochi2d-test/runtime/inochi2d.js",
-        "duration": 15,
-        "bytes": 7760
+        "duration": 10.100000000093132,
+        "bytes": 1291
       },
       {
         "path": "/inochi2d-test/runtime/secondary_motion.js",
-        "duration": 13.799999999988358,
-        "bytes": 1034
+        "duration": 12.399999999906868,
+        "bytes": 4026
+      },
+      {
+        "path": "/inochi2d-test/runtime/inochi2d.js",
+        "duration": 12.600000000093132,
+        "bytes": 44289
       },
       {
         "path": "/inochi2d-test/runtime/inochi2d_bg.wasm",
-        "duration": 7.7000000000116415,
+        "duration": 8.5,
         "bytes": 911722
       },
       {
         "path": "/inochi2d/v4/MewNook.inx",
-        "duration": 109.20000000001164,
-        "bytes": 1776122
+        "duration": 14.599999999627471,
+        "bytes": 2622043
       }
     ]
   },
+  "headPatDuringSpeech": true,
   "streamingCancel": true,
-  "warmReadyMs": 216.5,
-  "offlineReadyMs": 159.5,
+  "warmReadyMs": 182.7,
+  "offlineReadyMs": 189.4,
   "offlineRepeat": true,
   "mobile": {
     "dpr": 1,
     "maxFps": 30,
     "width": 390,
     "height": 616,
-    "framesInSecond": 17
+    "framesInSecond": 19
   },
   "backgroundPauseResume": true
 }
