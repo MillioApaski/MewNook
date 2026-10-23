@@ -41,12 +41,14 @@ def eye(side,z):
  # Static, independently editable eyeball materials. Lid skin covers them.
  for label in ('sclera','iris'):
   imagepart(side+' independent '+label,F/(side+'-'+label+'.png'),z-5 if label=='iris' else z-4,head,'eye',side)
- skin=np.array(Image.open(V/'face-layer-rebuild-v2/face-and-neck.png').convert('RGBA'))
+ skin=np.array(Image.open(V/'face-layer-rebuild-v3/face-and-neck.png').convert('RGBA'))
  xs=np.flatnonzero(opening.any(0));x0,x1=int(xs.min())-5,int(xs.max())+6
  y0,y1=int(min(top[x0:x1]))-20,int(max(bottom[x0:x1]))+18
  for upper in (True,False):
   # UVs sample the fixed clean skin; geometry follows the aperture boundary.
   im=Image.fromarray(skin).crop((x0,y0,x1,y1))
+  if upper:
+   lid=np.array(im);lid[:,:,3]=255;im=Image.fromarray(lid)
   q=part(side+(' upper' if upper else ' lower')+' moving eyelid skin',im,(x0,y0),z-6,head,'eye-lid',side)
   xy=sourcexy(q);initial=xy.copy();target=xy.copy()
   for i,(x,y) in enumerate(xy):
@@ -80,7 +82,6 @@ def eye(side,z):
 
 for e in m['parts']:
  parent=head if e['head_child'] else root;z=100*(e['front_order']-len(m['parts']));s='left' if 'left' in e['name'].lower() else 'right' if 'right' in e['name'].lower() else None
- if e['role']=='connector':z=-1850.
  if e['role']=='eye':
   eye(s,z);continue
  if e['role']=='mouth':
@@ -96,9 +97,7 @@ for e in m['parts']:
    sleepy['opacity']=0
    param('ParamDrowsyMouth',[bind(sleepy,'opacity',[0.,1.])],0,1,2)
  elif e['role']=='face':
-  imagepart('Fixed clean face and original neck',V/'face-layer-rebuild-v2/face-and-neck.png',z,parent,'face',None)
- elif e['name']=='left source chest lock':
-  part(e['name'],Image.open(V/'face-layer-rebuild-v2/left-chest-lock.png'),e['offset'],z,parent,e['role'],s)
+  imagepart('Fixed clean face and original neck',V/'face-layer-rebuild-v3/face-and-neck.png',z,parent,'face',None)
  else:part(e['name'],Image.open(S/e['file']),e['offset'],z,parent,e['role'],s)
 param('ParamHeadRoll',[bind(head,'transform.r.z',[-.055,0,.055])]);param('ParamHeadX',[bind(head,'transform.t.x',[-3.,0.,3.])]);param('ParamHeadY',[bind(head,'transform.t.y',[-3.,0.,3.])])
 hair={'left':[],'right':[],'front':[]};ear={'left':[],'right':[]};brow={'left':[],'right':[]};breathing=[bind(breath,'transform.t.y',[1.5,0.,-1.5])];tail=[]

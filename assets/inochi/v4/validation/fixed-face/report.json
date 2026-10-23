@@ -3,28 +3,30 @@
     {
       "closure": 0.25,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 4771
+      "eyeChangedPixels": 5500
     },
     {
       "closure": 0.5,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 6627
+      "eyeChangedPixels": 7548
     },
     {
       "closure": 0.75,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 8391
+      "eyeChangedPixels": 9337
     },
     {
       "closure": 1,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 9386
+      "eyeChangedPixels": 10223,
+      "exposedBluePixels": 0
     }
   ],
   "errors": [],
   "resetChangedPixels": 0,
   "hairWindResetChangedPixels": 0,
-  "modelSha256": "ff9939b5c6ffda5e72354a2dc91680abb59588023930c2595245aa0e37c8d79d",
+  "headRollResetChangedPixels": 0,
+  "modelSha256": "31de954a86b75cacedb6759a40caffae35c869ca681e690ad4b3a224ad03b15e",
   "browser": "153.0.8010.0",
   "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair"
 }

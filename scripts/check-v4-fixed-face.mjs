@@ -22,7 +22,9 @@ try{
   await p.evaluate(t=>window.probe.set({ParamEyeBlinkLeft:t,ParamEyeBlinkRight:t}),t);const frame=await capture('closure-'+Math.round(t*100))
   const protectedChanges=difference(original,frame,[0,0,650,145]);assert.equal(protectedChanges,0,'Blink changed foreground crown hair')
   const eyeChanges=difference(original,frame,[180,190,490,330]);assert.ok(eyeChanges>50,'Eyelid mesh did not move')
-  report.eyes.push({closure:t,protectedHairChanges:protectedChanges,eyeChangedPixels:eyeChanges})
+  let exposedBluePixels=0
+  if(t===1){for(const region of [[215,230,310,325],[385,170,475,265]])for(let y=region[1];y<region[3];y++)for(let x=region[0];x<region[2];x++){const i=(y*frame.width+x)*4;if(frame.data[i+2]-frame.data[i]>45&&frame.data[i+2]-frame.data[i+1]>20&&frame.data[i]<150)exposedBluePixels++}assert.ok(exposedBluePixels<6,'Iris leaked through closed upper lid: '+exposedBluePixels)}
+  report.eyes.push({closure:t,protectedHairChanges:protectedChanges,eyeChangedPixels:eyeChanges,...(t===1?{exposedBluePixels}:{})})
  }
  await p.evaluate(()=>window.probe.set({ParamDrowsyMouth:1}));const sleepy=await capture('sleepy');assert.ok(difference(original,sleepy,[310,310,410,360])>2,'Tiny sleepy mouth missing')
  await p.evaluate(()=>window.probe.action('none',0));const reset=await capture('reset');report.resetChangedPixels=difference(original,reset,[0,0,650,750]);assert.ok(report.resetChangedPixels<12);assert.deepEqual(errors,[])
@@ -31,5 +33,10 @@ try{
   await capture('hair-wind-'+(direction>0?'positive':'negative'))
  }
  await p.evaluate(()=>window.probe.action('none',0));const finalReset=await capture('reset');report.hairWindResetChangedPixels=difference(original,finalReset,[0,0,650,750]);assert.equal(report.hairWindResetChangedPixels,0)
+ for(const direction of [-1,1]){
+  await p.evaluate(direction=>window.probe.set({ParamHeadRoll:direction,ParamEyeBlinkLeft:1,ParamEyeBlinkRight:1}),direction)
+  await capture('head-roll-'+(direction>0?'positive':'negative'))
+ }
+ await p.evaluate(()=>window.probe.action('none',0));const headReset=await capture('reset');report.headRollResetChangedPixels=difference(original,headReset,[0,0,650,750]);assert.equal(report.headRollResetChangedPixels,0)
  report.modelSha256=createHash('sha256').update(await readFile(path.join(root,'assets/inochi/v4/rig/MewNook-v4-source-rig.inx'))).digest('hex');report.browser=await b.version();report.fixedFace='single static texture; separate eyeball, moving upper/lower lid meshes and hair';await writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report))
 }finally{await b?.close();server.close()}

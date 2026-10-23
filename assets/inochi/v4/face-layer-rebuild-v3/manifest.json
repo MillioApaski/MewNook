@@ -1,0 +1,13 @@
+{
+  "stage": "native outline retained; no whole-face warp/hull or hair-order change",
+  "outside_eye_repair_rgba_exact": true,
+  "both_side_junctions_rgba_exact": true,
+  "alpha_exact_except_original_eye_holes": true,
+  "eye_hole_pixels_filled": 2697,
+  "canvas": [
+    1122,
+    1402
+  ],
+  "source": "scene-source-v1 native face and face-layer-rebuild-v1 painted eyeless study",
+  "face_sha256": "ac12aaa779ad95a6eb029ef2d88e023c88b67d524f5e1b90121d5a3215705e76"
+}
