@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,io,json,struct,math
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageFilter
 R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';S=V/'scene-source-v1';m=json.loads((S/'manifest.json').read_text());W,H=m['canvas'];pivot=np.array(m['head_pivot']);NULL=4294967295;uid=0;textures=[];params=[];nodes=[];sourceparts=[]
 def fresh():
  global uid
@@ -38,28 +38,40 @@ def eye(side,z):
  closed=np.array(Image.open(F/(side+'-closed-lash.png')).convert('RGBA'))
  top=profile(opening,'top');bottom=profile(opening,'bottom');curve=profile(closed[:,:,3]>128,'mean')
  bindings=[]
- # Static, independently editable eyeball materials. Lid skin covers them.
+ # One source pixel of inset absorbs bilinear filtering at the aperture edge.
+ eyeball_mask=np.array(Image.fromarray(opening.astype('uint8')*255).filter(ImageFilter.MinFilter(3)))>0
+ # Keep the static eyeball inside the native aperture. Hidden iris underpaint
+ # must not require a rectangular skin cover extending onto the cheek/hair.
  for label in ('sclera','iris'):
-  imagepart(side+' independent '+label,F/(side+'-'+label+'.png'),z-5 if label=='iris' else z-4,head,'eye',side)
+  im=np.array(Image.open(F/(side+'-'+label+'.png')).convert('RGBA'))
+  im[:,:,3]=np.where(eyeball_mask,im[:,:,3],0)
+  im=Image.fromarray(im);bb=im.getbbox();assert bb
+  part(side+' independent '+label,im.crop(bb),bb[:2],z-5 if label=='iris' else z-4,head,'eye',side)
  skin=np.array(Image.open(V/'face-layer-rebuild-v3/face-and-neck.png').convert('RGBA'))
- xs=np.flatnonzero(opening.any(0));x0,x1=int(xs.min())-5,int(xs.max())+6
- y0,y1=int(min(top[x0:x1]))-20,int(max(bottom[x0:x1]))+18
+ xs=np.flatnonzero(opening.any(0));x0,x1=int(xs.min()),int(xs.max())+1
+ y0,y1=int(top[xs].min())-1,int(bottom[xs].max())+2
+ # Every column has an anchored aperture boundary. UVs sample the final clean
+ # skin inside that aperture; no surrounding face/hair pixels move with a lid.
  for upper in (True,False):
-  # UVs sample the fixed clean skin; geometry follows the aperture boundary.
-  im=Image.fromarray(skin).crop((x0,y0,x1,y1))
-  if upper:
-   lid=np.array(im);lid[:,:,3]=255;im=Image.fromarray(lid)
-  q=part(side+(' upper' if upper else ' lower')+' moving eyelid skin',im,(x0,y0),z-6,head,'eye-lid',side)
-  xy=sourcexy(q);initial=xy.copy();target=xy.copy()
-  for i,(x,y) in enumerate(xy):
-   xi=int(np.clip(round(x),0,W-1));f=(y-y0)/(y1-y0)
-   a,b=(y0,top[xi]) if upper else (bottom[xi],y1)
-   aa,bb=(y0,curve[xi]+1.5) if upper else (curve[xi]-1.5,y1)
-   initial[i,1]=a+(b-a)*f;target[i,1]=aa+(bb-aa)*f
-   # UV remains registered to the source skin at the neutral geometry.
-   q['mesh']['uvs'][i*2+1]=(initial[i,1]-y0)/(y1-y0)
+  lid=skin[y0:y1,x0:x1].copy();lid[:,:,3]=255
+  q=part(side+(' upper' if upper else ' lower')+' moving eyelid skin',Image.fromarray(lid),(x0,y0),z-6,head,'eye-lid',side)
+  nx=x1-x0+1;ny=4;initial=[];target=[];uv=[];indices=[]
   offset=np.array([x0+(x1-x0)/2,y0+(y1-y0)/2])
-  q['mesh']['verts']=(initial-offset).reshape(-1).tolist()
+  for j in range(ny):
+   f=j/(ny-1)
+   for i in range(nx):
+    x=x0+i;xi=min(x,x1-1)
+    hi=top[xi]-.5;lo=bottom[xi]+.5
+    closed_y=float(np.clip(curve[xi],hi,lo))
+    edge=hi if upper else lo
+    end=min(lo,closed_y+1.5) if upper else max(hi,closed_y-1.5)
+    initial.append([x,edge]);target.append([x,edge+(end-edge)*f])
+    uv.extend([i/(nx-1),(edge+(end-edge)*f-y0)/(y1-y0)])
+  for j in range(ny-1):
+   for i in range(nx-1):
+    k=j*nx+i;indices.extend([k,k+1,k+nx,k+1,k+nx+1,k+nx])
+  initial=np.array(initial,dtype=float);target=np.array(target,dtype=float)
+  q['mesh'].update(verts=(initial-offset).reshape(-1).tolist(),uvs=uv,indices=indices)
   delta=target-initial;bindings.append(bind(q,'deform',[np.zeros_like(delta).tolist(),delta.tolist()]))
  for label in ('upper-lash','lower-lash'):
   q=imagepart(side+' independent '+label,F/(side+'-'+label+'.png'),z-8,head,'eye-lash',side)

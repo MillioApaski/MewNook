@@ -49,7 +49,7 @@ try {
  new ResizeObserver(resize).observe(canvas)
  await controller.setCameraTransform(0,120,0.32)
  const candidateModel=requestModel!=='v2' && !isV4
- const modelUrl=isV4?'/inochi2d-test/models/MewNook-v4-review.inx?rig=source-art-20261023-native-contour'
+ const modelUrl=isV4?'/inochi2d-test/models/MewNook-v4-review.inx?rig=source-art-20261023-aperture-lids'
    : candidateModel?'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'
    : '/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'
  if(isV4){await controller.setCameraTransform(0,0,.46);document.querySelector('#scale').value='.46'}
@@ -199,3 +199,4 @@ window.addEventListener('pagehide',()=>{void controller?.unmount()},{once:true})
 </script>
 </body>
 </html>
+

@@ -15,6 +15,18 @@ footprints={'left':[(479,278),(489,266),(496,257),(505,251),(517,248),(528,249),
 mask=np.zeros((H,W),np.uint8)
 for points in footprints.values():cv2.fillPoly(mask,[np.array(points,np.int32)],255)
 mask=cv2.dilate(mask,np.ones((3,3),np.uint8))>0
+# Include the full authored lash cutouts, including isolated upper lash tips.
+eye_support={}
+for side in ('left','right'):
+ support=np.zeros((H,W),np.uint8)
+ for label in ('upper-lash','lower-lash'):
+  support|=(np.array(Image.open(V/'face-layer-rebuild-v1'/(side+'-'+label+'.png')).convert('RGBA'))[:,:,3]>0).astype('uint8')
+ eye_support[side]=cv2.dilate(support,np.ones((3,3),np.uint8)).astype(bool)
+ mask|=eye_support[side]
+# Detached right iris-highlight cutout connects to the exterior through a
+# fine hair slit, so it is not classified as an enclosed alpha component.
+eye_support['right'][224:241,600:616]=True
+mask|=eye_support['right']
 hair=np.zeros((H,W),np.uint8)
 for p in scene['parts']:
  if p['role']!='front-hair':continue
@@ -22,21 +34,29 @@ for p in scene['parts']:
 guard=cv2.dilate((hair>0).astype('uint8'),np.ones((3,3),np.uint8)).astype(bool)
  # Eye paint must be removed even beneath semitransparent hair edges.
 # The independent foreground hair remains unchanged.
-face=native.copy();filled=np.zeros((H,W),bool)
+# All holes in this fixed eye repair domain need backing, including detached
+# iris-highlight/lash cutouts that are absent from the aperture/lash masks.
+face=native.copy()
+# Fill enclosed cutouts, preserving the exterior face/hair silhouette.
+exterior=(native[:,:,3]==0).astype('uint8');cv2.floodFill(exterior,None,(0,0),2)
+interior=cv2.dilate((exterior==1).astype('uint8'),np.ones((3,3),np.uint8)).astype(bool)
+filled=mask&interior&(native[:,:,3]<255)
 for side in ('left','right'):
  aperture=np.array(Image.open(V/'face-source-v5'/(side+'-opening-mask.png')))>0
- filled|=aperture&(native[:,:,3]<255)
+ filled|=(aperture|eye_support[side])&(native[:,:,3]<255)
 face[filled,3]=255
+for support in eye_support.values():
+ assert np.all(face[support,3]==255),'Old eye cutout still has transparent pixels'
 # Keep every original outline/cheek/hair pixel outside the fixed eye repair.
 # Match the painted study's colour to each surrounding eye ring once at export.
 for side,points in footprints.items():
- local=np.zeros((H,W),np.uint8);cv2.fillPoly(local,[np.array(points,np.int32)],255);local=cv2.dilate(local,np.ones((3,3),np.uint8)).astype(bool)&mask
+ local=np.zeros((H,W),np.uint8);cv2.fillPoly(local,[np.array(points,np.int32)],255);local=(cv2.dilate(local,np.ones((3,3),np.uint8)).astype(bool)|eye_support[side])&mask
  ring=cv2.dilate(local.astype('uint8'),np.ones((9,9),np.uint8)).astype(bool)&~local&~guard&(native[:,:,3]>250)
  C=native[:,:,:3].astype(float);P=paint[:,:,:3].astype(float)
  ring&=(C[:,:,0]-C[:,:,2]>10)&(C.mean(2)>185)
  delta=np.median(C[ring]-P[ring],axis=0) if ring.any() else np.zeros(3)
  rgb=np.clip(P+delta,0,255)
- distance=cv2.distanceTransform(local.astype('uint8'),cv2.DIST_L2,5);weight=np.clip(distance/3,0,1)
+ distance=cv2.distanceTransform(local.astype('uint8'),cv2.DIST_L2,5);weight=np.clip(distance/3,0,1);weight[filled&local]=1
  # One fixed underpainting, not a skin tile swapped during blinking.
  face[local,:3]=np.round(rgb[local]*weight[local,None]+C[local]*(1-weight[local,None])).astype('uint8')
 for side in ('left','right'):

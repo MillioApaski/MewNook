@@ -2,31 +2,36 @@
   "eyes": [
     {
       "closure": 0.25,
+      "protectedCheekChanges": 0,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 5500
+      "eyeChangedPixels": 4556
     },
     {
       "closure": 0.5,
+      "protectedCheekChanges": 0,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 7548
+      "eyeChangedPixels": 6255
     },
     {
       "closure": 0.75,
+      "protectedCheekChanges": 0,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 9337
+      "eyeChangedPixels": 7882
     },
     {
       "closure": 1,
+      "protectedCheekChanges": 0,
       "protectedHairChanges": 0,
-      "eyeChangedPixels": 10223,
+      "eyeChangedPixels": 8648,
       "exposedBluePixels": 0
     }
   ],
   "errors": [],
+  "closedEyeballContributionPixels": 0,
   "resetChangedPixels": 0,
   "hairWindResetChangedPixels": 0,
   "headRollResetChangedPixels": 0,
-  "modelSha256": "31de954a86b75cacedb6759a40caffae35c869ca681e690ad4b3a224ad03b15e",
+  "modelSha256": "07770a894d0d81a2643a9f1cf68d0bb3459c118ffcaddda929b336457ea4234d",
   "browser": "153.0.8010.0",
   "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair"
 }
