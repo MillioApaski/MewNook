@@ -39,6 +39,13 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,woff2,png,webp}'],
+        // Install the app shell first; room art and experimental rigs are fetched on demand.
+        globIgnores:['inochi2d-test/**','inochi2d/**','assets/rooms/**','assets/companion/**'],
+        runtimeCaching:[
+          {urlPattern:/\/inochi2d(?:-test)?\/.*\.js(?:\?.*)?$/,handler:'NetworkFirst',options:{cacheName:'mewnook-runtime-v1',expiration:{maxEntries:16,maxAgeSeconds:2592000},cacheableResponse:{statuses:[200]}}},
+          {urlPattern:/\/inochi2d(?:-test)?\/.*\.(?:inx|wasm)(?:\?.*)?$/,handler:'CacheFirst',options:{cacheName:'mewnook-rig-v1',expiration:{maxEntries:24,maxAgeSeconds:2592000},cacheableResponse:{statuses:[200]}}},
+          {urlPattern:/\/(?:assets\/(?:rooms|companion)|inochi2d)\/.*\.(?:png|webp|svg)(?:\?.*)?$/,handler:'NetworkFirst',options:{cacheName:'mewnook-art-v1',expiration:{maxEntries:32,maxAgeSeconds:2592000},cacheableResponse:{statuses:[200]}}}
+        ],
         navigateFallback: '/index.html',
         // Independent runtime tests must not be replaced by the PWA app shell.
         navigateFallbackDenylist: [/^\/inochi2d-test(?:\/|$)/]

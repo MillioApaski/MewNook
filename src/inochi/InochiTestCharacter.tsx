@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react'
 import type {CompanionActivity} from './companionActivity'
 import{sourceArtFrame}from'./sourceArtFrame'
+import{chatExpression,expressionPose}from'../../public/inochi2d-test/chatExpression.js'
 
 /** Shared room renderer for the approved original-art character and legacy fallback. */
 interface SourceAction {
@@ -8,10 +9,12 @@ interface SourceAction {
   headRoll:number; headY:number; hair:number; brow:number; done:boolean
 }
 interface SourceActions {
+  createActionMixer(): (state:SourceAction,now:number)=>SourceAction
   sampleAction(action:string,elapsed:number):SourceAction
   sourceArtParameters(state:SourceAction,blink?:number,wind?:number):Record<string,number>
 }
 interface Controller {
+  setRenderPolicy?(policy:{paused?:boolean;maxFps?:number}):void
   mount(canvas: HTMLCanvasElement): Promise<void> | void
   loadModel(url:string): Promise<void>
   getAnimationNames?(): string[]
@@ -31,11 +34,12 @@ interface Props {
   active: boolean
   scale: number
   activity: CompanionActivity
+  speechText?:string
   touches: number
   onStatus: (status:InochiTestStatus,error?:string)=>void
 }
 
-export function InochiTestCharacter({model,active,scale,activity,touches,onStatus}:Props){
+export function InochiTestCharacter({model,active,scale,activity,speechText='',touches,onStatus}:Props){
   const canvasRef=useRef<HTMLCanvasElement|null>(null)
   const controllerRef=useRef<Controller|null>(null)
   const namesRef=useRef<string[]>([])
@@ -43,12 +47,15 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
   const tapUntilRef=useRef(0)
   const tapStartedRef=useRef(0)
   const actionsRef=useRef<SourceActions|null>(null)
+  const actionMixerRef=useRef<ReturnType<SourceActions['createActionMixer']>|null>(null)
   const resizeRef=useRef<(()=>void)|null>(null)
   const scaleRef=useRef(scale)
   scaleRef.current=scale
   const controllerReadyRef=useRef(false)
   const loadedModelRef=useRef('')
   const manualBlinkUntil=useRef(0)
+  const speechRef=useRef(speechText)
+  speechRef.current=speechText
   const smoothed=useRef({smile:0,sleepy:0,mouth:0})
 
   useEffect(()=>{
@@ -57,14 +64,17 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
     if(!canvas)return
     let disposed=false,controller:Controller|null=null,observer:ResizeObserver|null=null
     let resizeHandler:(()=>void)|null=null
+    let visibilityHandler:(()=>void)|null=null
+    const startedAt=performance.now()
     canvas.dataset.modelState='loading'
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261020':'/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261022-hairguard':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261020'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261022-hairguard'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
+        actionMixerRef.current=actionsRef.current.createActionMixer()
       }
       const bridge=await import(/* @vite-ignore */ moduleUrl) as Bridge
       if(disposed)return
@@ -72,10 +82,14 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       if(disposed){await controller.unmount();return}
       controllerRef.current=controller
       await controller.mount(canvas)
+      visibilityHandler=()=>controller?.setRenderPolicy?.({paused:document.visibilityState==='hidden',maxFps:window.matchMedia('(max-width:680px)').matches?30:60})
+      document.addEventListener('visibilitychange',visibilityHandler)
+      visibilityHandler()
       const resize=()=>{
         if(!canvas.isConnected||!controller)return
         const bounds=(canvas.parentElement??canvas).getBoundingClientRect()
-        const ratio=Math.min(window.devicePixelRatio||1,1.25)
+        const ratio=Math.min(window.devicePixelRatio||1,window.matchMedia('(max-width:680px)').matches?1:1.25)
+        visibilityHandler?.()
         void controller.resize(Math.max(1,bounds.width),Math.max(1,bounds.height),ratio)
         const userScale=Math.min(.9,Math.max(.1,scaleRef.current))
         const source=loadedModelRef.current==='v4'
@@ -98,7 +112,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261020'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261022-hairguard'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -119,7 +133,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
-      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261020':'legacy'
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261022-hairguard':'legacy'
       resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
@@ -130,6 +144,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       // Keep the poster until the loaded rig has reached a browser paint.
       await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))
       if(disposed)return
+      canvas.dataset.modelReadyMs=(performance.now()-startedAt).toFixed(1)
       canvas.dataset.modelState='ready'
       onStatus('ready',loadedModel===model?'':model+' 无法加载，已回退 '+loadedModel)
     })().catch(e=>{
@@ -146,6 +161,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       resizeRef.current=null
       actionsRef.current=null
       observer?.disconnect()
+      if(visibilityHandler)document.removeEventListener('visibilitychange',visibilityHandler)
       if(resizeHandler)window.removeEventListener('resize',resizeHandler)
       if(controllerRef.current===controller)controllerRef.current=null
       if(controller)void Promise.resolve(controller.unmount()).catch(()=>{})
@@ -183,7 +199,7 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
 
   useEffect(()=>{
     if(!active)return
-    const clock=window.setInterval(()=>{
+    const tick=()=>{
       const c=controllerRef.current
       if(!c || !controllerReadyRef.current)return
       if(document.visibilityState==='hidden')return
@@ -209,16 +225,22 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
         const response=actions.sampleAction(touched?'tap':'none',current-tapStartedRef.current)
         response.sleepy=state.sleepy
         response.mouth=state.mouth
-        if(!touched)response.brow=sleepy?.57:talking?-.2:0
+        if(!touched){
+          response.brow=talking?-.2:0
+          if(talking)Object.assign(response,expressionPose(chatExpression(speechRef.current)))
+        }
         const motion=focused?.4:sleepy?.3:1
-        const values=actions.sourceArtParameters(response,blink,Math.sin(t*.82)*.2*motion)
+        const values=actions.sourceArtParameters(actionMixerRef.current?.(response,current)??response,blink,Math.sin(t*.82)*.2*motion)
         values.ParamBreath=Math.sin(t*(sleepy?1.25:2))*(focused?.42:.65)
         values.ParamTailDeform=Math.sin(t*.94+1.7)*.28*motion
         for(const [id,value] of Object.entries(values))set(id,value)
         if(canvasRef.current){
+          canvasRef.current.dataset.chatExpression=talking?chatExpression(speechRef.current).kind:'neutral'
+          canvasRef.current.dataset.brow=values.ParamBrowLeft.toFixed(3)
           canvasRef.current.dataset.headPat=touched?'active':'idle'
           canvasRef.current.dataset.eyeClosure=values.ParamEyeBlinkLeft.toFixed(3)
           canvasRef.current.dataset.mouthOpen=values.ParamMouthOpen.toFixed(3)
+          canvasRef.current.dataset.drowsyMouth=values.ParamDrowsyMouth.toFixed(3)
           canvasRef.current.dataset.headRoll=values.ParamHeadRoll.toFixed(3)
         }
         return
@@ -246,8 +268,14 @@ export function InochiTestCharacter({model,active,scale,activity,touches,onStatu
       set('ParamEmbarrassed',touched && !focused?.6:0)
       set('ParamSleepy',state.sleepy)
       set('ParamMouthOpen',state.mouth)
-    },70)
-    return()=>window.clearInterval(clock)
+    }
+    let clock:number|undefined
+    const sync=()=>{
+      window.clearInterval(clock)
+      if(document.visibilityState!=='hidden'){tick();clock=window.setInterval(tick,70)}
+    }
+    sync();document.addEventListener('visibilitychange',sync)
+    return()=>{window.clearInterval(clock);document.removeEventListener('visibilitychange',sync)}
   },[active,activity])
 
   return <canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'正坐姿动态猫娘':'旧版动态猫娘'} />

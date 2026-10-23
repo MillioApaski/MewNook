@@ -12,7 +12,7 @@ test('each standalone action finishes and clears all expression parameters',()=>
 test('blink closes then opens; sleepy does not open a second mouth',()=>{
  assert.equal(sampleAction('idle',120).blink,1)
  assert.ok(sampleAction('idle',270).blink<1)
- assert.equal(sampleAction('sleep',800).sleepy,.95)
+ assert.equal(sampleAction('sleep',1200).sleepy,.95)
  assert.equal(sampleAction('sleep',800).mouth,0)
 })
 test('touch makes the ears visibly reverse direction instead of holding a tiny offset',()=>{
@@ -30,12 +30,26 @@ test('head pat coordinates head, hair and ears and releases every channel',()=>{
 })
 test('changing source expressions assigns a single eyelid and mouth owner',async()=>{
  const{sourceArtParameters}=await import('../public/inochi2d-test/actions.js')
- const sleepy=sourceArtParameters(sampleAction('sleep',900),1)
+ const sleepy=sourceArtParameters(sampleAction('sleep',1200),1)
  assert.equal(sleepy.ParamEyeBlinkLeft,1)
  assert.equal(sleepy.ParamMouthOpen,0)
+ assert.equal(sleepy.ParamDrowsyMouth,1)
  assert.equal(sleepy.ParamSleepyLeft,0)
  const chat=sourceArtParameters(sampleAction('chat',800))
  assert.equal(chat.ParamEyeBlinkLeft,0)
  assert.equal(chat.ParamHeadRoll,0)
  for(const v of Object.values(sourceArtParameters(sampleAction('none',0))))assert.equal(Math.abs(v),0)
+})
+
+test('approved sleepy face closes gently with a dedicated tiny painted mouth; blink and speech retain control',async()=>{
+ const {sourceArtParameters}=await import('../public/inochi2d-test/actions.js')
+ const state=sampleAction('sleep',1200),face=sourceArtParameters(state)
+ assert.equal(face.ParamEyeBlinkLeft,1)
+ assert.equal(face.ParamMouthOpen,0)
+ assert.equal(face.ParamDrowsyMouth,1)
+ assert.ok(face.ParamBrowLeft<.35)
+ assert.equal(sourceArtParameters(state,1).ParamEyeBlinkLeft,1)
+ assert.equal(sourceArtParameters({...state,mouth:.7}).ParamMouthOpen,.7)
+ assert.equal(sourceArtParameters({...state,mouth:.7}).ParamDrowsyMouth,0)
+ for(const value of Object.values(sourceArtParameters(sampleAction('sleep',5000))))assert.equal(Math.abs(value),0)
 })

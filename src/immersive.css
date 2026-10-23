@@ -168,3 +168,9 @@ body{overflow:hidden}
 .art-character-layer{position:absolute;inset:0;z-index:2;opacity:1;mask:none;-webkit-mask:none;clip-path:none}
 .art-character-layer .inochi-demo-layer,.art-character-layer .inochi-demo-canvas,.art-character-layer .source-character-poster{mask:none;-webkit-mask:none;clip-path:none}
 .art-desk-layer{opacity:1;mask:none;-webkit-mask:none;clip-path:none;transition:none}
+
+/* Source-art touch target shares the poster/live camera's coordinate frame. */
+.source-character:not(:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"])) .art-character{pointer-events:none}
+.source-head-target{position:absolute;z-index:3;border:0;padding:0;background:transparent;clip-path:ellipse(50% 50%);pointer-events:auto;cursor:pointer}
+.source-head-target:focus-visible{background:#a9cbff44;outline:3px solid #789acb;outline-offset:-4px;border-radius:50%}
+.source-character:has(canvas[data-model-version="v3"],canvas[data-model-version="v2"]) .source-head-target{display:none}

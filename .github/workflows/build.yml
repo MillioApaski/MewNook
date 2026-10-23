@@ -36,11 +36,13 @@ jobs:
           python scripts/check-mewnook-v4.py /tmp/MewNook-v4-base.inx
           python scripts/upgrade-mewnook-v4.py --source "$SOURCE" --input /tmp/MewNook-v4-base.inx --output public/inochi2d-test/models/MewNook-v4.inx --report /tmp/v4-motion-report.json
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
+          python scripts/prepare-v4-sleepy-source.py
+          python scripts/register-v4-fixed-face.py
           python scripts/build-mewnook-v4-source-rig.py
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d/v4/MewNook.inx
       - name: Standalone action timeline tests
-        run: node --test tests/inochiActions.test.mjs tests/parameterOpacity.test.mjs tests/characterSettings.test.mjs
+        run: node --test tests/*.test.mjs
       - name: AI protocol unit tests
         run: npm run test:ai
       - name: Companion activity regression tests
@@ -96,10 +98,14 @@ jobs:
         run: node scripts/check-companion-chat.mjs
       - name: Verify approved model in the production room
         run: node scripts/check-room-source.mjs
+      - name: Verify chat expressions, mobile budget and offline cache
+        run: node scripts/check-chat-performance.mjs
       - name: Verify existing tabs reload after PWA updates
         run: node scripts/check-pwa-update.mjs
       - name: Verify source artwork bindings in real Chromium
-        run: CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
+        run: |
+          CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-source.mjs
+          CHROMIUM_PATH=/usr/bin/google-chrome node scripts/check-v4-fixed-face.mjs
       - name: Verify standalone v4 action regions and recovery
         run: node scripts/check-v4-review.mjs
       - name: Upload v4 candidate screenshots and model

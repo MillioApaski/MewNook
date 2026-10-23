@@ -1,0 +1,73 @@
+{
+  "keys": [
+    0.0,
+    0.125,
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    0.875,
+    1.0
+  ],
+  "eyes": {
+    "left": {
+      "slot_offset": [
+        475,
+        253
+      ],
+      "slot_size": [
+        81,
+        54
+      ],
+      "skin_rgb_offset": [
+        -2.0,
+        0.0,
+        3.0
+      ],
+      "closed_lash_source_pixels": 426,
+      "outside_painted_lash_dark_residue": 0,
+      "skin_repair": "harmonic original-skin fill; original skin and hair outside eye paint preserved",
+      "repair_bbox": [
+        477,
+        253,
+        555,
+        307
+      ],
+      "solver_iterations": 1343,
+      "edge_skin_pixels": 136,
+      "previous_skin_edge_mean_difference": 10.384803921568627,
+      "skin_edge_mean_difference": 0,
+      "neutral_matches_previous": true
+    },
+    "right": {
+      "slot_offset": [
+        583,
+        213
+      ],
+      "slot_size": [
+        87,
+        62
+      ],
+      "skin_rgb_offset": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "closed_lash_source_pixels": 447,
+      "outside_painted_lash_dark_residue": 0,
+      "skin_repair": "harmonic original-skin fill; original skin and hair outside eye paint preserved",
+      "repair_bbox": [
+        591,
+        214,
+        670,
+        275
+      ],
+      "solver_iterations": 1769,
+      "edge_skin_pixels": 150,
+      "previous_skin_edge_mean_difference": 9.962222222222222,
+      "skin_edge_mean_difference": 0,
+      "neutral_matches_previous": true
+    }
+  }
+}

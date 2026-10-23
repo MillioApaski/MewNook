@@ -1,0 +1,59 @@
+{
+  "keys": [
+    0.0,
+    0.125,
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    0.875,
+    1.0
+  ],
+  "eyes": {
+    "left": {
+      "slot_offset": [
+        475,
+        246
+      ],
+      "slot_size": [
+        84,
+        64
+      ],
+      "closed_lash_source_pixels": 426,
+      "skin_repair": "complete original eye footprint including pale crease; harmonic skin fill",
+      "repair_bbox": [
+        477,
+        247,
+        558,
+        309
+      ],
+      "solver_iterations": 1214,
+      "protected_hair_pixels": 624,
+      "hair_pixels_unchanged_in_all_frames": true,
+      "repair_hair_overlap_pixels": 0
+    },
+    "right": {
+      "slot_offset": [
+        583,
+        209
+      ],
+      "slot_size": [
+        94,
+        66
+      ],
+      "closed_lash_source_pixels": 447,
+      "skin_repair": "complete original eye footprint including pale crease; harmonic skin fill",
+      "repair_bbox": [
+        588,
+        210,
+        652,
+        271
+      ],
+      "solver_iterations": 1476,
+      "protected_hair_pixels": 1581,
+      "hair_pixels_unchanged_in_all_frames": true,
+      "repair_hair_overlap_pixels": 0
+    }
+  }
+}

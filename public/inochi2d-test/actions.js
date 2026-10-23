@@ -22,17 +22,36 @@ export function sampleAction(action,elapsed){
    result.brow=-.2*envelope
  }
  if(action==='sleep'){
-   result.sleepy=Math.min(1,t/450,(5000-t)/450)*.95
-   result.brow=result.sleepy*.6
+   const phase=Math.min(1,t/1000,(5000-t)/800)
+   result.sleepy=phase*phase*(3-2*phase)*.95
  }
  return result
 }
 export function sourceArtParameters(state,blink=0,wind=0){
- const closure=Math.max(blink,state.blink,state.sleepy*.82)
+ const drowsy=Math.max(0,Math.min(1,(state.sleepy-.2)/.75))
+ const closure=Math.max(blink,state.blink,drowsy)
  return {ParamEyeBlinkLeft:closure,ParamEyeBlinkRight:closure,
-  ParamMouthOpen:state.mouth,ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
+  ParamMouthOpen:state.mouth,ParamDrowsyMouth:drowsy*(1-Math.min(1,state.mouth/.2)),ParamHeadRoll:state.headRoll,ParamHeadY:state.headY,
   ParamHeadX:0,ParamBrowLeft:state.brow,ParamBrowRight:state.brow,
   ParamEarLeft:state.earLeft,ParamEarRight:state.earRight,
   ParamHairLeft:wind+state.hair,ParamHairRight:wind*.85-state.hair,
   ParamHairFront:wind*.65+state.hair*.7,ParamSleepy:0,ParamSleepyLeft:0,ParamSleepyRight:0}
+}
+
+// Retain the displayed pose across interruptions and activity changes.
+// Blink stays direct so a quick closure does not turn into a slow squint.
+export function createActionMixer(){
+ let pose=null,last=null
+ const keys=['mouth','sleepy','earLeft','earRight','headRoll','headY','hair','brow']
+ return (target,now)=>{
+   if(!pose){pose={...target};last=now;return {...pose}}
+   const dt=Math.min(100,Math.max(0,now-last));last=now
+   const weight=1-Math.exp(-dt/85)
+   for(const key of keys){
+     const next=pose[key]+(target[key]-pose[key])*weight
+     pose[key]=Math.abs(next-target[key])<.001?target[key]:next
+   }
+   pose.blink=target.blink;pose.done=target.done
+   return {...pose}
+ }
 }

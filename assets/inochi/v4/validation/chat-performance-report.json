@@ -1,0 +1,77 @@
+{
+  "environment": "Headless Chromium / software WebGL, local Vite server; timings are not real-phone benchmarks",
+  "expressions": [
+    {
+      "kind": "happy",
+      "brow": -0.157
+    },
+    {
+      "kind": "caring",
+      "brow": 0.169
+    },
+    {
+      "kind": "curious",
+      "brow": -0.15
+    }
+  ],
+  "errors": [],
+  "cold": {
+    "readyMs": 555.2,
+    "frames": 17,
+    "maxFps": "60",
+    "resources": [
+      {
+        "path": "/inochi2d/v4/poster.png",
+        "duration": 18,
+        "bytes": 1201610
+      },
+      {
+        "path": "/inochi2d-test/actions.js",
+        "duration": 7.599999999976717,
+        "bytes": 1073
+      },
+      {
+        "path": "/inochi2d-test/runtime/inochi_source_bridge.js",
+        "duration": 14.700000000011642,
+        "bytes": 23007
+      },
+      {
+        "path": "/inochi2d-test/runtime/parameter_opacity.js",
+        "duration": 12.5,
+        "bytes": 631
+      },
+      {
+        "path": "/inochi2d-test/runtime/inochi2d.js",
+        "duration": 15,
+        "bytes": 7760
+      },
+      {
+        "path": "/inochi2d-test/runtime/secondary_motion.js",
+        "duration": 13.799999999988358,
+        "bytes": 1034
+      },
+      {
+        "path": "/inochi2d-test/runtime/inochi2d_bg.wasm",
+        "duration": 7.7000000000116415,
+        "bytes": 911722
+      },
+      {
+        "path": "/inochi2d/v4/MewNook.inx",
+        "duration": 109.20000000001164,
+        "bytes": 1776122
+      }
+    ]
+  },
+  "streamingCancel": true,
+  "warmReadyMs": 216.5,
+  "offlineReadyMs": 159.5,
+  "offlineRepeat": true,
+  "mobile": {
+    "dpr": 1,
+    "maxFps": 30,
+    "width": 390,
+    "height": 616,
+    "framesInSecond": 17
+  },
+  "backgroundPauseResume": true
+}
