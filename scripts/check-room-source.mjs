@@ -40,7 +40,9 @@ const roomHash=modelHash(await readFile(new URL('../public/inochi2d/v4/MewNook.i
 assert.equal(roomHash,modelHash(await readFile(new URL('../public/inochi2d-test/models/MewNook-v4-review.inx',import.meta.url))),'Room and review must use the same model')
 const out=process.env.ROOM_CHECK_OUT||'/tmp/mewnook-source-room';await mkdir(out,{recursive:true});const report=[]
 try{
- const fresh=await browser.newPage({viewport:{width:1440,height:1000}})
+ // Fault injection must reach page.route; a Service Worker can serve the
+ // model before that handler sees it. Offline/SW behavior is tested separately.
+ const fresh=await browser.newPage({viewport:{width:1440,height:1000},serviceWorkers:'block'})
  const errors=[];fresh.on('pageerror',e=>errors.push(e.message))
  let releaseModel;const held=new Promise(resolve=>{releaseModel=resolve})
  await fresh.route('**/inochi2d/v4/MewNook.inx*',async route=>{await held;await route.continue()})
@@ -171,12 +173,18 @@ try{
  assert.ok(Math.abs(framing[0].scale-framing[1].scale)<.001,'DPR must not change the CSS size of the model')
  await writeFile(out+'/framing.json',JSON.stringify(framing,null,2))
  // A source-model download failure must keep the legacy model's old frame.
- const legacy=await browser.newPage({viewport:{width:1440,height:1000}})
- await legacy.route('**/inochi2d/v4/MewNook.inx*',route=>route.abort());await legacy.goto('http://127.0.0.1:4173/')
+ const legacy=await browser.newPage({viewport:{width:1440,height:1000},serviceWorkers:'block'})
+ let blockedV4=0
+ await legacy.route('**/inochi2d/v4/MewNook.inx*',route=>{blockedV4++;return route.abort()});await legacy.goto('http://127.0.0.1:4173/')
+ await legacy.waitForFunction(()=>['ready','error'].includes(document.querySelector('canvas')?.dataset.modelState),null,{timeout:60000})
+ const legacyState=await legacy.locator('canvas').evaluate(c=>({...c.dataset}))
+ assert.equal(blockedV4,1,'The v4 download must actually be blocked')
+ assert.equal(legacyState.modelState,'ready',JSON.stringify(legacyState))
+ assert.equal(legacyState.modelVersion,'v3',JSON.stringify(legacyState))
  await legacy.locator('canvas[data-model-version="v3"]').waitFor({timeout:60000})
  const legacyFrame=await legacy.locator('canvas').evaluate(c=>({scale:Number(c.dataset.inochi2dCameraScale),width:c.getBoundingClientRect().width/c.closest('.art-stage').getBoundingClientRect().width}))
  assert.equal(legacyFrame.scale,.32);assert.ok(Math.abs(legacyFrame.width-.377)<.001);await legacy.close()
  // Blocking both dynamic fallbacks must expose the original PNG instead of an empty room.
- const fallback=await browser.newPage();await fallback.route('**/*.inx*',route=>route.abort());await fallback.goto('http://127.0.0.1:4173/');await fallback.waitForFunction(()=>document.querySelector('canvas')?.dataset.modelState==='error');assert.equal(await fallback.locator('.art-character.inochi-ready').count(),0);assert.equal(await fallback.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'visible');assert.equal(await fallback.locator('.art-character img').evaluate(p=>getComputedStyle(p).visibility),'hidden');await fallback.close()
- assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',loadingPoster:true,noOldPortraitRequest:!oldPortraitRequested,handover,legacyMigration:true,headPat:true,repeatedPatEyelids:true,nightPatReturnsToSleep:true,modelSha256:roomHash,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,layers,opacity,framing,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
+ const fallback=await browser.newPage({serviceWorkers:'block'}),blockedModels=[];await fallback.route('**/*.inx*',route=>{blockedModels.push(new URL(route.request().url()).pathname);return route.abort()});await fallback.goto('http://127.0.0.1:4173/');await fallback.waitForFunction(()=>document.querySelector('canvas')?.dataset.modelState==='error');assert.deepEqual(blockedModels,['/inochi2d/v4/MewNook.inx','/inochi2d-test/models/MewNook-v3.inx','/inochi2d-test/models/MewNook-v2.inx']);assert.equal(await fallback.locator('.art-character.inochi-ready').count(),0);assert.equal(await fallback.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'visible');assert.equal(await fallback.locator('.art-character img').evaluate(p=>getComputedStyle(p).visibility),'hidden');await fallback.close()
+ assert.deepEqual(errors,[]);report.push({freshDefault:'v4 source art',loadingPoster:true,noOldPortraitRequest:!oldPortraitRequested,handover,legacyMigration:true,headPat:true,repeatedPatEyelids:true,nightPatReturnsToSleep:true,modelSha256:roomHash,chatAndReset:true,nightEyelids:true,optOutPersists:true,pngFallback:true,productionModelRequested:modelRequested,blockedV4,blockedModels,layers,opacity,framing,errors});await writeFile(out+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))
 }finally{await browser.close()}
