@@ -43,3 +43,26 @@ test('repeated touch blends from the displayed pose without reopening closed eye
  const settled=mix(sampleAction('tap',400),1400,2)
  assert.equal(settled.blink,1)
 })
+
+test('retriggered closed eyes stay closed through intermediate frames and delayed ticks',()=>{
+ for(const ticks of [[0,33,70,100,110,120,140,180,250,300],[70,110,197,300]]){
+  const mix=createActionMixer();mix(sampleAction('tap',450),1000,1)
+  for(const elapsed of ticks){
+   const pose=mix(sampleAction('tap',elapsed),1000+elapsed,2)
+   assert.equal(pose.blink,1,'reopened at '+elapsed+' ms')
+  }
+  let pose
+  for(let elapsed=370;elapsed<=4000;elapsed+=70)pose=mix(sampleAction(elapsed<2400?'tap':'none',elapsed),1000+elapsed,elapsed<2400?2:0)
+  assert.equal(pose.blink,0);assert.equal(pose.pat,0)
+ }
+})
+
+test('cancelling a retrigger releases the preserved eyelid closure',()=>{
+ const mix=createActionMixer();mix(sampleAction('tap',450),1000,1)
+ mix(sampleAction('tap',0),1000,2)
+ const released=mix(sampleAction('none',0),1140,0)
+ assert.ok(released.blink<1)
+ let end
+ for(let now=1210;now<3000;now+=70)end=mix(sampleAction('none',0),now,0)
+ assert.equal(end.blink,0);assert.equal(end.pat,0)
+})

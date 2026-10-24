@@ -73,7 +73,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
       const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261024-headpat':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261024-headpat'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261024-retrigger'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
         actionMixerRef.current=actionsRef.current.createActionMixer()
       }
@@ -161,6 +161,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       delete canvas.dataset.headPat
       delete canvas.dataset.headPatWeight
       delete canvas.dataset.headPatClosure
+      delete canvas.dataset.headPatRevision
       resizeRef.current=null
       actionsRef.current=null
       observer?.disconnect()
@@ -248,6 +249,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
           canvasRef.current.dataset.mouthOpen=values.ParamMouthOpen.toFixed(3)
           canvasRef.current.dataset.drowsyMouth=values.ParamDrowsyMouth.toFixed(3)
           canvasRef.current.dataset.headRoll=values.ParamHeadRoll.toFixed(3)
+          canvasRef.current.dataset.headPatRevision=String(touched?tapStartedRef.current:0)
         }
         return
       }

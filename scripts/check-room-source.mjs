@@ -106,12 +106,31 @@ try{
  await target.click()
  await page.waitForFunction(()=>Math.abs(Number(document.querySelector('canvas').dataset.headRoll))>.3)
  assert.ok(Number(await page.locator('canvas').getAttribute('data-head-pat-weight'))>.4);assert.equal(await page.locator('canvas').getAttribute('data-head-pat'),'active')
- const rollBefore=Number(await page.locator('canvas').getAttribute('data-head-roll'))
- const closureBefore=Number(await page.locator('canvas').getAttribute('data-head-pat-closure'))
- await target.click();await page.waitForTimeout(80)
- const rollAfter=Number(await page.locator('canvas').getAttribute('data-head-roll'))
- assert.ok(Math.abs(rollAfter-rollBefore)<.4,'repeated pat must blend from displayed pose')
- assert.ok(Math.abs(Number(await page.locator('canvas').getAttribute('data-head-pat-closure'))-closureBefore)<.3,'repeated pat must not snap the eyelids open')
+ // Capture at the actual pointer event, then inspect the new reaction's
+ // first 300 ms. Host-side locator calls do not represent one animation time.
+ await target.evaluate(button=>{
+  window.__patRetrigger=new Promise((resolve,reject)=>{
+   button.addEventListener('click',()=>{
+    const canvas=document.querySelector('canvas'),d=canvas.dataset
+    const before={revision:d.headPatRevision,closure:Number(d.headPatClosure),roll:Number(d.headRoll)},samples=[]
+    const finish=()=>{observer.disconnect();clearTimeout(timeout);resolve({before,samples})}
+    const observer=new MutationObserver(()=>{
+     const next=canvas.dataset
+     if(next.headPatRevision===before.revision||next.headPat==='idle')return
+     const elapsed=Date.now()-Number(next.headPatRevision)
+     if(elapsed<=300)samples.push({elapsed,closure:Number(next.headPatClosure),roll:Number(next.headRoll)})
+     if(elapsed>=300)finish()
+    })
+    const timeout=setTimeout(()=>{observer.disconnect();reject(new Error('No retrigger frames: '+JSON.stringify({before,samples,dataset:{...canvas.dataset}})))},5000)
+    observer.observe(canvas,{attributes:true,attributeFilter:['data-head-pat-revision','data-head-pat-closure']})
+   },{once:true,capture:true})
+  })
+ })
+ await target.click()
+ const retrigger=await page.evaluate(()=>window.__patRetrigger)
+ assert.ok(retrigger.samples.length>0,'Missing early retrigger samples: '+JSON.stringify(retrigger))
+ assert.ok(Math.abs(retrigger.samples[0].roll-retrigger.before.roll)<.4,'Repeated pat changed pose at interruption: '+JSON.stringify(retrigger))
+ assert.ok(retrigger.samples.every(s=>s.closure+.002>=retrigger.before.closure),'Repeated pat reopened the eyelids: '+JSON.stringify(retrigger))
  await page.screenshot({path:out+'/head-pat.png'})
  await page.waitForFunction(()=>document.querySelector('canvas').dataset.headPat==='idle')
  await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.headRoll)===0,{},{timeout:2000})

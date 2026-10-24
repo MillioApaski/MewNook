@@ -48,7 +48,8 @@ export function createActionMixer(){
  return (target,now,touchRevision=0)=>{
    if(!pose){pose={...target};last=now;lastTouch=touchRevision;return {...pose}}
    if(touchRevision!==lastTouch){
-     if(touchRevision&&pose.pat>.01)retrigger={pose:{...pose},at:now}
+     if(!touchRevision)retrigger=null
+     else if(pose.pat>.01)retrigger={pose:{...pose},at:now}
      lastTouch=touchRevision
    }
    const dt=Math.min(100,Math.max(0,now-last));last=now
@@ -65,7 +66,9 @@ export function createActionMixer(){
    if(retrigger){
      const phase=Math.max(0,Math.min(1,(now-retrigger.at)/300)),blend=phase*phase*(3-2*phase)
      for(const key of keys)pose[key]=retrigger.pose[key]+(target[key]-retrigger.pose[key])*blend
-     pose.blink=Math.max(target.blink,retrigger.pose.blink*(1-blend))
+     // Preserve the existing closure until the new blink catches up.
+     // Fading this floor briefly reopened eyes in the middle of a retrigger.
+     pose.blink=Math.max(target.blink,retrigger.pose.blink)
      if(phase===1)retrigger=null
    }
    pose.done=target.done
