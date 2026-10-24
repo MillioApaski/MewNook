@@ -1,5 +1,6 @@
 import assert from'node:assert/strict'
 import http from'node:http'
+import{createHash}from'node:crypto'
 import{mkdir,writeFile,readFile}from'node:fs/promises'
 import{fileURLToPath}from'node:url'
 import path from'node:path'
@@ -27,6 +28,11 @@ try{
  for(const name of['ParamHeadRoll','ParamHairLeft','ParamHairRight','ParamHairFront','ParamEarLeft','ParamEarRight','ParamTailDeform','ParamBreath','ParamBrowLeft','ParamBrowRight']){
   await clear();await set({[name]:1});const pos=diff(baseline,await snapshot(name+'-positive'));await set({[name]:-1});const neg=diff(baseline,await snapshot(name+'-negative'));assert.ok(pos.count>2&&neg.count>2,name+' binding has no visible effect');report.parameters[name]={positive:pos,negative:neg}
  }
+ // Touch-only bow must be an actual mesh/head transform, not just a timer.
+ await clear();await set({ParamHeadPat:1});const bow=diff(baseline,await snapshot('head-pat-bow'))
+ assert.ok(bow.count>500,'Touch-only head bow is not visibly bound')
+ await clear();const bowReset=diff(baseline,await snapshot());assert.equal(bowReset.count,0)
+ report.parameters.ParamHeadPat={positive:bow,resetChangedPixels:bowReset.count}
  // Exercise continuous eyelid meshes and every mouth opacity interval in WASM.
  for(const name of['ParamEyeBlinkLeft','ParamEyeBlinkRight','ParamMouthOpen','ParamDrowsyMouth']){
   await clear();const counts=[];for(let k=0;k<=16;k++){await set({[name]:k/16});counts.push(diff(baseline,await snapshot()).count)}assert.equal(counts[0],0);assert.ok(Math.max(...counts)>8);report.parameters[name]={intermediateChangedPixels:counts}
@@ -35,5 +41,6 @@ try{
  for(const name of['chat','sleep','tap','idle','sleep','chat','tap']){await p.evaluate(n=>window.probe.action(n,650),name);await p.waitForTimeout(90)}
  await clear();report.switchReset=diff(baseline,await snapshot('reset'));assert.ok(report.switchReset.count<12)
  await p.evaluate(()=>window.probe.camera(0,350,.95));await clear();await snapshot('face-neutral');for(const[n,t]of[['idle',140],['chat',800],['sleep',900],['tap',650]]){await p.evaluate(([n,t])=>window.probe.action(n,t),[n,t]);await p.waitForTimeout(150);await snapshot('face-'+n)}
+ report.modelSha256=createHash('sha256').update(await readFile(path.join(root,'assets/inochi/v4/rig/MewNook-v4-source-rig.inx'))).digest('hex')
  report.debug=await p.evaluate(()=>window.probe.debug());assert.deepEqual(errors,[]);assert.equal(report.debug.canvasDataset.inochi2dTickError,undefined);await writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({actions:report.actions,parameters:Object.keys(report.parameters),switchReset:report.switchReset,errors},null,2))
 }finally{await browser?.close();server.close()}

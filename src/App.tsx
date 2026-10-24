@@ -222,6 +222,8 @@ export default function App() {
   const handleCompanionClick = () => {
     setInochiTouches(n=>n+1)
     lastInteraction.current = Date.now()
+    // Touch still animates, but must not replace a line already being delivered.
+    if(speechUntil>Date.now())return
     const mode = companionMode(timer.phase, timer.running)
     const line = pickCompanionClickLine(mode, touchCount.current++, activeArtPose)
     // Focus-mode taps acknowledge the user without changing the reading/typing pose.
