@@ -201,6 +201,46 @@
       "pauseRestoresIdle": true
     },
     {
+      "scene": "night",
+      "width": 2048,
+      "height": 1098,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8855,
+        "frontScale": 0.88548,
+        "top": 71.990005,
+        "frontTop": 72,
+        "region": [
+          577,
+          904,
+          932,
+          976
+        ]
+      },
+      "foregroundPixels": 20688,
+      "visibleHandPixels": 7866,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
       "scene": "day",
       "width": 390,
       "height": 844,
@@ -242,21 +282,22 @@
     }
   ],
   "errors": [],
+  "waistBackingOpaque": true,
+  "foregroundExcludesTorso": true,
   "sceneSwitchDuringFocus": true,
   "cachedFocusOffline": true,
   "handsLoadFailureKeepsBody": true,
-  "bodySha256": "311bc511c0b9673725c176103d39dcfd7159f06e9649a382ad5e2662d9e4ffd3",
-  "handsSha256": "fa664fab820b7fd41842b32c878c1bf179e4915f19b2285730311d7a8dd3a62c",
-  "unitTestsPassed": 32,
-  "productionBuild": "passed",
-  "roomRegression": "passed",
-  "chatOfflineBackgroundRegression": "passed",
-  "fixedFaceRegression": {
-    "modelSha256": "311bc511c0b9673725c176103d39dcfd7159f06e9649a382ad5e2662d9e4ffd3",
-    "closedEyeballContributionPixels": 0,
-    "resetChangedPixels": 0,
-    "hairWindResetChangedPixels": 0,
-    "headRollResetChangedPixels": 0,
-    "errors": []
+  "bodySha256": "ee28f666f273ca6addf3fb05e9be8dcc4151fb83765561b630634accd763ca9c",
+  "handsSha256": "5313e56afad475b1840d4df50383e09574595319e4b5b11a1427a0fe1d19a72e",
+  "validation": {
+    "unitTests": 32,
+    "build": "passed",
+    "productionRoom": "passed",
+    "fixedFace": {
+      "closedBluePixels": 0,
+      "closedEyeballContributionPixels": 0,
+      "protectedCheekChanges": 0,
+      "protectedHairChanges": 0
+    }
   }
 }

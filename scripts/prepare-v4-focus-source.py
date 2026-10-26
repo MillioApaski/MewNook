@@ -7,8 +7,8 @@ from PIL import Image
 from v4_source_io import export_ora
 R=Path(__file__).resolve().parents[1];V=R/'assets/inochi/v4';O=V/'focus-source-v1';W,H=1122,1402
 native=np.array(Image.open(V/'scene-source-v1/part-19.png').convert('RGBA'))
-clean=np.array(Image.open(O/'inputs/clean-body-painted.png').convert('RGBA').resize((481,488),Image.Resampling.LANCZOS))
-report={'canvas':[W,H],'offset':[345,375],'split_source_y':695,'poses':{}}
+fill=np.array(Image.open(O/'inputs/torso-fill-painted-v2.png').convert('RGBA').resize((481,650),Image.Resampling.LANCZOS))
+report={'canvas':[W,H],'offset':[345,375],'split_source_y':695,'torso_backing':'registered fabric fill, no resting sleeves','foreground_excludes_center_torso':True,'poses':{}}
 for pose in ('typing','reading'):
  a=np.array(Image.open(O/'inputs'/(pose+'-painted.png')).convert('RGBA').resize((481,650),Image.Resampling.LANCZOS))
  # Lock original neck, collar and shoulders. The painted arm study is used
@@ -17,7 +17,21 @@ for pose in ('typing','reading'):
  weight=np.clip((np.arange(650)-190)/90,0,1)[:,None,None]
  a=np.round(n*(1-weight)+a*weight).astype('uint8')
  assert np.array_equal(a[:190],native[:190])
- back=a.copy();front=a.copy();back[320:]=0;back[320:488]=clean[320:488];front[:320]=0
+ # The body behind the desk must be the SAME extended working torso.
+ # Never paste the resting lap/sleeves beneath the raised arms.
+ back=a.copy();front=a.copy();front[:320]=0
+ # Fill only the missing center waist behind the table. Existing pose pixels
+ # remain unchanged; the registered repaint supplies hidden cardigan fabric.
+ yy,xx=np.mgrid[:650,:481]
+ fabric=np.clip((yy-300)/50,0,1)*np.clip((500-yy)/15,0,1)*np.clip((xx-130)/12,0,1)*np.clip((355-xx)/12,0,1)
+ back=np.array(Image.composite(Image.fromarray(fill),Image.fromarray(back),Image.fromarray(np.round(fabric*255).astype('uint8'))))
+ # Remove the central jacket bridge from the foreground. Only the two
+ # forearms and the book/keyboard may cross the desktop; torso stays behind.
+ yy,xx=np.mgrid[:650,:481]
+ left=np.interp(yy[:,0],[320,350,380,420,460],[174,185,169,153,137])[:,None]
+ right=np.interp(yy[:,0],[320,350,380,420,460],[331,315,319,334,351])[:,None]
+ front[:,:,3]=np.where((yy<462)&(xx>left)&(xx<right),0,front[:,:,3])
+ front[front[:,:,3]==0]=0
  for label,tile in [('body',back),('hands',front)]:
   full=Image.new('RGBA',(W,H));full.alpha_composite(Image.fromarray(tile),(345,375));full.save(O/(pose+'-'+label+'.png'))
  full_body=np.array(Image.open(O/(pose+'-body.png')));full_hands=np.array(Image.open(O/(pose+'-hands.png')));composite=Image.alpha_composite(Image.fromarray(full_body),Image.fromarray(full_hands))

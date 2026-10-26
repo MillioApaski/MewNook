@@ -12,7 +12,7 @@ def node(name,trans=(0,0),children=None):return {'uuid':fresh(),'name':name,'typ
 parser=argparse.ArgumentParser();parser.add_argument('--foreground',action='store_true');parser.add_argument('--output',type=Path);args=parser.parse_args()
 root=node('Root');breath=node('Head breath');head=node('Head root',pivot-np.array([W/2,H/2]));root['children'].append(breath);breath['children'].append(head)
 def part(name,im,offset,z,parent,role,side=None):
- a=np.array(im.convert('RGBA'));h,w=a.shape[:2];a[:,:,:3]=((a[:,:,:3].astype('uint16')*a[:,:,3:4].astype('uint16')+127)//255).astype('uint8');buf=io.BytesIO();Image.fromarray(a).save(buf,format='PNG');tex=len(textures);textures.append(buf.getvalue());nx=26 if role=='work-hands' else 18 if role in ['eye-lash','eye-lid'] else 10 if role in ['ear','back-hair','connector','front-hair','body','neck-support','tail'] else 2;ny=24 if role=='work-hands' else 4 if role in ['eye-lash','eye-lid'] else 12 if nx>2 else 2
+ a=np.array(im.convert('RGBA'));h,w=a.shape[:2];a[:,:,:3]=((a[:,:,:3].astype('uint16')*a[:,:,3:4].astype('uint16')+127)//255).astype('uint8');buf=io.BytesIO();Image.fromarray(a).save(buf,format='PNG');tex=len(textures);textures.append(buf.getvalue());nx=26 if role=='work-hands' else 18 if role in ['eye-lash','eye-lid'] else 10 if role in ['ear','back-hair','connector','front-hair','body','neck-support','tail'] else 18 if role=='iris' else 2;ny=24 if role=='work-hands' else 4 if role in ['eye-lash','eye-lid'] else 12 if nx>2 else 2
  verts=[];uv=[];indices=[];coords=[]
  for j in range(ny):
   for i in range(nx):
@@ -47,7 +47,7 @@ def eye(side,z):
   im=np.array(Image.open(F/(side+'-'+label+'.png')).convert('RGBA'))
   im[:,:,3]=np.where(eyeball_mask,im[:,:,3],0)
   im=Image.fromarray(im);bb=im.getbbox();assert bb
-  part(side+' independent '+label,im.crop(bb),bb[:2],z-5 if label=='iris' else z-4,head,'eye',side)
+  part(side+' independent '+label,im.crop(bb),bb[:2],z-5 if label=='iris' else z-4,head,'iris' if label=='iris' else 'eye',side)
  skin=np.array(Image.open(V/'face-layer-rebuild-v3/face-and-neck.png').convert('RGBA'))
  xs=np.flatnonzero(opening.any(0));x0,x1=int(xs.min()),int(xs.max())+1
  y0,y1=int(top[xs].min())-1,int(bottom[xs].max())+2
@@ -130,6 +130,16 @@ if args.foreground:
    d[:,1]=weight*(1.4 if pose=='typing' else .2);work[side].append(bind(q,'deform',[(-d).tolist(),zero.tolist(),d.tolist()]))
  param('ParamFocus',enter,0,1,2)
  for side in ('Left','Right'):param('ParamWork'+side,work[side])
+# A native downward-looking pose, separate from touch and ordinary chat.
+# Pitch the head about the neck; keep eyes, lids, face and hair together.
+look=[bind(head,'transform.t.y',[0.,35.]),bind(head,'transform.s.y',[1.,.84]),bind(head,'transform.r.z',[0.,.10])]
+for q,role,xy,side in sourceparts:
+ if role=='iris':
+  # Anchor the aperture boundary; only the interior iris mesh moves down.
+  x,y=xy.T;dx=np.minimum(x-x.min(),x.max()-x);dy=np.minimum(y-y.min(),y.max()-y)
+  d=np.zeros_like(xy);d[:,1]=10*np.clip(dx/10,0,1)*np.clip(dy/7,0,1)
+  look.append(bind(q,'deform',[np.zeros_like(d).tolist(),d.tolist()]))
+param('ParamWorkLookDown',look,0,1,2)
 # Separate touch-only weight makes the bow visible without amplifying idle/chat.
 param('ParamHeadPat',[bind(head,'transform.t.y',[0.,7.]),bind(head,'transform.r.z',[0.,.025])],0,1,2)
 param('ParamHeadRoll',[bind(head,'transform.r.z',[-.055,0,.055])]);param('ParamHeadX',[bind(head,'transform.t.x',[-3.,0.,3.])]);param('ParamHeadY',[bind(head,'transform.t.y',[-3.,0.,3.])])

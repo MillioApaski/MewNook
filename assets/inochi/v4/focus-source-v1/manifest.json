@@ -8,16 +8,18 @@
     375
   ],
   "split_source_y": 695,
+  "torso_backing": "registered fabric fill, no resting sleeves",
+  "foreground_excludes_center_torso": true,
   "poses": {
     "typing": {
       "original_upper_torso_exact": true,
-      "body_sha256": "f3c74a244ac5b8c99502a7edc15f1c5b47300d95a84d98b202c68fa8f5cc87fb",
-      "hands_sha256": "1ac3ec7ce98dd6792abb1b240442090e5873129dea5fe9c4e96c18332e44f844"
+      "body_sha256": "c9ea2783bd361f8433697f99ccefff9727010fe7495422f1b3aa5259834178be",
+      "hands_sha256": "e49c1815298df237f987864ba8549aa69de335c7f8ba117740c9ed3686a36da7"
     },
     "reading": {
       "original_upper_torso_exact": true,
-      "body_sha256": "8445296127e3e3d845f9c157ed9123de5aada8bf663b46a9edc3fe5e7a5e0283",
-      "hands_sha256": "3a6d9c8be177651b3bd518863b88d42e7ecdb6556c2d0e92273582ff2b6c9a9f"
+      "body_sha256": "6bdd0fb43d5e2e497cfd3b5a24cdf4abaa85e0151fb0bdaddb0395055be85ce6",
+      "hands_sha256": "9e8abe21e62b722c0d888ba84115a7a488165715467e32d2e44c38afce5fc6c1"
     }
   },
   "desk_patches": {

@@ -26,7 +26,7 @@ export function useFocusHands({active,requested,host,body,scale}:{active:boolean
     const element=canvas.current
     setFailed(false)
     void(async()=>{
-      const bridgeUrl='/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261026-focus'
+      const bridgeUrl='/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261027-focus-fix'
       const bridge=await import(/* @vite-ignore */ bridgeUrl)
       if(disposed)return
       c=await bridge.createInochi2DController({wasmUrl:'/inochi2d-test/runtime/inochi2d_bg.wasm'}) as HandsController
@@ -49,7 +49,7 @@ export function useFocusHands({active,requested,host,body,scale}:{active:boolean
       observer.observe(element.parentElement!)
       if(body.current?.parentElement)observer.observe(body.current.parentElement)
       window.addEventListener('resize',resize)
-      await c.loadModel('/inochi2d/v4/MewNook-hands.inx?rig=source-art-20261026-focus')
+      await c.loadModel('/inochi2d/v4/MewNook-hands.inx?rig=source-art-20261027-focus-fix')
       if(disposed)return
       resize();c.setRenderPolicy({paused:true,maxFps:30});controller.current=c;setLoaded(true)
     })().catch(async()=>{controller.current=null;if(c){await c.unmount();c=null}if(!disposed)setFailed(true)})

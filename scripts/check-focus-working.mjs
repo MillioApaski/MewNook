@@ -7,16 +7,28 @@ const origin=process.env.ROOM_TEST_ORIGIN||'http://127.0.0.1:4173',out='assets/i
 await mkdir(out,{recursive:true})
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl']})
 const report={cases:[],errors:[]}
+for(const pose of ['reading','typing']){
+ const body=PNG.sync.read(await readFile(`assets/inochi/v4/focus-source-v1/${pose}-body.png`))
+ const hands=PNG.sync.read(await readFile(`assets/inochi/v4/focus-source-v1/${pose}-hands.png`))
+ for(let y=780;y<800;y++)for(let x=550;x<640;x++){
+  const i=(y*body.width+x)*4
+  assert.ok(body.data[i+3]>250,'Missing jacket exposes the chair between the arms')
+  assert.equal(hands.data[i+3],0,'Central jacket must stay behind the desk')
+ }
+}
+report.waistBackingOpaque=true;report.foregroundExcludesTorso=true
 const changed=(a,b,box)=>{let count=0;for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){const i=(y*a.width+x)*4;if(Math.abs(a.data[i]-b.data[i])+Math.abs(a.data[i+1]-b.data[i+1])+Math.abs(a.data[i+2]-b.data[i+2])>35)count++}return count}
 try{
- for(const [scene,width,height]of[['day',1440,1000],['day',2560,1080],['rain',1440,1000],['sunset',1440,1000],['night',1440,1000],['day',390,844]]){
+ for(const [scene,width,height]of[['day',1440,1000],['day',2560,1080],['rain',1440,1000],['sunset',1440,1000],['night',1440,1000],['night',2048,1098],['day',390,844]]){
   const p=await browser.newPage({viewport:{width,height}}),requests=[]
   p.on('pageerror',e=>report.errors.push(e.message));p.on('request',r=>{if(r.url().includes('MewNook-hands.inx'))requests.push(r.url())})
   await p.addInitScript(scene=>{localStorage.setItem('mewnook:settings',JSON.stringify({scene,city:''}));localStorage.setItem('mewnook:focusPose',JSON.stringify('reading'))},scene)
   await p.goto(origin);await p.locator('.inochi-demo-canvas[data-model-state=ready]').waitFor({timeout:60000})
+  assert.equal(await p.locator('.inochi-demo-canvas').getAttribute('data-work-look-down'),'0.000')
   assert.equal(requests.length,0,'Idle must not load a second model')
   await p.getByRole('button',{name:'开始或继续计时',exact:true}).click()
   await p.waitForFunction(()=>Number(document.querySelector('.inochi-demo-canvas').dataset.focusBlend)>.999,null,{timeout:30000})
+  assert.equal(await p.locator('.inochi-demo-canvas').getAttribute('data-work-look-down'),'1.000','Focus must look down at the work surface')
   await p.addStyleTag({content:'.vn-dialogue{visibility:hidden!important}'})
   const layers=await p.locator('.art-stage').evaluate(e=>[...e.children].map(c=>[c.dataset.roomLayer,Number(getComputedStyle(c).zIndex)]))
   assert.deepEqual(layers,[['background',0],['character',2],['desk',3],['hands',4]])
@@ -58,6 +70,7 @@ try{
   }
   await p.getByRole('button',{name:'暂停计时',exact:true}).click()
   await p.waitForFunction(()=>Number(document.querySelector('.inochi-demo-canvas').dataset.focusBlend)===0)
+  assert.equal(await p.locator('.inochi-demo-canvas').getAttribute('data-work-look-down'),'0.000','Pause must restore the head pose')
   assert.equal(await p.locator('.source-hands-canvas').getAttribute('data-render-paused'),'true')
   report.cases.push({scene,width,height,layers,geometry,foregroundPixels,visibleHandPixels,poseSwitch:true,headPatKeepsWorking:true,pauseRestoresIdle:true})
   if(scene==='day'&&width===1440){
