@@ -47,11 +47,11 @@ try {
   await page.getByRole('textbox',{name:'和猫娘说话',exact:true}).fill('测试等待与取消')
   await page.getByRole('button',{name:'发送消息',exact:true}).click()
   await page.getByRole('button',{name:'停止生成',exact:true}).waitFor()
-  assert.equal(await page.locator('canvas').getAttribute('data-activity'),'idle','waiting does not open mouth')
+  assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-activity'),'idle','waiting does not open mouth')
   await page.getByRole('button',{name:'停止生成',exact:true}).click()
   release()
   await page.getByText('已停止生成，可以重试。',{exact:true}).waitFor()
-  assert.equal(await page.locator('canvas').getAttribute('data-activity'),'idle')
+  assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-activity'),'idle')
   assert.equal(await page.getByText('迟到的回复',{exact:true}).count(),0)
   console.log('Companion pending request / cancel passed')
 } finally {

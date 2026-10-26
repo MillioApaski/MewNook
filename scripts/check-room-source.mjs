@@ -49,21 +49,21 @@ try{
  let oldPortraitRequested=false;fresh.on('request',r=>{if(/\/assets\/(rooms\/[^/]+\/character|companion\/)/.test(r.url()))oldPortraitRequested=true})
  await fresh.goto('http://127.0.0.1:4173/',{waitUntil:'domcontentloaded'})
  await fresh.waitForFunction(()=>{const p=document.querySelector('.source-character-poster');return p?.complete&&p.naturalWidth>0})
- assert.equal(await fresh.locator('canvas').getAttribute('data-model-state'),'loading')
+ assert.equal(await fresh.locator('canvas.inochi-demo-canvas').getAttribute('data-model-state'),'loading')
  assert.equal(await fresh.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'visible')
  assert.equal(await fresh.locator('.art-character img').evaluate(p=>getComputedStyle(p).visibility),'hidden')
- assert.equal(await fresh.locator('canvas').evaluate(c=>getComputedStyle(c).visibility),'hidden')
+ assert.equal(await fresh.locator('canvas.inochi-demo-canvas').evaluate(c=>getComputedStyle(c).visibility),'hidden')
  assert.equal(await fresh.locator('.inochi-demo-layer').evaluate(p=>getComputedStyle(p).opacity),'1')
  await fresh.screenshot({path:out+'/loading-poster.png'})
  await fresh.setViewportSize({width:390,height:844});await fresh.waitForTimeout(100)
  await fresh.screenshot({path:out+'/loading-poster-mobile.png'})
  await fresh.setViewportSize({width:1440,height:1000});releaseModel()
 
- await fresh.locator('canvas[data-model-revision="source-art-20261024-headpat"]').waitFor({timeout:60000})
+ await fresh.locator('canvas[data-model-revision="source-art-20261026-focus"]').waitFor({timeout:60000})
  await fresh.locator('.art-character.inochi-ready').waitFor();await fresh.waitForTimeout(350);await fresh.screenshot({path:out+'/fresh-install.png'})
- assert.equal(await fresh.locator('canvas').getAttribute('data-model-version'),'v4')
+ assert.equal(await fresh.locator('canvas.inochi-demo-canvas').getAttribute('data-model-version'),'v4')
  const layers=await fresh.locator('.art-stage').evaluate(stage=>[...stage.children].map(e=>({name:e.dataset.roomLayer,z:Number(getComputedStyle(e).zIndex)})))
- assert.deepEqual(layers,[{name:'background',z:0},{name:'character',z:2},{name:'desk',z:3}])
+ assert.deepEqual(layers,[{name:'background',z:0},{name:'character',z:2},{name:'desk',z:3},{name:'hands',z:4}])
  const opacity=await fresh.evaluate(()=>{
   const desk=document.querySelector('.art-desk-layer'),poster=document.querySelector('.source-character-poster'),c=document.createElement('canvas');c.width=1672;c.height=941;const ctx=c.getContext('2d');ctx.drawImage(desk,0,0);const pixels=ctx.getImageData(0,0,1672,941).data
   const partial=[600,900].map(x=>{let count=0;for(let y=0;y<941;y++){const a=pixels[(y*1672+x)*4+3];if(a>0&&a<255)count++}return count})
@@ -74,7 +74,7 @@ try{
 
  assert.equal(oldPortraitRequested,false,'loading must not fetch the old portrait')
  assert.equal(await fresh.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'hidden')
- assert.equal(await fresh.locator('canvas').evaluate(c=>getComputedStyle(c).visibility),'visible')
+ assert.equal(await fresh.locator('canvas.inochi-demo-canvas').evaluate(c=>getComputedStyle(c).visibility),'visible')
  const handover=await fresh.evaluate(()=>{
   const p=document.querySelector('.source-character-poster').getBoundingClientRect(),c=document.querySelector('canvas'),b=c.getBoundingClientRect(),d=c.dataset
   const scale=Number(d.inochi2dCameraScale)/Number(d.inochi2dDevicePixelRatio)
@@ -89,7 +89,7 @@ try{
  await page.addInitScript(()=>{
   if(!localStorage.getItem('mewnook:settings'))localStorage.setItem('mewnook:settings',JSON.stringify({inochiTestMode:false,inochiModel:'v3',scene:'day',city:'',nickname:'keep-me'}))
  })
- await page.goto('http://127.0.0.1:4173/');await page.locator('canvas[data-model-revision="source-art-20261024-headpat"]').waitFor({timeout:60000});await page.locator('.art-character.inochi-ready').waitFor();assert.ok(modelRequested)
+ await page.goto('http://127.0.0.1:4173/');await page.locator('canvas[data-model-revision="source-art-20261026-focus"]').waitFor({timeout:60000});await page.locator('.art-character.inochi-ready').waitFor();assert.ok(modelRequested)
  const migrated=await page.evaluate(()=>JSON.parse(localStorage.getItem('mewnook:settings')));assert.equal(migrated.nickname,'keep-me');assert.equal(migrated.inochiTestMode,true);assert.equal(migrated.inochiModel,'v4');assert.equal(migrated.inochiModelRevision,1)
  await page.waitForTimeout(350);await page.screenshot({path:out+'/day.png'})
  assert.equal(await page.locator('.art-character').evaluate(e=>getComputedStyle(e).pointerEvents),'none')
@@ -99,13 +99,13 @@ try{
  // Empty corner is outside the clipped ellipse; body is below the head.
  await page.mouse.click(head.x+1,head.y+1)
  await page.waitForTimeout(100)
- assert.equal(await page.locator('canvas').getAttribute('data-head-pat'),'idle')
+ assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-head-pat'),'idle')
  await page.mouse.click(head.x+head.width/2,head.y+head.height+40)
  await page.waitForTimeout(100)
- assert.equal(await page.locator('canvas').getAttribute('data-head-pat'),'idle')
+ assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-head-pat'),'idle')
  await target.click()
  await page.waitForFunction(()=>Math.abs(Number(document.querySelector('canvas').dataset.headRoll))>.3)
- assert.ok(Number(await page.locator('canvas').getAttribute('data-head-pat-weight'))>.4);assert.equal(await page.locator('canvas').getAttribute('data-head-pat'),'active')
+ assert.ok(Number(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-head-pat-weight'))>.4);assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-head-pat'),'active')
  // Capture at the actual pointer event, then inspect the new reaction's
  // first 300 ms. Host-side locator calls do not represent one animation time.
  await target.evaluate(button=>{
@@ -140,20 +140,20 @@ try{
  await page.waitForFunction(()=>document.querySelector('canvas').dataset.activity==='idle'&&Number(document.querySelector('canvas').dataset.mouthOpen)<.015)
  // Persisted opt-out and re-enable must work after the one-time upgrade.
  await page.getByRole('button',{name:'设置',exact:true}).click();const toggle=page.locator('.inochi-test-settings input[type=checkbox]');await toggle.uncheck();await page.reload();assert.equal(await page.locator('canvas.inochi-demo-canvas').count(),0)
- await page.getByRole('button',{name:'设置',exact:true}).click();await page.locator('.inochi-test-settings input[type=checkbox]').check();await page.locator('canvas[data-model-revision="source-art-20261024-headpat"]').waitFor({timeout:60000})
+ await page.getByRole('button',{name:'设置',exact:true}).click();await page.locator('.inochi-test-settings input[type=checkbox]').check();await page.locator('canvas[data-model-revision="source-art-20261026-focus"]').waitFor({timeout:60000})
  await page.getByRole('button',{name:'关闭面板',exact:true}).click()
  for(const scene of['rain','sunset','night']){
   await page.evaluate(scene=>{const s=JSON.parse(localStorage.getItem('mewnook:settings'));localStorage.setItem('mewnook:settings',JSON.stringify({...s,scene}))},scene)
-  await page.reload();await page.locator('.art-character.inochi-ready').waitFor({timeout:60000});if(scene==='night'){await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.eyeClosure)>.98&&Number(document.querySelector('canvas').dataset.drowsyMouth)>.98);assert.ok(Number(await page.locator('canvas').getAttribute('data-mouth-open'))<.015)}
+  await page.reload();await page.locator('.art-character.inochi-ready').waitFor({timeout:60000});if(scene==='night'){await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.eyeClosure)>.98&&Number(document.querySelector('canvas').dataset.drowsyMouth)>.98);assert.ok(Number(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-mouth-open'))<.015)}
   if(scene==='night'){
    await page.locator('.source-head-target').click()
    await page.waitForFunction(()=>Number(document.querySelector('canvas').dataset.headPatWeight)>.6)
-   assert.equal(await page.locator('canvas').getAttribute('data-activity'),'chat')
+   assert.equal(await page.locator('canvas.inochi-demo-canvas').getAttribute('data-activity'),'chat')
    await page.waitForFunction(()=>document.querySelector('canvas').dataset.headPat==='idle'&&document.querySelector('canvas').dataset.activity==='sleepy'&&Number(document.querySelector('canvas').dataset.eyeClosure)>.98&&Number(document.querySelector('canvas').dataset.drowsyMouth)>.98)
   }
   await page.waitForTimeout(350);await page.screenshot({path:out+'/'+scene+'.png'})
  }
- await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);const mobileBounds=await page.locator('canvas').boundingBox();console.log('MOBILE BOUNDS',JSON.stringify(mobileBounds));await page.screenshot({path:out+'/mobile.png'});assert.ok(mobileBounds.x>=-1&&mobileBounds.x+mobileBounds.width<=391,'source character canvas must fit mobile viewport')
+ await page.setViewportSize({width:390,height:844});await page.waitForTimeout(350);const mobileBounds=await page.locator('canvas.inochi-demo-canvas').boundingBox();console.log('MOBILE BOUNDS',JSON.stringify(mobileBounds));await page.screenshot({path:out+'/mobile.png'});assert.ok(mobileBounds.x>=-1&&mobileBounds.x+mobileBounds.width<=391,'source character canvas must fit mobile viewport')
  // Check composition in source coordinates, including the actual foreground
  // alpha edge. A ready canvas alone missed the former full-body/stool framing.
  const framing=[]
@@ -183,7 +183,7 @@ try{
   assert.ok(width<=680?geometry.ear.y>geometry.timer.bottom:geometry.earRight.x<geometry.timer.left,'timer must not cover the ears')
   await framed.screenshot({path:out+`/framing-${scene}-${width}-${deviceScaleFactor}.png`});framing.push({scene,width,height,deviceScaleFactor,...geometry})
   if(width===2560){
-   const before=await framed.locator('canvas').getAttribute('data-inochi2d-camera-scale')
+   const before=await framed.locator('canvas.inochi-demo-canvas').getAttribute('data-inochi2d-camera-scale')
    await framed.setViewportSize({width,height:900})
    await framed.waitForFunction(before=>document.querySelector('canvas').dataset.inochi2dCameraScale!==before,before)
   }
@@ -196,12 +196,12 @@ try{
  let blockedV4=0
  await legacy.route('**/inochi2d/v4/MewNook.inx*',route=>{blockedV4++;return route.abort()});await legacy.goto('http://127.0.0.1:4173/')
  await legacy.waitForFunction(()=>['ready','error'].includes(document.querySelector('canvas')?.dataset.modelState),null,{timeout:60000})
- const legacyState=await legacy.locator('canvas').evaluate(c=>({...c.dataset}))
+ const legacyState=await legacy.locator('canvas.inochi-demo-canvas').evaluate(c=>({...c.dataset}))
  assert.equal(blockedV4,1,'The v4 download must actually be blocked')
  assert.equal(legacyState.modelState,'ready',JSON.stringify(legacyState))
  assert.equal(legacyState.modelVersion,'v3',JSON.stringify(legacyState))
  await legacy.locator('canvas[data-model-version="v3"]').waitFor({timeout:60000})
- const legacyFrame=await legacy.locator('canvas').evaluate(c=>({scale:Number(c.dataset.inochi2dCameraScale),width:c.getBoundingClientRect().width/c.closest('.art-stage').getBoundingClientRect().width}))
+ const legacyFrame=await legacy.locator('canvas.inochi-demo-canvas').evaluate(c=>({scale:Number(c.dataset.inochi2dCameraScale),width:c.getBoundingClientRect().width/c.closest('.art-stage').getBoundingClientRect().width}))
  assert.equal(legacyFrame.scale,.32);assert.ok(Math.abs(legacyFrame.width-.377)<.001);await legacy.close()
  // Blocking both dynamic fallbacks must expose the original PNG instead of an empty room.
  const fallback=await browser.newPage({serviceWorkers:'block'}),blockedModels=[];await fallback.route('**/*.inx*',route=>{blockedModels.push(new URL(route.request().url()).pathname);return route.abort()});await fallback.goto('http://127.0.0.1:4173/');await fallback.waitForFunction(()=>document.querySelector('canvas')?.dataset.modelState==='error');assert.deepEqual(blockedModels,['/inochi2d/v4/MewNook.inx','/inochi2d-test/models/MewNook-v3.inx','/inochi2d-test/models/MewNook-v2.inx']);assert.equal(await fallback.locator('.art-character.inochi-ready').count(),0);assert.equal(await fallback.locator('.source-character-poster').evaluate(p=>getComputedStyle(p).visibility),'visible');assert.equal(await fallback.locator('.art-character img').evaluate(p=>getComputedStyle(p).visibility),'hidden');await fallback.close()

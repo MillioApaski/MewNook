@@ -9,9 +9,10 @@ def fresh():
  global uid
  uid+=1;return uid
 def node(name,trans=(0,0),children=None):return {'uuid':fresh(),'name':name,'type':'Node','enabled':True,'zsort':0,'transform':{'trans':[float(trans[0]),float(trans[1]),0.],'rot':[0.,0.,0.],'scale':[1.,1.]},'lockToRoot':False,'children':children or []}
+parser=argparse.ArgumentParser();parser.add_argument('--foreground',action='store_true');parser.add_argument('--output',type=Path);args=parser.parse_args()
 root=node('Root');breath=node('Head breath');head=node('Head root',pivot-np.array([W/2,H/2]));root['children'].append(breath);breath['children'].append(head)
 def part(name,im,offset,z,parent,role,side=None):
- a=np.array(im.convert('RGBA'));h,w=a.shape[:2];a[:,:,:3]=((a[:,:,:3].astype('uint16')*a[:,:,3:4].astype('uint16')+127)//255).astype('uint8');buf=io.BytesIO();Image.fromarray(a).save(buf,format='PNG');tex=len(textures);textures.append(buf.getvalue());nx=18 if role in ['eye-lash','eye-lid'] else 10 if role in ['ear','back-hair','connector','front-hair','body','neck-support','tail'] else 2;ny=4 if role in ['eye-lash','eye-lid'] else 12 if nx>2 else 2
+ a=np.array(im.convert('RGBA'));h,w=a.shape[:2];a[:,:,:3]=((a[:,:,:3].astype('uint16')*a[:,:,3:4].astype('uint16')+127)//255).astype('uint8');buf=io.BytesIO();Image.fromarray(a).save(buf,format='PNG');tex=len(textures);textures.append(buf.getvalue());nx=26 if role=='work-hands' else 18 if role in ['eye-lash','eye-lid'] else 10 if role in ['ear','back-hair','connector','front-hair','body','neck-support','tail'] else 2;ny=24 if role=='work-hands' else 4 if role in ['eye-lash','eye-lid'] else 12 if nx>2 else 2
  verts=[];uv=[];indices=[];coords=[]
  for j in range(ny):
   for i in range(nx):
@@ -92,7 +93,7 @@ def eye(side,z):
  expanded.append(bind(q,'opacity',[0.]*8+[1.]))
  param('ParamEyeBlink'+side.title(),expanded,0,1,9)
 
-for e in m['parts']:
+for e in ([] if args.foreground else m['parts']):
  parent=head if e['head_child'] else root;z=100*(e['front_order']-len(m['parts']));s='left' if 'left' in e['name'].lower() else 'right' if 'right' in e['name'].lower() else None
  if e['role']=='eye':
   eye(s,z);continue
@@ -108,9 +109,27 @@ for e in m['parts']:
    sleepy=part('Original painted tiny sleepy mouth',Image.open(V/'sleepy-source-v1/mouth-sleepy.png'),offset,z-len(keys),parent,'mouth',s)
    sleepy['opacity']=0
    param('ParamDrowsyMouth',[bind(sleepy,'opacity',[0.,1.])],0,1,2)
+ elif e['role']=='body':
+  q=part(e['name'],Image.open(S/e['file']),e['offset'],z,parent,'body',s)
+  param('ParamFocus',[bind(q,'opacity',[1.,0.])],0,1,2)
+  for pose in ('typing','reading'):
+   q=imagepart(pose+' focus torso',V/'focus-source-v1'/(pose+'-body.png'),z-1,parent,'body',None);q['opacity']=0
+   param('ParamFocus'+pose.title(),[bind(q,'opacity',[0.,1.])],0,1,2)
  elif e['role']=='face':
   imagepart('Fixed clean face and original neck',V/'face-layer-rebuild-v3/face-and-neck.png',z,parent,'face',None)
  else:part(e['name'],Image.open(S/e['file']),e['offset'],z,parent,e['role'],s)
+if args.foreground:
+ enter=[];work={'Left':[],'Right':[]}
+ for pose in ('typing','reading'):
+  q=imagepart(pose+' foreground forearms and '+('keyboard' if pose=='typing' else 'book'),V/'focus-source-v1'/(pose+'-hands.png'),-100,root,'work-hands',None);q['opacity']=0
+  param('ParamFocus'+pose.title(),[bind(q,'opacity',[0.,1.])],0,1,2)
+  xy=sourcexy(q);x,y=xy.T;zero=np.zeros_like(xy);down=zero.copy();down[:,1]=30*np.clip((y-695)/200,0,1)
+  enter.append(bind(q,'deform',[down.tolist(),zero.tolist()]))
+  for side in ('Left','Right'):
+   d=zero.copy();weight=np.clip(1-np.abs(y-875)/60,0,1)*np.clip(((585-x) if side=='Left' else (x-565))/65,0,1)
+   d[:,1]=weight*(1.4 if pose=='typing' else .2);work[side].append(bind(q,'deform',[(-d).tolist(),zero.tolist(),d.tolist()]))
+ param('ParamFocus',enter,0,1,2)
+ for side in ('Left','Right'):param('ParamWork'+side,work[side])
 # Separate touch-only weight makes the bow visible without amplifying idle/chat.
 param('ParamHeadPat',[bind(head,'transform.t.y',[0.,7.]),bind(head,'transform.r.z',[0.,.025])],0,1,2)
 param('ParamHeadRoll',[bind(head,'transform.r.z',[-.055,0,.055])]);param('ParamHeadX',[bind(head,'transform.t.x',[-3.,0.,3.])]);param('ParamHeadY',[bind(head,'transform.t.y',[-3.,0.,3.])])
@@ -124,7 +143,7 @@ for p,role,xy,s in sourceparts:
  elif role=='ear':
   distance=(-57*(y-112)-95*(x-451))/110.8 if s=='left' else (102*(x-577)-107*(y-72))/147.8;weight=np.clip((distance-8)/90,0,1);center=np.array(m['ears'][s]['pivot']);v=xy-center;d[:,0]=-v[:,1]*.08*weight;d[:,1]=v[:,0]*.08*weight;ear[s].append(bind(p,'deform',[(-d).tolist(),zero.tolist(),d.tolist()]))
  elif role=='brow':brow[s].append(bind(p,'transform.t.y',[-2.,0.,2.]))
- elif role in ['body','neck-support']:
+ elif role in ['body','neck-support','work-hands']:
   d[:,1]=-1.5*np.clip((863-y)/480,0,1);breathing.append(bind(p,'deform',[(-d).tolist(),zero.tolist(),d.tolist()]))
  elif role=='tail':
   d[:,0]=10*np.clip((865-y)/430,0,1)**2;d[:,1]=3*np.clip((865-y)/430,0,1);tail.append(bind(p,'deform',[(-d).tolist(),zero.tolist(),d.tolist()]))
@@ -133,6 +152,6 @@ for s in ('left','right'):
 param('ParamHairFront',hair['front']);param('ParamBreath',breathing);param('ParamTailDeform',tail)
 for name in ['ParamSmile','ParamSleepy','ParamSleepyLeft','ParamSleepyRight','ParamEmbarrassed','ParamEyeDeformLeft','ParamLidCurveLeft','ParamBodyZ','ParamTailSwing']:param(name,[])
 model={'meta':{'name':'MewNook v4 Source Art Review','version':'v0.9.0','rigger':'MewNook','artist':'Original MewNook art and registered hidden/pose repaint','rights':None,'copyright':'MewNook','licenseURL':'','contact':'','reference':'','thumbnailId':NULL,'preservePixels':False,'sourceArtOpacityBindings':True},'physics':{'pixelsPerMeter':2000.,'gravity':9.8},'nodes':root,'param':params,'automation':[],'animations':[],'groups':[]}
-parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,default=V/'rig/MewNook-v4-source-rig.inx');args=parser.parse_args();payload=json.dumps(model,separators=(',',':'),ensure_ascii=False).encode();blob=bytearray(b'TRNSRTS\0')+struct.pack('>I',len(payload))+payload+b'TEX_SECT'+struct.pack('>I',len(textures))
+args.output=args.output or (V/('rig/MewNook-v4-hands.inx' if args.foreground else 'rig/MewNook-v4-source-rig.inx'));payload=json.dumps(model,separators=(',',':'),ensure_ascii=False).encode();blob=bytearray(b'TRNSRTS\0')+struct.pack('>I',len(payload))+payload+b'TEX_SECT'+struct.pack('>I',len(textures))
 for tex in textures:blob+=struct.pack('>I',len(tex))+b'\0'+tex
 args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_bytes(blob);print(len(sourceparts),'parts',len(params),'parameters',len(blob),'bytes',args.output)

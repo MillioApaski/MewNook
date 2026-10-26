@@ -1,5 +1,6 @@
 import {useEffect, useRef} from 'react'
 import type {CompanionActivity} from './companionActivity'
+import {useFocusHands} from './useFocusHands'
 import{sourceArtFrame}from'./sourceArtFrame'
 import{chatExpression,expressionPose}from'../../public/inochi2d-test/chatExpression.js'
 
@@ -36,12 +37,20 @@ interface Props {
   scale: number
   activity: CompanionActivity
   speechText?:string
+  focusPose?:'reading'|'typing'|null
+  workSurfaceReady?:boolean
+  handsHost?:HTMLDivElement|null
   touches: number
   onStatus: (status:InochiTestStatus,error?:string)=>void
 }
 
-export function InochiTestCharacter({model,active,scale,activity,speechText='',touches,onStatus}:Props){
+export function InochiTestCharacter({model,active,scale,activity,speechText='',focusPose=null,handsHost=null,workSurfaceReady=true,touches,onStatus}:Props){
   const canvasRef=useRef<HTMLCanvasElement|null>(null)
+  const hands=useFocusHands({active:active&&model==='v4',requested:!!focusPose,host:handsHost,body:canvasRef,scale})
+  const focusRef=useRef(focusPose);focusRef.current=focusPose
+  const surfaceReadyRef=useRef(workSurfaceReady);surfaceReadyRef.current=workSurfaceReady
+  const focusWeights=useRef({typing:0,reading:0})
+  const handsPaused=useRef(true)
   const controllerRef=useRef<Controller|null>(null)
   const namesRef=useRef<string[]>([])
   const firstTouchRef=useRef(touches)
@@ -71,9 +80,9 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261024-headpat':'/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261026-focus':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261024-retrigger'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261026-focus'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
         actionMixerRef.current=actionsRef.current.createActionMixer()
       }
@@ -83,7 +92,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       if(disposed){await controller.unmount();return}
       controllerRef.current=controller
       await controller.mount(canvas)
-      visibilityHandler=()=>controller?.setRenderPolicy?.({paused:document.visibilityState==='hidden',maxFps:window.matchMedia('(max-width:680px)').matches?30:60})
+      visibilityHandler=()=>{controller?.setRenderPolicy?.({paused:document.visibilityState==='hidden',maxFps:window.matchMedia('(max-width:680px)').matches?30:60});const paused=document.visibilityState==='hidden'||focusWeights.current.typing+focusWeights.current.reading===0;hands.controller.current?.setRenderPolicy({paused,maxFps:30});handsPaused.current=paused}
       document.addEventListener('visibilitychange',visibilityHandler)
       visibilityHandler()
       const resize=()=>{
@@ -113,7 +122,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261024-headpat'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261026-focus'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -134,7 +143,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
-      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261024-headpat':'legacy'
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261026-focus':'legacy'
       resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
@@ -222,16 +231,32 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
       state.sleepy+=((sleepy?0.95:focused?0.12:0)-state.sleepy)*0.12
       // Smooth new-text speech and release the mouth when the reply finishes.
       state.mouth+=((talking?(0.52+0.38*Math.abs(Math.sin(t*4.8))):0)-state.mouth)*0.25
-      const set=(name:string,val:number)=>void c.setParameter?.(name,val)
+      const set=(name:string,val:number)=>{
+        void c.setParameter?.(name,val)
+        if(['ParamFocus','ParamFocusTyping','ParamFocusReading','ParamWorkLeft','ParamWorkRight','ParamBreath'].includes(name))void hands.controller.current?.setParameter(name,val)
+      }
       if(v4){
         if(!actionsRef.current)return
         const actions=actionsRef.current
+        const weights=focusWeights.current,requested=hands.controller.current&&surfaceReadyRef.current?focusRef.current:null
+        for(const key of ['typing','reading'] as const){
+          weights[key]+=((requested===key?1:0)-weights[key])*.32
+          if(Math.abs(weights[key]-(requested===key?1:0))<.001)weights[key]=requested===key?1:0
+        }
+        const focus=weights.typing+weights.reading
+        set('ParamFocus',focus);set('ParamFocusTyping',weights.typing);set('ParamFocusReading',weights.reading)
+        set('ParamWorkLeft',Math.sin(t*(requested==='typing'?7.5:1.3))*focus)
+        set('ParamWorkRight',Math.sin(t*(requested==='typing'?8.2:1.1)+1.2)*focus)
+        const paused=focus===0
+        if(hands.controller.current&&paused!==handsPaused.current){hands.controller.current.setRenderPolicy({paused,maxFps:30});handsPaused.current=paused}
+
         const response=actions.sampleAction(touched?'tap':'none',current-tapStartedRef.current)
         response.sleepy=state.sleepy
         response.mouth=state.mouth
         if(!touched){
           response.brow=talking?-.2:0
           if(talking)Object.assign(response,expressionPose(chatExpression(speechRef.current)))
+          else if(requested){response.headY=.28;response.brow=.1}
         }
         const motion=focused?.4:sleepy?.3:1
         const pose=actionMixerRef.current?.(response,current,touched?tapStartedRef.current:0)??response
@@ -250,6 +275,9 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
           canvasRef.current.dataset.drowsyMouth=values.ParamDrowsyMouth.toFixed(3)
           canvasRef.current.dataset.headRoll=values.ParamHeadRoll.toFixed(3)
           canvasRef.current.dataset.headPatRevision=String(touched?tapStartedRef.current:0)
+          canvasRef.current.dataset.focusPose=requested??'idle'
+          canvasRef.current.dataset.focusBlend=focus.toFixed(3)
+          canvasRef.current.closest<HTMLElement>('.art-stage')?.style.setProperty('--focus-blend',String(focus))
         }
         return
       }
@@ -286,5 +314,5 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',t
     return()=>{window.clearInterval(clock);document.removeEventListener('visibilitychange',sync)}
   },[active,activity])
 
-  return <canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'正坐姿动态猫娘':'旧版动态猫娘'} />
+  return <><canvas ref={canvasRef} className="inochi-demo-canvas" data-activity={activity} aria-label={model==='v4'?'正坐姿动态猫娘':'旧版动态猫娘'} />{hands.portal}</>
 }

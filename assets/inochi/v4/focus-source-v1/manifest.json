@@ -1,0 +1,65 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "offset": [
+    345,
+    375
+  ],
+  "split_source_y": 695,
+  "poses": {
+    "typing": {
+      "original_upper_torso_exact": true,
+      "body_sha256": "f3c74a244ac5b8c99502a7edc15f1c5b47300d95a84d98b202c68fa8f5cc87fb",
+      "hands_sha256": "1ac3ec7ce98dd6792abb1b240442090e5873129dea5fe9c4e96c18332e44f844"
+    },
+    "reading": {
+      "original_upper_torso_exact": true,
+      "body_sha256": "8445296127e3e3d845f9c157ed9123de5aada8bf663b46a9edc3fe5e7a5e0283",
+      "hands_sha256": "3a6d9c8be177651b3bd518863b88d42e7ecdb6556c2d0e92273582ff2b6c9a9f"
+    }
+  },
+  "desk_patches": {
+    "day": {
+      "native_box": [
+        190,
+        730,
+        770,
+        900
+      ],
+      "sha256": "167cda8970a95fc432412eb5bbebb3fbfd63c95267cb48ccbc647fc7fa03fa34",
+      "outside_box_transparent": true
+    },
+    "rain": {
+      "native_box": [
+        200,
+        730,
+        825,
+        910
+      ],
+      "sha256": "b766251af47e86bb5a8634db3eebd75edfe3bf354b85e426b8d4769bcc480a81",
+      "outside_box_transparent": true
+    },
+    "sunset": {
+      "native_box": [
+        180,
+        735,
+        815,
+        910
+      ],
+      "sha256": "1197b6de3cfb54c69570d69b5890a62424c48ea3d68dc2f6921fc7b56e177ac5",
+      "outside_box_transparent": true
+    },
+    "night": {
+      "native_box": [
+        250,
+        695,
+        945,
+        905
+      ],
+      "sha256": "ab45324db12eeb3714590664ec11c129ad33da4866b56192304c9330009c9017",
+      "outside_box_transparent": true
+    }
+  }
+}
