@@ -38,7 +38,11 @@ jobs:
           python scripts/check-mewnook-v4-motion.py public/inochi2d-test/models/MewNook-v4.inx
           python scripts/prepare-v4-sleepy-source.py
           python scripts/register-v4-fixed-face.py
+          python scripts/prepare-v4-focus-source.py
+          python scripts/prepare-v4-focus-head.py
           python scripts/build-mewnook-v4-source-rig.py
+          python scripts/build-mewnook-v4-source-rig.py --foreground
+          cp assets/inochi/v4/rig/MewNook-v4-hands.inx public/inochi2d/v4/MewNook-hands.inx
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d-test/models/MewNook-v4-review.inx
           cp assets/inochi/v4/rig/MewNook-v4-source-rig.inx public/inochi2d/v4/MewNook.inx
       - name: Standalone action timeline tests
@@ -100,6 +104,8 @@ jobs:
         run: node scripts/check-room-source.mjs
       - name: Verify chat expressions, mobile budget and offline cache
         run: node scripts/check-chat-performance.mjs
+      - name: Verify focus poses and hand-desktop occlusion
+        run: node scripts/check-focus-working.mjs
       - name: Verify existing tabs reload after PWA updates
         run: node scripts/check-pwa-update.mjs
       - name: Verify source artwork bindings in real Chromium
@@ -120,6 +126,8 @@ jobs:
             /tmp/inochi-v4-review
             /tmp/mewnook-source-room
             assets/inochi/v4/validation/source-runtime
+            assets/inochi/v4/validation/focus-working
+            public/inochi2d/v4/MewNook-hands.inx
             public/inochi2d-test/models/MewNook-v4-review.inx
           if-no-files-found: ignore
       - name: Save validated standalone candidate on internal PR branch
@@ -131,7 +139,7 @@ jobs:
           git fetch origin "$REVIEW_BRANCH"
           test "$(git rev-parse FETCH_HEAD)" = "$REVIEW_HEAD" || { echo "Branch moved; skip stale candidate"; exit 0; }
           git checkout -B review-candidate "$REVIEW_HEAD"
-          git add public/inochi2d-test/models/MewNook-v4-review.inx
+          git add public/inochi2d-test/models/MewNook-v4-review.inx public/inochi2d/v4/MewNook.inx public/inochi2d/v4/MewNook-hands.inx public/inochi2d/v4/focus-desk-*.png
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -141,7 +149,7 @@ jobs:
       - name: Commit pinned Inochi2D test assets into repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          git add public/inochi2d-test/
+          git add public/inochi2d-test/ public/inochi2d/v4/
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

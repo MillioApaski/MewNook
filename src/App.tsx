@@ -128,6 +128,9 @@ export default function App() {
   const [dialogueSequence, setDialogueSequence] = useState(0)
   const [dialogueTimeoutMs, setDialogueTimeoutMs] = useState(6500)
   const [sceneLine, setSceneLine] = useState<string | null>(null)
+  const [handsHost,setHandsHost]=useState<HTMLDivElement|null>(null)
+  const [focusStarted,setFocusStarted]=useState(false)
+  const [focusDeskScene,setFocusDeskScene]=useState('')
   const [focusPose, setFocusPose] = useSavedState<'auto' | 'reading' | 'typing'>('focusPose', 'auto')
   const [inochiStatus, setInochiStatus] = useState<InochiTestStatus>('off')
   const [inochiError, setInochiError] = useState('')
@@ -217,6 +220,7 @@ export default function App() {
   const activeArtPose = timer.running && timer.phase === 'focus'
     ? (focusPose === 'auto' ? (activeTask ? 'typing' : 'reading') : focusPose)
     : null
+  useEffect(()=>{if(activeArtPose)setFocusStarted(true)},[activeArtPose])
   const mood: Mood = moodOverride || (timer.phase === 'focus' && timer.running ? (activeTask ? 'typing' : 'reading') : timer.phase !== 'focus' ? 'stretch' : roomScene === 'night' ? 'sleepy' : 'idle')
   const showName = settings.nickname.trim() || '你'
   const handleCompanionClick = () => {
@@ -256,7 +260,7 @@ export default function App() {
     if (!timer.running && timer.phase === 'focus') {
       setMoodOverride(null)
       showDialogue('专注时间开始啦。我也会一起' +
-        ((focusPose === 'typing' || (focusPose === 'auto' && activeTask)) ? '写字，安静陪着你。' : '看书，安静陪着你。'))
+        ((focusPose === 'typing' || (focusPose === 'auto' && activeTask)) ? '打字，安静陪着你。' : '看书，安静陪着你。'))
     }
     // Use the same timestamp for the countdown deadline and its first render.
     // Otherwise Math.ceil can briefly display one extra second on start.
@@ -514,10 +518,11 @@ export default function App() {
           {settings.inochiModel==='v4' && <><SourceCharacterPoster scale={settings.inochiScale||0.32}/><SourceHeadTarget scale={settings.inochiScale||0.32} onPat={handleCompanionClick}/></>}
           <InochiTestCharacter key={settings.inochiModel === 'v4' ? 'v4' : 'v3'} model={settings.inochiModel === 'v4' ? 'v4' : 'v3'} active={settings.inochiTestMode} scale={settings.inochiScale||0.32}
             activity={companionActivity({phase:timer.phase,running:timer.running,night:roomScene==='night',speaking:speechUntil>0})}
-            speechText={speechUntil>0?speechText:''} touches={inochiTouches} onStatus={reportInochiStatus}/>
+            speechText={speechUntil>0?speechText:''} focusPose={activeArtPose} handsHost={handsHost} workSurfaceReady={focusDeskScene===roomScene} touches={inochiTouches} onStatus={reportInochiStatus}/>
         </div>}
         </div>
         <img data-room-layer="desk" className="art-foreground art-desk-layer" src={'/assets/rooms/' + illustratedScene + '/desk.svg'} alt="" draggable={false}/>
+        {settings.inochiTestMode&&settings.inochiModel==='v4'&&<div className="source-hands-layer" data-room-layer="hands" ref={setHandsHost}>{focusStarted&&<img className="art-foreground focus-desk-patch" src={'/inochi2d/v4/focus-desk-'+illustratedScene+'.png?rig=focus-v1'} onLoad={()=>setFocusDeskScene(illustratedScene)} alt="" draggable={false}/>}</div>}
       </div>}
       <div className="room-wall-texture" aria-hidden="true"/>
       <div className="room-window" aria-hidden="true"><div className="window-moon"/><div className="window-hills"/><div className="window-city"/><div className="window-rain"/><div className="window-frame cross"/><div className="window-frame vertical"/></div>
@@ -579,7 +584,7 @@ export default function App() {
           <div className="clock-display"><span>{timeLabel(remaining)}</span><svg viewBox="0 0 270 12" preserveAspectRatio="none"><rect width="270" height="12" rx="6" fill="#e8e7f1"/><rect width={270 * progress / 100} height="12" rx="6" fill="#8b98ce"/></svg></div>
           <div className="timer-actions"><button className="primary-button" onClick={toggleTimer}>{timer.running ? <Pause size={18}/> : <Play size={18} fill="currentColor"/>}{timer.running ? '暂停专注' : remaining < currentDuration ? '继续计时' : '开始专注'}</button><ButtonIcon title="重置当前计时" onClick={resetTimer}><RotateCcw size={18}/></ButtonIcon></div>
           <div className="timer-task"><span>本轮任务</span><select aria-label="本轮专注关联任务" value={timer.selectedTaskId || ''} onChange={e => setTimer(t => ({...t,selectedTaskId:e.target.value || null}))}><option value="">自由专注</option>{tasks.filter(t=>!t.done).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></div>
-          <div className="timer-task focus-pose-control"><span>猫娘专注动作</span><select aria-label="专注时猫娘的动作" value={focusPose} onChange={e => setFocusPose(e.target.value as 'auto' | 'reading' | 'typing')}><option value="auto">自动（自由看书／任务打字）</option><option value="reading">专注看书</option><option value="typing">专注写字 / 打字</option></select></div>
+          <div className="timer-task focus-pose-control"><span>猫娘专注动作</span><select aria-label="专注时猫娘的动作" value={focusPose} onChange={e => setFocusPose(e.target.value as 'auto' | 'reading' | 'typing')}><option value="auto">自动（自由看书／任务打字）</option><option value="reading">专注看书</option><option value="typing">专注打字</option></select></div>
           <div className="timer-summary"><span><Sparkles size={16}/> 今日累计 <strong>{todayMinutes} 分钟</strong></span><span><Check size={16}/> 完成 <strong>{completedToday}/{todayTasks.length} 项</strong></span></div>
           <button className="drawer-secondary-link" onClick={() => openPanel('tasks')}>安排今天的计划 <ChevronRight size={16}/></button>
         </section>}

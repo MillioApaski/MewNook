@@ -1,0 +1,67 @@
+{
+  "canvas": [
+    1122,
+    1402
+  ],
+  "offset": [
+    345,
+    375
+  ],
+  "split_source_y": 695,
+  "torso_backing": "registered fabric fill, no resting sleeves",
+  "foreground_excludes_center_torso": true,
+  "poses": {
+    "typing": {
+      "original_upper_torso_exact": true,
+      "body_sha256": "c9ea2783bd361f8433697f99ccefff9727010fe7495422f1b3aa5259834178be",
+      "hands_sha256": "e49c1815298df237f987864ba8549aa69de335c7f8ba117740c9ed3686a36da7"
+    },
+    "reading": {
+      "original_upper_torso_exact": true,
+      "body_sha256": "6bdd0fb43d5e2e497cfd3b5a24cdf4abaa85e0151fb0bdaddb0395055be85ce6",
+      "hands_sha256": "9e8abe21e62b722c0d888ba84115a7a488165715467e32d2e44c38afce5fc6c1"
+    }
+  },
+  "desk_patches": {
+    "day": {
+      "native_box": [
+        190,
+        730,
+        770,
+        900
+      ],
+      "sha256": "167cda8970a95fc432412eb5bbebb3fbfd63c95267cb48ccbc647fc7fa03fa34",
+      "outside_box_transparent": true
+    },
+    "rain": {
+      "native_box": [
+        200,
+        730,
+        825,
+        910
+      ],
+      "sha256": "b766251af47e86bb5a8634db3eebd75edfe3bf354b85e426b8d4769bcc480a81",
+      "outside_box_transparent": true
+    },
+    "sunset": {
+      "native_box": [
+        180,
+        735,
+        815,
+        910
+      ],
+      "sha256": "1197b6de3cfb54c69570d69b5890a62424c48ea3d68dc2f6921fc7b56e177ac5",
+      "outside_box_transparent": true
+    },
+    "night": {
+      "native_box": [
+        250,
+        695,
+        945,
+        905
+      ],
+      "sha256": "ab45324db12eeb3714590664ec11c129ad33da4866b56192304c9330009c9017",
+      "outside_box_transparent": true
+    }
+  }
+}

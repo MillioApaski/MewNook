@@ -1,0 +1,24 @@
+{
+  "registration": {
+    "scale": 0.5511083123425693,
+    "offset": [
+      121,
+      40
+    ],
+    "uniform": true,
+    "neck_anchor": [
+      598,
+      430
+    ]
+  },
+  "blink_input_offset": [
+    13,
+    1
+  ],
+  "mouth_input_offset": [
+    0,
+    1
+  ],
+  "protected_head_proportions": true,
+  "head_scale_parameter": false
+}

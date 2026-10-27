@@ -1,0 +1,293 @@
+{
+  "cases": [
+    {
+      "scene": "day",
+      "width": 1440,
+      "height": 1000,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8065,
+        "frontScale": 0.80645,
+        "top": 71.97431999999998,
+        "frontTop": 72,
+        "region": [
+          326,
+          830,
+          649,
+          895
+        ]
+      },
+      "foregroundPixels": 17290,
+      "visibleHandPixels": 5132,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "day",
+      "width": 2560,
+      "height": 1080,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.871,
+        "frontScale": 0.87097,
+        "top": 126.51016999999996,
+        "frontTop": 126.523,
+        "region": [
+          759,
+          945,
+          1108,
+          1015
+        ]
+      },
+      "foregroundPixels": 9461,
+      "visibleHandPixels": 7729,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "rain",
+      "width": 1440,
+      "height": 1000,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8065,
+        "frontScale": 0.80645,
+        "top": 71.97431999999998,
+        "frontTop": 72,
+        "region": [
+          326,
+          830,
+          649,
+          895
+        ]
+      },
+      "foregroundPixels": 19436,
+      "visibleHandPixels": 5682,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "sunset",
+      "width": 1440,
+      "height": 1000,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8065,
+        "frontScale": 0.80645,
+        "top": 71.97431999999998,
+        "frontTop": 72,
+        "region": [
+          326,
+          830,
+          649,
+          895
+        ]
+      },
+      "foregroundPixels": 18122,
+      "visibleHandPixels": 6303,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "night",
+      "width": 1440,
+      "height": 1000,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8065,
+        "frontScale": 0.80645,
+        "top": 71.97431999999998,
+        "frontTop": 72,
+        "region": [
+          326,
+          830,
+          649,
+          895
+        ]
+      },
+      "foregroundPixels": 17838,
+      "visibleHandPixels": 6269,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "night",
+      "width": 2048,
+      "height": 1098,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.8855,
+        "frontScale": 0.88548,
+        "top": 71.990005,
+        "frontTop": 72,
+        "region": [
+          577,
+          904,
+          932,
+          976
+        ]
+      },
+      "foregroundPixels": 20688,
+      "visibleHandPixels": 7866,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    },
+    {
+      "scene": "day",
+      "width": 390,
+      "height": 844,
+      "layers": [
+        [
+          "background",
+          0
+        ],
+        [
+          "character",
+          2
+        ],
+        [
+          "desk",
+          3
+        ],
+        [
+          "hands",
+          4
+        ]
+      ],
+      "geometry": {
+        "scale": 0.6161,
+        "frontScale": 0.61611,
+        "top": 112.2396875,
+        "frontTop": 112.236,
+        "region": [
+          95,
+          691,
+          343,
+          741
+        ]
+      },
+      "foregroundPixels": 4644,
+      "visibleHandPixels": 3876,
+      "poseSwitch": true,
+      "headPatKeepsWorking": true,
+      "pauseRestoresIdle": true
+    }
+  ],
+  "errors": [],
+  "paintedHeadWithoutSquash": true,
+  "waistBackingOpaque": true,
+  "foregroundExcludesTorso": true,
+  "sceneSwitchDuringFocus": true,
+  "cachedFocusOffline": true,
+  "handsLoadFailureKeepsBody": true,
+  "bodySha256": "53612c67f9d6ffebd4fbdbbe10aed36e1099089655b2a16b7df90d12ad0e4dcb",
+  "handsSha256": "34266bfb5acec3760dff0958bbcc7768bef5458220f2abbe34ed4f76a6d26da0"
+}
