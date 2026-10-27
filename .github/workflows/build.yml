@@ -39,6 +39,7 @@ jobs:
           python scripts/prepare-v4-sleepy-source.py
           python scripts/register-v4-fixed-face.py
           python scripts/prepare-v4-focus-source.py
+          python scripts/prepare-v4-focus-head.py
           python scripts/build-mewnook-v4-source-rig.py
           python scripts/build-mewnook-v4-source-rig.py --foreground
           cp assets/inochi/v4/rig/MewNook-v4-hands.inx public/inochi2d/v4/MewNook-hands.inx

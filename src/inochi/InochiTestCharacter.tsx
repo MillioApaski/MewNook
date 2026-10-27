@@ -80,9 +80,9 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
     onStatus('loading')
     void (async()=>{
       if(!canvas.getContext('webgl2'))throw new Error('浏览器缺少 WebGL2 支持')
-      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261027-focus-fix':'/inochi2d-test/runtime/inochi_bridge.js'
+      const moduleUrl=model==='v4'?'/inochi2d-test/runtime/inochi_source_bridge.js?rig=source-art-20261028-focus-head':'/inochi2d-test/runtime/inochi_bridge.js'
       if(model==='v4'){
-        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261027-focus-fix'
+        const actionsUrl='/inochi2d-test/actions.js?rig=source-art-20261028-focus-head'
         actionsRef.current=await import(/* @vite-ignore */ actionsUrl) as SourceActions
         actionMixerRef.current=actionsRef.current.createActionMixer()
       }
@@ -122,7 +122,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
       await controller.setCameraTransform(0,120,scale)
       if(disposed)return
       const candidates=model==='v4' ? [
-        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261027-focus-fix'},
+        {name:'v4',url:'/inochi2d/v4/MewNook.inx?rig=source-art-20261028-focus-head'},
         {name:'v3',url:'/inochi2d-test/models/MewNook-v3.inx?rig=tilted-lid-v2-20261015'},
         {name:'v2',url:'/inochi2d-test/models/MewNook-v2.inx?rig=tilted-lid-v2-20261015'}
       ] : [
@@ -143,7 +143,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
       loadedModelRef.current=loadedModel
       canvas.dataset.modelVersion=loadedModel
       canvas.dataset.requestedModel=model
-      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261027-focus-fix':'legacy'
+      canvas.dataset.modelRevision=loadedModel==='v4'?'source-art-20261028-focus-head':'legacy'
       resize()
       if(disposed)return
       namesRef.current=controller.getAnimationNames?.()||[]
@@ -244,7 +244,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
           if(Math.abs(weights[key]-(requested===key?1:0))<.001)weights[key]=requested===key?1:0
         }
         const focus=weights.typing+weights.reading
-        set('ParamWorkLookDown',focus*(touched?.35:1));
+        set('ParamWorkLookDown',focus);
         set('ParamFocus',focus);set('ParamFocusTyping',weights.typing);set('ParamFocusReading',weights.reading)
         set('ParamWorkLeft',Math.sin(t*(requested==='typing'?7.5:1.3))*focus)
         set('ParamWorkRight',Math.sin(t*(requested==='typing'?8.2:1.1)+1.2)*focus)
@@ -261,7 +261,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
         }
         const motion=focused?.4:sleepy?.3:1
         const pose=actionMixerRef.current?.(response,current,touched?tapStartedRef.current:0)??response
-        const lookClosure=focus*(touched?0:.36)
+        const lookClosure=0
         const values=actions.sourceArtParameters(pose,Math.max(blink,lookClosure),Math.sin(t*.82)*.2*motion)
         values.ParamBreath=Math.sin(t*(sleepy?1.25:2))*(focused?.42:.65)
         values.ParamTailDeform=Math.sin(t*.94+1.7)*.28*motion
@@ -279,7 +279,7 @@ export function InochiTestCharacter({model,active,scale,activity,speechText='',f
           canvasRef.current.dataset.headPatRevision=String(touched?tapStartedRef.current:0)
           canvasRef.current.dataset.focusPose=requested??'idle'
           canvasRef.current.dataset.focusBlend=focus.toFixed(3)
-          canvasRef.current.dataset.workLookDown=(focus*(touched?.35:1)).toFixed(3)
+          canvasRef.current.dataset.workLookDown=(focus).toFixed(3)
           canvasRef.current.closest<HTMLElement>('.art-stage')?.style.setProperty('--focus-blend',String(focus))
         }
         return

@@ -282,22 +282,12 @@
     }
   ],
   "errors": [],
+  "paintedHeadWithoutSquash": true,
   "waistBackingOpaque": true,
   "foregroundExcludesTorso": true,
   "sceneSwitchDuringFocus": true,
   "cachedFocusOffline": true,
   "handsLoadFailureKeepsBody": true,
-  "bodySha256": "ee28f666f273ca6addf3fb05e9be8dcc4151fb83765561b630634accd763ca9c",
-  "handsSha256": "5313e56afad475b1840d4df50383e09574595319e4b5b11a1427a0fe1d19a72e",
-  "validation": {
-    "unitTests": 32,
-    "build": "passed",
-    "productionRoom": "passed",
-    "fixedFace": {
-      "closedBluePixels": 0,
-      "closedEyeballContributionPixels": 0,
-      "protectedCheekChanges": 0,
-      "protectedHairChanges": 0
-    }
-  }
+  "bodySha256": "53612c67f9d6ffebd4fbdbbe10aed36e1099089655b2a16b7df90d12ad0e4dcb",
+  "handsSha256": "34266bfb5acec3760dff0958bbcc7768bef5458220f2abbe34ed4f76a6d26da0"
 }

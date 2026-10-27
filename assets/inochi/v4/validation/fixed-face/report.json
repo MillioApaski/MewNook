@@ -31,7 +31,27 @@
   "resetChangedPixels": 0,
   "hairWindResetChangedPixels": 0,
   "headRollResetChangedPixels": 0,
-  "modelSha256": "07770a894d0d81a2643a9f1cf68d0bb3459c118ffcaddda929b336457ea4234d",
+  "studyingEyes": [
+    {
+      "closure": 0.25,
+      "protectedCrownChanges": 0
+    },
+    {
+      "closure": 0.5,
+      "protectedCrownChanges": 0
+    },
+    {
+      "closure": 0.75,
+      "protectedCrownChanges": 0
+    },
+    {
+      "closure": 1,
+      "protectedCrownChanges": 0,
+      "exposedBluePixels": 0
+    }
+  ],
+  "studyResetChangedPixels": 0,
+  "modelSha256": "53612c67f9d6ffebd4fbdbbe10aed36e1099089655b2a16b7df90d12ad0e4dcb",
   "browser": "153.0.8010.0",
   "fixedFace": "single static texture; separate eyeball, moving upper/lower lid meshes and hair"
 }

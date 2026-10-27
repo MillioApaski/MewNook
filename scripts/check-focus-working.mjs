@@ -7,6 +7,11 @@ const origin=process.env.ROOM_TEST_ORIGIN||'http://127.0.0.1:4173',out='assets/i
 await mkdir(out,{recursive:true})
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl']})
 const report={cases:[],errors:[]}
+const modelBytes=await readFile('public/inochi2d/v4/MewNook.inx')
+const model=JSON.parse(modelBytes.subarray(12,12+modelBytes.readUInt32BE(8)).toString())
+const look=model.param.find(p=>p.name==='ParamWorkLookDown')
+assert.ok(look.bindings.length>0&&look.bindings.every(b=>b.param_name==='opacity'),'Looking down must switch painted artwork, never squash the head')
+report.paintedHeadWithoutSquash=true
 for(const pose of ['reading','typing']){
  const body=PNG.sync.read(await readFile(`assets/inochi/v4/focus-source-v1/${pose}-body.png`))
  const hands=PNG.sync.read(await readFile(`assets/inochi/v4/focus-source-v1/${pose}-hands.png`))
@@ -60,6 +65,7 @@ try{
   await p.locator('.source-head-target').click()
   await p.waitForFunction(()=>document.querySelector('.inochi-demo-canvas').dataset.headPat==='active')
   assert.equal(await p.locator('.inochi-demo-canvas').getAttribute('data-focus-pose'),'typing')
+  assert.equal(await p.locator('.inochi-demo-canvas').getAttribute('data-work-look-down'),'1.000')
   if(scene==='day'&&width===1440){
    await p.getByRole('button',{name:'设置',exact:true}).click()
    await p.getByRole('combobox',{name:'场景',exact:true}).selectOption('rain')

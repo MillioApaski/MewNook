@@ -51,5 +51,24 @@ try{
   await capture('head-roll-'+(direction>0?'positive':'negative'))
  }
  await p.evaluate(()=>window.probe.action('none',0));const headReset=await capture('reset');report.headRollResetChangedPixels=difference(original,headReset,[0,0,650,750]);assert.equal(report.headRollResetChangedPixels,0)
+ // The working head is separate artwork. Its eyelids/mouth must not move
+ // its crown or leave the old front-facing face visible underneath.
+ await p.evaluate(()=>window.probe.set({ParamWorkLookDown:1,ParamEyeBlinkLeft:0,ParamEyeBlinkRight:0}));const study=await capture('study-open')
+ report.studyingEyes=[]
+ for(const closure of [.25,.5,.75,1]){
+  await p.evaluate(closure=>window.probe.set({ParamEyeBlinkLeft:closure,ParamEyeBlinkRight:closure}),closure)
+  const frame=await capture('study-blink-'+closure)
+  assert.equal(difference(study,frame,[0,0,650,250]),0,'Study blink changed the crown/head proportions')
+  let blue=0
+  if(closure===1){for(const box of [[195,324,299,386],[352,274,454,355]])for(let y=box[1];y<box[3];y++)for(let x=box[0];x<box[2];x++){
+   const i=(y*frame.width+x)*4;if(frame.data[i+2]-frame.data[i]>45&&frame.data[i+2]-frame.data[i+1]>20&&frame.data[i]<150)blue++
+  }assert.ok(blue<6,'Study eyes leak through the closed lid: '+blue)}
+  report.studyingEyes.push({closure,protectedCrownChanges:0,...(closure===1?{exposedBluePixels:blue}:{})})
+ }
+ await p.evaluate(()=>window.probe.set({ParamEyeBlinkLeft:0,ParamEyeBlinkRight:0,ParamMouthOpen:1}));const speaking=await capture('study-speaking')
+ assert.ok(difference(study,speaking,[320,392,365,427])>5,'Study speaking mouth is missing')
+ await p.evaluate(async()=>{await window.probe.set({ParamWorkLookDown:0});await window.probe.action('none',0)})
+ const restored=await capture('study-reset');assert.equal(difference(original,restored,[0,0,650,750]),0,'Study pose did not restore the original face')
+ report.studyResetChangedPixels=0
  report.modelSha256=createHash('sha256').update(await readFile(path.join(root,'assets/inochi/v4/rig/MewNook-v4-source-rig.inx'))).digest('hex');report.browser=await b.version();report.fixedFace='single static texture; separate eyeball, moving upper/lower lid meshes and hair';await writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report))
 }finally{await b?.close();server.close()}
